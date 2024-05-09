@@ -1,11 +1,13 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import { ThemeProvider } from '@/components/theme-provider'
-import MetamaskProvider from '@/providers'
+import '@rainbow-me/rainbowkit/styles.css'
 import './globals.css'
+import { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import { ThemeProvider } from '@/providers/ThemeProvider'
+// import MetamaskProvider from '@/providers'
 import { Toaster } from '@/components/ui/toaster'
 import { Header } from '@/components/Header'
 import Footer from '@/components/Footer'
+import { WalletProvider } from '@/providers/WalletProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -22,7 +24,8 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body className={inter.className}>
-        <MetamaskProvider>
+        <WalletProvider>
+          {/* <MetamaskProvider> */}
           <ThemeProvider
             attribute='class'
             defaultTheme='system'
@@ -34,7 +37,8 @@ export default function RootLayout({
             <Footer />
             <Toaster />
           </ThemeProvider>
-        </MetamaskProvider>
+          {/* </MetamaskProvider> */}
+        </WalletProvider>
       </body>
     </html>
   )

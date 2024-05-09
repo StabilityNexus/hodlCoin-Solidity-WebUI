@@ -1,7 +1,7 @@
 'use client'
 
 import React, { createContext } from 'react'
-import MetamaskContext from '@/contexts'
+import MetamaskContext from '@/contexts/EthersContext'
 import { connectMetamask } from '@/utils/connectMetamask'
 
 export default function MetamaskProvider({

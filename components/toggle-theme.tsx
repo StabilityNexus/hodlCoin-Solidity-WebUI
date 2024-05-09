@@ -15,6 +15,16 @@ import {
 export function ModeToggle() {
   const { setTheme } = useTheme()
 
+  function toggleDarkMode() {
+    localStorage.setItem('color-scheme', 'dark')
+    setTheme('dark')
+  }
+
+  function toggleLightMode() {
+    localStorage.setItem('color-scheme', 'light')
+    setTheme('light')
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -25,15 +35,11 @@ export function ModeToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
-        <DropdownMenuItem onClick={() => setTheme('light')}>
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('dark')}>
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('system')}>
+        <DropdownMenuItem onClick={toggleLightMode}>Light</DropdownMenuItem>
+        <DropdownMenuItem onClick={toggleDarkMode}>Dark</DropdownMenuItem>
+        {/* <DropdownMenuItem onClick={() => setTheme('system')}>
           System
-        </DropdownMenuItem>
+        </DropdownMenuItem> */}
       </DropdownMenuContent>
     </DropdownMenu>
   )

@@ -7,14 +7,15 @@ import React from 'react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { NavBar } from './NavBar'
-import MetamaskContext from '@/contexts'
-import { Button } from './ui/button'
+// import MetamaskContext from '@/contexts/EthersContext'
+// import { Button } from './ui/button'
 import { ModeToggle } from './toggle-theme'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
 
 export function Header() {
-  const { signer, account, connectWallet } = React.useContext(
-    MetamaskContext,
-  ) as any
+  // const { signer, account, connectWallet } = React.useContext(
+  //   MetamaskContext,
+  // ) as any
 
   return (
     <div className='fixed w-full h-16 bottom-0 lg:top-0 z-20 flex flex-col shadow-xl border-b-[1px] border-secondary justify-center backdrop-blur-md bg-background/15'>
@@ -50,14 +51,16 @@ export function Header() {
 
           <ModeToggle />
 
-          <Button onClick={connectWallet}>
+          <ConnectButton />
+
+          {/* <Button onClick={connectWallet}>
             {signer
               ? 'Connected: ' +
                 account?.substring(0, 5) +
                 '...' +
                 account?.substring(38, 42)
               : 'Connect Wallet'}
-          </Button>
+          </Button> */}
         </div>
       </div>
     </div>

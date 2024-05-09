@@ -27,7 +27,7 @@ export default function ExplorerVaults() {
   return (
     <div className='w-full max-w-screen-2xl'>
       <div className='p-6 w-full md:px-24 lg:px-24 mb-24'>
-        <div className='grid grid-cols-2 gap-6'>
+        <div className='w-full grid grid-cols-2 gap-6'>
           {vaults.map((vault, index) => {
             return (
               <div key={index}>
