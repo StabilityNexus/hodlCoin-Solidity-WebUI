@@ -42,11 +42,11 @@ export function Header() {
             HodlCoin
           </p>
         </Link>
-        <div className='flex-1 flex flex-row h-[100%] px-24 justify-end items-center hidden lg:flex'>
+        <div className='flex-1 flex flex-row h-[100%] px-8 justify-end items-center hidden lg:flex'>
           <NavBar />
         </div>
 
-        <div className='h-[100%] flex flex-row justify-center items-center lg:space-x-4'>
+        <div className='h-[100%] flex flex-row justify-center items-center lg:space-x-12'>
           {/* <AvatarMenu /> */}
 
           <ModeToggle />

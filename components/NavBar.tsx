@@ -33,7 +33,7 @@ export function NavBar() {
   return (
     <NavigationMenu>
       <NavigationMenuList>
-        <NavigationMenuItem>
+        {/* <NavigationMenuItem>
           <NavigationMenuTrigger className='hover:text-primary'>
             Getting started
           </NavigationMenuTrigger>
@@ -43,13 +43,6 @@ export function NavBar() {
                 <NavigationMenuLink asChild>
                   <Link href='/'>
                     <div className='flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-[#6c18d0] to-[#8028c3] p-6 no-underline outline-none focus:shadow-md'>
-                      {/* <Image
-                        className='cursor-pointer h-10 w-10 hidden lg:inline-block'
-                        src={Pic}
-                        width={100}
-                        height={100}
-                        alt=''
-                      /> */}
                       <div className='mb-2 mt-4 text-lg font-bold text-white'>
                         HodlCoin
                       </div>
@@ -68,13 +61,13 @@ export function NavBar() {
               </ListItem>
             </ul>
           </NavigationMenuContent>
-        </NavigationMenuItem>
+        </NavigationMenuItem> */}
         <NavigationMenuItem>
-          <NavigationMenuTrigger className='hover:text-primary'>
+          <NavigationMenuTrigger className='hover:text-foreground'>
             TEST ROUTES
           </NavigationMenuTrigger>
           <NavigationMenuContent>
-            <ul className='grid gap-2 p-3 md:w-[300px] lg:w-[400px]'>
+            <ul className='grid gap-2 p-3 md:w-[250px] lg:w-[300px]'>
               {components.map(component => (
                 <ListItem
                   key={component.title}
@@ -87,13 +80,13 @@ export function NavBar() {
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
-        <NavigationMenuItem>
+        {/* <NavigationMenuItem>
           <Link href='/' legacyBehavior passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
               <p className='hover:text-primary'>X</p>
             </NavigationMenuLink>
           </Link>
-        </NavigationMenuItem>
+        </NavigationMenuItem> */}
       </NavigationMenuList>
     </NavigationMenu>
   )

@@ -95,7 +95,7 @@ const navigation = [
 
 export default function Footer() {
   return (
-    <footer className='w-full px-24 py-10'>
+    <footer className='w-full px-24 py-10 space-y-4'>
       <div className='flex items-center justify-between'>
         <Image
           unoptimized
@@ -103,8 +103,8 @@ export default function Footer() {
           loading='lazy'
           src='./logo.png'
           alt='Stability Nexus Logo'
-          height={65}
-          width={65}
+          height={50}
+          width={50}
         />
         <div className='flex items-center gap-2'>
           <svg
@@ -141,7 +141,11 @@ export default function Footer() {
               />
             </g>
           </svg>
-          <Link href='mailto:djedalliance@gmail.com' className='font-medium'>
+          <Link
+            href='mailto:djedalliance@gmail.com'
+            target='_blank'
+            className='font-medium'
+          >
             contact@stability.nexus
           </Link>
         </div>
@@ -152,6 +156,7 @@ export default function Footer() {
             <Link
               key={item.name}
               href={item.href}
+              target='_blank'
               className=' rounded-full bg-secondary/30 p-2 hover:bg-secondary'
             >
               <span className='sr-only'>{item.name}</span>
@@ -162,18 +167,21 @@ export default function Footer() {
         <div className='flex items-center gap-3 md:order-1'>
           <Link
             href='/research'
+            target='_blank'
             className='font-medium text-black hover:underline hover:decoration-primary hover:decoration-2'
           >
             Research
           </Link>
           <Link
             href='https://news.stability.nexus/'
+            target='_blank'
             className='font-medium text-black hover:underline hover:decoration-primary hover:decoration-2'
           >
             News
           </Link>
           <Link
             href='https://docs.stability.nexus/'
+            target='_blank'
             className='font-medium text-black hover:underline hover:decoration-primary hover:decoration-2'
           >
             Docs
