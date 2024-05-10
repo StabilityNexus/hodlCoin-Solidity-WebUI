@@ -104,7 +104,7 @@ export default function ProfileMenu() {
           </h1>
           {!submitted ? (
             <div className='px-12 pt-4'>
-              <CardDescription className='mt-8'>
+              <CardDescription className='mt-8 text-foreground'>
                 <Input
                   type='text'
                   placeholder='Name'
