@@ -7,22 +7,31 @@ import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
 import { Loader2 } from 'lucide-react'
 import { StylishButton } from '../StylishButton'
+import { useAccount } from 'wagmi'
+import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
+import { writeContract } from '@wagmi/core'
+import { config } from '@/utils/config'
 
 export default function UnholdBox({
   id,
   vault,
+  hodlCoinBalance
 }: {
-  id: number
+  id: number | string
   vault: vaultsProps | null
+  hodlCoinBalance: BigInt
 }) {
   const { toast } = useToast()
 
   const [loadingUnhold, setLoadingUnhold] = useState<boolean>(false)
   const [unholdAmount, setUnholdAmount] = useState<number | null>(null)
 
-  const conversion = (amount: number) => {
-    return amount * (1 + (vault?.rate ?? 0))
-  }
+  const account = useAccount();
+
+
+  // const conversion = (amount: number) => {
+  //   return amount * (1 + (vault?.rate ?? 0))
+  // }
 
   const unholdAction = async () => {
     try {
@@ -35,7 +44,16 @@ export default function UnholdBox({
         setLoadingUnhold(false)
         return
       }
-      await new Promise(resolve => setTimeout(resolve, 4000))
+
+      const tx = await writeContract(config as any, {
+        abi: HodlCoinAbi,
+        // @ts-ignore
+        address: vault?.address as string,
+        functionName: 'unhodl',
+        args: [BigInt(unholdAmount * 10**18)],
+        account: account?.address as '0x${string}'
+      });
+
       toast({
         title: 'Unhold Done',
         description: 'Your unhold has been successfully completed',
@@ -63,8 +81,11 @@ export default function UnholdBox({
           onChange={e => setUnholdAmount(Number(e.target.value))}
         />
         <div className='flex flex-row space-x-2 px-2 pb-4 text-sm text-primary'>
-          <p>{unholdAmount !== null ? conversion(unholdAmount) : 0}</p>
-          <p>ETH</p>
+          <p
+          style={{  cursor: 'pointer'}}
+          onClick={() => setUnholdAmount(Number(hodlCoinBalance))}
+          >{Number(hodlCoinBalance).toString()}</p>
+          <p>{vault?.name}</p>
         </div>
         {loadingUnhold ? (
           <Button className='w-full' disabled>

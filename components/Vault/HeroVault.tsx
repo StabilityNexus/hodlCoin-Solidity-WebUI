@@ -5,24 +5,7 @@ import { vaultsProps } from '@/utils/props'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 
-export default function HeroVault({ id }: { id: number }) {
-  const [loading, setLoading] = useState<boolean>(false)
-
-  const [vault, setVault] = useState<vaultsProps | null>(null)
-
-  const getVaultsData = async () => {
-    try {
-      setLoading(true)
-      setVault(vaultsData[id - 1])
-      setLoading(false)
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  useEffect(() => {
-    getVaultsData()
-  })
+export default function HeroVault({ vault }: { vault: vaultsProps | null}) {
 
   return (
     <div className='w-full flex flex-col items-center justify-center'>

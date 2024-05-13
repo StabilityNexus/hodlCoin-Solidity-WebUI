@@ -11,7 +11,7 @@ export default function CardExplorer({
   price,
   rate,
 }: {
-  id: number
+  id: number | string
   name: string
   address: string
   avatar: string
@@ -21,7 +21,7 @@ export default function CardExplorer({
   rate: number
 }) {
   return (
-    <Link href={`/${id}`}>
+    <Link href={`/${address}`}>
       <div className='aspect-[6/1] shadow-xl overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-105 group border-secondary border-[1px]'>
         <div className='w-full h-full flex flex-row justify-between'>
           <div className='h-full aspect-square overflow-hidden'>

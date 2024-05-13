@@ -11,18 +11,37 @@ export default function ExplorerVaults() {
   const [vaults, setVaults] = useState<vaultsProps[]>([])
 
   const getVaultsData = async () => {
+
     try {
-      setLoading(true)
-      setVaults(vaultsData)
-      setLoading(false)
+      setLoading(true);
+
+      const options = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+
+      const url = process.env.NEXT_PUBLIC_API_URL + '/vaults';
+      const response = await fetch(url, options);
+      const data = await response.json();
+
+      setVaults(data.vaults);
+
+      console.log(data.vaults);
     } catch (error) {
       console.error(error)
+    }
+    finally {
+      setLoading(false)
     }
   }
 
   useEffect(() => {
+    if(vaults.length > 0) return;
+
     getVaultsData()
-  })
+  }, [])
 
   return (
     <div className='w-full max-w-screen-2xl'>
@@ -35,7 +54,7 @@ export default function ExplorerVaults() {
                   id={vault.id}
                   name={vault.name}
                   address={vault.address}
-                  avatar={vault.avatar}
+                  avatar={'/images/avatar1.jpeg'}
                   supply={vault.supply}
                   reserve={vault.reserve}
                   price={vault.price}

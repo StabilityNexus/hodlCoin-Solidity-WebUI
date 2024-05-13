@@ -9,17 +9,18 @@ import Animation from '@/public/animations/congrats_animation.json'
 import { toast } from '../ui/use-toast'
 import Link from 'next/link'
 import { useState } from 'react'
-import { WagmiProvider, useWriteContract } from 'wagmi'
+import { WagmiProvider, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
+import { writeContract } from '@wagmi/core'
 
 import { HodlCoinVaultFactories } from '@/utils/addresses'
 import { HodlCoinFactoryAbi } from '@/utils/contracts/HodlCoinFactory'
-import { getChainId } from 'viem/actions'
+import { getChainId, waitForTransactionReceipt } from 'viem/actions'
 
 import { config } from '@/utils/config'
 import { ERC20Abi } from '@/utils/contracts/ERC20'
 
 export default function ProfileMenu() {
-  const { data: hash, writeContract } = useWriteContract()
+  //const { data: hash, writeContract } = useWriteContract()
 
   const [name, setName] = useState<string>('')
   const [symbol, setSymbol] = useState<string>('')
@@ -33,7 +34,9 @@ export default function ProfileMenu() {
 
   const [loadingCreation, setLoadingCreation] = useState<boolean>(false)
   const [loadingApproval, setLoadingApproval] = useState<boolean>(false)
-  const [submitted, setSubmitted] = useState<boolean>(false)
+  const [submitted, setSubmitted] = useState<boolean>(false);
+
+  const [hashTx, setHashTx] = useState<string>('');
 
   async function approveInitialReserve() {
     try {
@@ -44,30 +47,34 @@ export default function ProfileMenu() {
       const chainId = config.state.chainId
 
       //const chainId = await getChainId(config)
-
-      writeContract({
+      const tx = await writeContract(config as any, {
         address: coin as `0x${string}`,
         abi: ERC20Abi,
         functionName: 'approve',
         args: [HodlCoinVaultFactories[chainId], BigInt(initialReserve)],
-      })
-    } catch (err) {
-      console.log(err)
-    } finally {
-      setLoadingApproval(false)
+      });
+
+      setHashTx(tx);
+
+      console.log('tx', tx)
+
       toast({
         title: 'Approval Done',
         description: 'Your approval has been successfully completed',
       })
+    } catch (err) {
+      console.log(err)
+    } finally {
+      setLoadingApproval(false);
     }
   }
 
   async function createVault() {
     try {
       setLoadingCreation(true)
-      const chainId = config.state.chainId
+      const chainId = config.state.chainId;
 
-      writeContract({
+      const tx = await writeContract(config as any, {
         address: HodlCoinVaultFactories[chainId],
         abi: HodlCoinFactoryAbi,
         functionName: 'createHodlCoin',
@@ -82,16 +89,47 @@ export default function ProfileMenu() {
           BigInt(devFee),
           BigInt(initialReserve),
         ],
-      })
-    } catch (err) {
-      console.log(err)
-    } finally {
-      setLoadingCreation(false)
+      });
+
+      const waitForTransaction = await waitForTransactionReceipt(config as any, {
+        hash: tx
+      });
+
+      console.log('waitForTransaction', waitForTransaction);
+
       toast({
         title: 'Vault Created',
         description: 'Your vault has been successfully created',
       })
-      setSubmitted(true)
+
+      const options = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          symbol,
+          chainId,
+          coin,
+          vaultCreatorTreasury,
+          devTreasury,
+          reserveFee,
+          vaultCreatorFee,
+          devFee
+        })
+      }
+
+      const url = process.env.NEXT_PUBLIC_API_URL + '/vault';
+
+      const response = await fetch(url, options);
+      const data = await response.json();
+
+      console.log(data);
+
+      setSubmitted(true);
+    } catch (err) {
+      console.log(err)
+    } finally {
+      setLoadingCreation(false)
     }
   }
 
@@ -180,7 +218,7 @@ export default function ProfileMenu() {
                   {loadingApproval ? (
                     <Button className='w-full mt-4' disabled>
                       <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                      Loading...
+                      Approving your tokens...
                     </Button>
                   ) : (
                     <Button
@@ -195,7 +233,7 @@ export default function ProfileMenu() {
                   {loadingCreation ? (
                     <Button className='w-full mt-4' disabled>
                       <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                      Loading...
+                      Creating Vault...
                     </Button>
                   ) : (
                     <Button className='w-full mt-4' onClick={createVault}>
@@ -219,7 +257,9 @@ export default function ProfileMenu() {
                     Your vault has been successfully created
                   </p>
                   <Link href='/'>
-                    <Button variant='outline'>Go back to Home</Button>
+                    <Button 
+                    onClick={() => window.open(`https://sepolia.scrollscan.com/tx/${hashTx}`)}
+                    variant='outline'>See the transaction on-chain</Button>
                   </Link>
                 </div>
               </CardDescription>

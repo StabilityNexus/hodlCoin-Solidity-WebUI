@@ -1,70 +1,121 @@
 'use client'
 
 import { vaultsProps } from '@/utils/props'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
 import { Loader2 } from 'lucide-react'
 import { StylishButton } from '../StylishButton'
+import { writeContract } from '@wagmi/core'
+import { config } from '@/utils/config'
+import { ERC20Abi } from '@/utils/contracts/ERC20'
+import { useAccount } from 'wagmi'
+import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
 
 export default function HodlBox({
   id,
   vault,
+  coinBalance,
 }: {
-  id: number
+  id: any
   vault: vaultsProps | null
+  coinBalance: BigInt
 }) {
   const { toast } = useToast()
 
   const [loadingHold, setLoadingHold] = useState<boolean>(false)
-  const [holdAmount, setHoldAmount] = useState<number | null>(null)
+  const [hodlAmount, setHodlAmount] = useState<number | null>(null);
 
-  const conversion = (amount: number) => {
-    return amount * (1 + (vault?.rate ?? 0))
-  }
+  const [coinApproved, setCoinApproved] = useState<boolean>(false);
 
-  const holdAction = async () => {
+  const account = useAccount();
+
+  // const conversion = (amount: number) => {
+  //   return amount * (1 + (vault?.rate ?? 0))
+  // }
+
+  const hodlAction = async () => {
     try {
       setLoadingHold(true)
-      if (holdAmount === null || holdAmount <= 0) {
+      if (hodlAmount === null || hodlAmount <= 0) {
         toast({
           title: 'Amount Null',
           description: 'Please input a valid amount',
         })
         setLoadingHold(false)
-        return
+        return;
       }
-      await new Promise(resolve => setTimeout(resolve, 4000))
-      toast({
-        title: 'Hold Done',
-        description: 'Your hold has been successfully completed',
-      })
-      console.log('hold', holdAmount)
-      setLoadingHold(false)
+
+      if(!coinApproved){
+        const tx = await writeContract(config as any, {
+          abi:ERC20Abi,
+          // @ts-ignore
+          address: vault?.coinAddress as string,
+          functionName: 'approve',
+          args: [vault?.address, BigInt(hodlAmount * 10**18)],
+          account: account?.address as '0x${string}',
+        });
+        
+        setCoinApproved(true);
+        toast({
+          title: 'Approval Done',
+          description: 'You have successfully approved your tokens',
+        })
+      }
+      else{
+
+        const tx = await writeContract(config as any, {
+          abi: HodlCoinAbi,
+          // @ts-ignore
+          address: vault?.address as string,
+          functionName: 'hodl',
+          args: [account?.address, BigInt(hodlAmount * 10**18)],
+          account: account?.address as '0x${string}',
+        });
+
+        toast({
+          title: 'Hodl Done',
+          description: 'Your hold has been successfully completed',
+        })
+      }
+      
     } catch (error) {
       toast({
         title: 'Error',
         description: String(error),
       })
       console.error(error)
+    } finally{
+      setLoadingHold(false);
+    }
+  }
+
+  async function getBalanceAsset(){
+    try{
+
+    } catch(err){
+      console.error(err);
     }
   }
 
   return (
     <div className='flex-1 shadow-xl overflow-hidden border-secondary border-[1px] p-12'>
       <div className='flex flex-col space-y-4'>
-        <h1 className='text-2xl font-bold pb-6'>Hold</h1>
+        <h1 className='text-2xl font-bold pb-6'>Hodl</h1>
         <Input
           type='number'
           placeholder='Amount'
           className='w-full'
-          value={holdAmount !== null ? holdAmount.toString() : ''}
-          onChange={e => setHoldAmount(Number(e.target.value))}
+          value={hodlAmount !== null ? hodlAmount.toString() : ''}
+          onChange={e => setHodlAmount(Number(e.target.value))}
         />
         <div className='flex flex-row space-x-2 px-2 pb-4 text-sm text-primary'>
-          <p>{holdAmount !== null ? conversion(holdAmount) : 0}</p>
-          <p>ETH</p>
+          <p
+          onClick={() => setHodlAmount(Number(coinBalance))}
+          style={{cursor: 'pointer'}}
+          >{Number(coinBalance).toString()}</p>
+          <p>{vault?.coinName}</p>
         </div>
         {loadingHold ? (
           <Button className='w-full' disabled>
@@ -72,7 +123,7 @@ export default function HodlBox({
             Please wait
           </Button>
         ) : (
-          <StylishButton buttonCall={holdAction}>hodl</StylishButton>
+          <StylishButton buttonCall={hodlAction}>{coinApproved? "hodl": `Approve ${vault?.coinName}`}</StylishButton>
         )}
       </div>
     </div>
