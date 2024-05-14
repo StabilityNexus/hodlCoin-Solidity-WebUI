@@ -35,8 +35,8 @@ export default function HeroVault({ vault }: { vault: vaultsProps | null}) {
                 <p className='text-sm text-foreground'>
                   Reserve: {vault.reserve}
                 </p>
-                <p className='text-sm text-foreground'>Price: {vault.price}</p>
-                <p className='text-sm text-foreground'>Rate: {vault.rate}</p>
+                {/* <p className='text-sm text-foreground'>Price: {vault.price}</p>
+                <p className='text-sm text-foreground'>Rate: {vault.rate}</p> */}
               </div>
             </div>
           </div>

@@ -15,11 +15,13 @@ import { config } from '@/utils/config'
 export default function UnholdBox({
   id,
   vault,
-  hodlCoinBalance
+  hodlCoinBalance,
+  getBalances
 }: {
   id: number | string
   vault: vaultsProps | null
   hodlCoinBalance: BigInt
+  getBalances: Function
 }) {
   const { toast } = useToast()
 
@@ -53,6 +55,8 @@ export default function UnholdBox({
         args: [BigInt(unholdAmount * 10**18)],
         account: account?.address as '0x${string}'
       });
+
+      await getBalances()
 
       toast({
         title: 'Unhold Done',

@@ -94,7 +94,9 @@ export default function VaultPage({ params: { vaultId } }) {
     <div className='w-full pt-32'>
       <div className='w-full md:px-24 lg:px-24 mb-12'>
         <HeroVault vault={vault} />
-        <ActionsVault  coinBalance={coinBalance}  hodlCoinBalance={hodlCoinBalance} vault={vault} />
+        <ActionsVault 
+        getBalances={getBalances}
+        coinBalance={coinBalance}  hodlCoinBalance={hodlCoinBalance} vault={vault} />
       </div>
     </div>
   )

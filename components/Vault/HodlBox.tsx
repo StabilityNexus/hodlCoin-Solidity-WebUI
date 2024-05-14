@@ -17,10 +17,12 @@ export default function HodlBox({
   id,
   vault,
   coinBalance,
+  getBalances
 }: {
   id: any
   vault: vaultsProps | null
   coinBalance: BigInt
+  getBalances: Function
 }) {
   const { toast } = useToast()
 
@@ -73,6 +75,8 @@ export default function HodlBox({
           args: [account?.address, BigInt(hodlAmount * 10**18)],
           account: account?.address as '0x${string}',
         });
+
+        getBalances();
 
         toast({
           title: 'Hodl Done',
