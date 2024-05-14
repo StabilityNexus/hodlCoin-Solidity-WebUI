@@ -22,7 +22,7 @@ export default function CardExplorer({
 }) {
   return (
     <Link href={`/${address}`}>
-      <div className='aspect-[6/1] shadow-xl overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-105 group border-secondary border-[1px]'>
+      <div className='aspect-[11/2] shadow-xl overflow-hidden cursor-pointer transition-transform duration-200 hover:scale-105 group border-secondary border-[1px]'>
         <div className='w-full h-full flex flex-row justify-between'>
           <div className='h-full aspect-square overflow-hidden'>
             <Image
@@ -37,7 +37,7 @@ export default function CardExplorer({
             <h3 className='text-xl font-bold text-foreground'>{name}</h3>
             <p className='text-sm text-foreground truncate'>{address}</p>
           </div>
-          <div className='py-4 px-4 flex flex-col items-start justify-center'>
+          <div className='py-4 px-6 flex flex-col items-start justify-center'>
             <p className='text-sm text-foreground'>Supply: {supply}</p>
             <p className='text-sm text-foreground'>Reserve: {reserve}</p>
             <p className='text-sm text-foreground'>Price: {price}</p>
