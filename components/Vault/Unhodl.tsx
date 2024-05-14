@@ -20,7 +20,7 @@ export default function UnholdBox({
 }: {
   id: number | string
   vault: vaultsProps | null
-  hodlCoinBalance: BigInt
+  hodlCoinBalance: number
   getBalances: Function
 }) {
   const { toast } = useToast()

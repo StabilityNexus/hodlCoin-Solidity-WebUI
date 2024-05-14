@@ -21,7 +21,7 @@ export default function HodlBox({
 }: {
   id: any
   vault: vaultsProps | null
-  coinBalance: BigInt
+  coinBalance: number
   getBalances: Function
 }) {
   const { toast } = useToast()
