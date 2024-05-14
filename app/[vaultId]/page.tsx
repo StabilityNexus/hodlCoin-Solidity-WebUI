@@ -144,23 +144,13 @@ export default function VaultPage({ params: { vaultId } }) {
   return (
     <div className='w-full pt-32'>
       <div className='w-full md:px-24 lg:px-24 mb-12'>
-        <HeroVault vault={vault} />
-        <br />
-        <p>
-          Price Hodl: {priceHodl.toFixed(6)} {vault?.coinName}/ {vault?.name}
-        </p>
-        <p>
-          Price Unhodl: {priceUnhodl.toFixed(6)} {vault?.coinName} /{' '}
-          {vault?.name}{' '}
-        </p>
-
-        <p>
-          Reserve: {coinReserve.toFixed(6)} {vault?.coinName}
-        </p>
-        <p>
-          Supply: {hodlCoinSupply.toFixed(6)} {vault?.name}
-        </p>
-
+        <HeroVault
+          vault={vault}
+          priceHodl={priceHodl}
+          priceUnhodl={priceUnhodl}
+          reserve={coinReserve}
+          supply={hodlCoinSupply}
+        />
         <ActionsVault
           getBalances={getBalances}
           coinBalance={coinBalance}

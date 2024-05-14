@@ -16,9 +16,9 @@ export default function UnholdBox({
   id,
   vault,
   hodlCoinBalance,
-  getBalances
+  getBalances,
 }: {
-  id: number | string
+  id: any
   vault: vaultsProps | null
   hodlCoinBalance: number
   getBalances: Function
@@ -28,8 +28,7 @@ export default function UnholdBox({
   const [loadingUnhold, setLoadingUnhold] = useState<boolean>(false)
   const [unholdAmount, setUnholdAmount] = useState<number | null>(null)
 
-  const account = useAccount();
-
+  const account = useAccount()
 
   // const conversion = (amount: number) => {
   //   return amount * (1 + (vault?.rate ?? 0))
@@ -52,9 +51,9 @@ export default function UnholdBox({
         // @ts-ignore
         address: vault?.address as string,
         functionName: 'unhodl',
-        args: [BigInt(unholdAmount * 10**18)],
-        account: account?.address as '0x${string}'
-      });
+        args: [BigInt(unholdAmount * 10 ** 18)],
+        account: account?.address as '0x${string}',
+      })
 
       await getBalances()
 
@@ -86,9 +85,11 @@ export default function UnholdBox({
         />
         <div className='flex flex-row space-x-2 px-2 pb-4 text-sm text-primary'>
           <p
-          style={{  cursor: 'pointer'}}
-          onClick={() => setUnholdAmount(Number(hodlCoinBalance))}
-          >{Number(hodlCoinBalance).toString()}</p>
+            style={{ cursor: 'pointer' }}
+            onClick={() => setUnholdAmount(Number(hodlCoinBalance))}
+          >
+            {Number(hodlCoinBalance).toString()}
+          </p>
           <p>{vault?.name}</p>
         </div>
         {loadingUnhold ? (
