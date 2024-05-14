@@ -18,14 +18,19 @@ import {
 
 const components: { title: string; href: string; description: string }[] = [
   {
-    title: 'createVault',
+    title: 'Create Vault',
     href: '/createVault',
-    description: 'Rota para criar o vault',
+    description: 'Fill in the form to create a vault',
   },
   {
-    title: 'explorer',
+    title: 'Explorer',
     href: '/explorer',
-    description: 'Rota para ver vaults',
+    description: 'Search for a vault by address',
+  },
+  {
+    title: 'Leaderboard',
+    href: '/',
+    description: 'Under construction',
   },
 ]
 
@@ -64,19 +69,30 @@ export function NavBar() {
         </NavigationMenuItem> */}
         <NavigationMenuItem>
           <NavigationMenuTrigger className='hover:text-foreground'>
-            TEST ROUTES
+            Application
           </NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className='grid gap-2 p-3 md:w-[250px] lg:w-[300px]'>
-              {components.map(component => (
-                <ListItem
-                  key={component.title}
-                  title={component.title}
-                  href={component.href}
-                >
-                  {component.description}
-                </ListItem>
-              ))}
+              {components.map(component =>
+                component.title === 'Leaderboard' ? (
+                  <ListItem
+                    key={component.title}
+                    title={component.title}
+                    href={component.href}
+                    className='cursor-not-allowed text-muted-foreground hover:text-muted-foreground hover:bg-transparent'
+                  >
+                    {component.description}
+                  </ListItem>
+                ) : (
+                  <ListItem
+                    key={component.title}
+                    title={component.title}
+                    href={component.href}
+                  >
+                    {component.description}
+                  </ListItem>
+                ),
+              )}
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>

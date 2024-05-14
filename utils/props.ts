@@ -10,4 +10,6 @@ export type vaultsProps = {
   reserve?: number
   hodlPrice?: number
   unhodlPrice?: number
+  rate?: number
+  price?: number
 }

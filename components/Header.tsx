@@ -38,9 +38,19 @@ export function Header() {
               alt=''
             />
           )} */}
-          <p className='cursor-pointer text-foreground mx-2 hidden lg:inline-block'>
-            HodlCoin
+          <p className='cursor-pointer font-semibold text-foreground mx-1 hidden lg:inline-block'>
+            HodlCoin by
           </p>
+          <Image
+            unoptimized
+            fetchPriority='high'
+            loading='lazy'
+            src='/logo.png'
+            alt=''
+            width={30}
+            height={30}
+            className='cursor-pointer mx-1 py-2 hidden lg:inline-block'
+          />
         </Link>
         <div className='flex-1 flex flex-row h-[100%] px-8 justify-end items-center hidden lg:flex'>
           <NavBar />

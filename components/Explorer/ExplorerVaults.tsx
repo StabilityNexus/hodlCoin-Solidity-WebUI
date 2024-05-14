@@ -11,34 +11,32 @@ export default function ExplorerVaults() {
   const [vaults, setVaults] = useState<vaultsProps[]>([])
 
   const getVaultsData = async () => {
-
     try {
-      setLoading(true);
+      setLoading(true)
 
       const options = {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
 
-      const url = process.env.NEXT_PUBLIC_API_URL + '/vaults';
-      const response = await fetch(url, options);
-      const data = await response.json();
+      const url = process.env.NEXT_PUBLIC_API_URL + '/vaults'
+      const response = await fetch(url, options)
+      const data = await response.json()
 
-      setVaults(data.vaults);
+      setVaults(data.vaults)
 
-      console.log(data.vaults);
+      console.log(data.vaults)
     } catch (error) {
       console.error(error)
-    }
-    finally {
+    } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    if(vaults.length > 0) return;
+    if (vaults.length > 0) return
 
     getVaultsData()
   }, [])
@@ -55,10 +53,10 @@ export default function ExplorerVaults() {
                   name={vault.name}
                   address={vault.address}
                   avatar={'/images/avatar1.jpeg'}
-                  supply={vault.supply}
-                  reserve={vault.reserve}
-                  price={vault.price}
-                  rate={vault.rate}
+                  supply={vault.supply || 0}
+                  reserve={vault.reserve || 0}
+                  price={vault.price || 0}
+                  rate={vault.rate || 0}
                 />
               </div>
             )
