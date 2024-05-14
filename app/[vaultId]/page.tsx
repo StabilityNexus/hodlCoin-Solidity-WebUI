@@ -4,7 +4,7 @@ import ActionsVault from '@/components/Vault/Actions'
 import HeroVault from '@/components/Vault/HeroVault'
 import { ERC20Abi } from '@/utils/contracts/ERC20'
 import { vaultsProps } from '@/utils/props'
-import { useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import { useAccount, useReadContract } from 'wagmi'
 import { readContract } from '@wagmi/core'
 import { config } from '@/utils/config'
@@ -21,8 +21,49 @@ export default function VaultPage({ params: { vaultId } }) {
   const [coinReserve, setCoinReserve] = useState<number>(0)
   const [hodlCoinSupply, setHodlCoinSupply] = useState<number>(0)
   const [priceHodl, setPriceHodl] = useState<number>(0)
-  const [priceUnhodl, setPriceUnhodl] = useState<number>(0)
+
+  const [devFee, setDevFee] = useState<number>(0);
+  const [vaultCreatorFee, setVaultCreatorFee] = useState<number>(0);
+  const [reserveFee, setReserveFee] = useState<number>(0);
+
   const account = useAccount()
+
+  async function getFees() {
+    try{
+
+      const devFeeOnChain = (await readContract(config as any, {
+        abi: HodlCoinAbi,
+        address: vaultId,
+        functionName: 'devFee',
+        args: [],
+      })) as number
+      setDevFee(Number(devFeeOnChain)/1000);
+
+      console.log("devFee", Number(devFeeOnChain))
+
+      const vaultCreatorFeeOnChain = (await readContract(config as any, {
+        abi: HodlCoinAbi,
+        address: vaultId,
+        functionName: 'vaultCreatorFee',
+        args: [],
+      })) as number
+      setVaultCreatorFee(Number(vaultCreatorFeeOnChain)/1000);
+
+
+      const reserveFeeOnChain = (await readContract(config as any, {
+        abi: HodlCoinAbi,
+        address: vaultId,
+        functionName: 'reserveFee',
+        args: [],
+      })) as number
+
+      setReserveFee(Number(reserveFeeOnChain)/1000);
+
+
+    } catch(err){
+      console.error(err)
+    }
+  }
 
   async function getReservesPrices() {
     try {
@@ -50,21 +91,7 @@ export default function VaultPage({ params: { vaultId } }) {
         args: [],
       })) as number
 
-      setPriceHodl(Number(priceHodlOnChain))
-
-      const priceUnhodldOnChain = (await readContract(config as any, {
-        abi: HodlCoinAbi,
-        address: vaultId,
-        functionName: 'priceUnhodl',
-        args: [],
-      })) as number
-
-      setPriceUnhodl(Number(priceUnhodldOnChain))
-
-      console.log('coinReserveOnChain', coinReserveOnChain)
-      console.log('hodlCoinSupplyOnChain', hodlCoinSupplyOnChain)
-      console.log('priceHodlOnChain', priceHodlOnChain)
-      console.log('priceUnhodldOnChain', priceUnhodldOnChain)
+      setPriceHodl(Number(priceHodlOnChain)/100000)
     } catch (err) {
       console.error(err)
     }
@@ -139,7 +166,11 @@ export default function VaultPage({ params: { vaultId } }) {
 
   useEffect(() => {
     getVaultsData()
-  }, [account.address])
+  }, [account.address]);
+
+  useEffect(() => {
+    getFees()
+  }, [account.address]);
 
   return (
     <div className='w-full pt-32'>
@@ -147,9 +178,11 @@ export default function VaultPage({ params: { vaultId } }) {
         <HeroVault
           vault={vault}
           priceHodl={priceHodl}
-          priceUnhodl={priceUnhodl}
           reserve={coinReserve}
           supply={hodlCoinSupply}
+          devFee={devFee}
+          vaultCreatorFee={vaultCreatorFee}
+          reserveFee={reserveFee}
         />
         <ActionsVault
           getBalances={getBalances}

@@ -8,15 +8,20 @@ import { useEffect, useState } from 'react'
 export default function HeroVault({
   vault,
   priceHodl,
-  priceUnhodl,
   reserve,
   supply,
+  devFee,
+  vaultCreatorFee,
+  reserveFee,
 }: {
   vault: vaultsProps | null
   priceHodl: any
-  priceUnhodl: any
   reserve: any
   supply: any
+  devFee: number
+  vaultCreatorFee: number
+  reserveFee: number
+
 }) {
   return (
     <div className='w-full flex flex-col items-center justify-center'>
@@ -44,17 +49,20 @@ export default function HeroVault({
                 {vault?.name}
               </p>
               <p className='text-sm text-foreground'>
-                Price Unhodl: {priceUnhodl.toFixed(6)} {vault?.coinName} /{' '}
-                {vault?.name}{' '}
-              </p>
-              <p className='text-sm text-foreground'>
                 Reserve: {reserve.toFixed(6)} {vault?.coinName}
               </p>
               <p className='text-sm text-foreground'>
                 Supply: {supply.toFixed(6)} {vault?.name}
               </p>
-              {/* <p className='text-sm text-foreground'>Price: {vault.price}</p>
-                <p className='text-sm text-foreground'>Rate: {vault.rate}</p> */}
+              <p className='text-sm text-foreground'>
+                Dev Fee: {devFee.toFixed(3)}%
+              </p>
+              <p className='text-sm text-foreground'>
+                Vault Creator Fee: {vaultCreatorFee.toFixed(3)}%
+              </p>
+              <p className='text-sm text-foreground'>
+                Reserve Fee: {reserveFee.toFixed(3)}%
+              </p>
             </div>
           </div>
         </div>

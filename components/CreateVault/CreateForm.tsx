@@ -10,7 +10,7 @@ import { toast } from '../ui/use-toast'
 import Link from 'next/link'
 import { useState } from 'react'
 import { WagmiProvider, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
-import { writeContract } from '@wagmi/core'
+import { getTransactionReceipt, simulateContract, writeContract } from '@wagmi/core'
 
 import { HodlCoinVaultFactories } from '@/utils/addresses'
 import { HodlCoinFactoryAbi } from '@/utils/contracts/HodlCoinFactory'
@@ -91,11 +91,24 @@ export default function ProfileMenu() {
         ],
       });
 
-      const waitForTransaction = await waitForTransactionReceipt(config as any, {
-        hash: tx
+      const result = await simulateContract(config as any, {
+        address: HodlCoinVaultFactories[chainId],
+        abi: HodlCoinFactoryAbi,
+        functionName: 'createHodlCoin',
+        args: [
+          name,
+          symbol,
+          coin,
+          vaultCreatorTreasury,
+          devTreasury,
+          BigInt(reserveFee),
+          BigInt(vaultCreatorFee),
+          BigInt(devFee),
+          BigInt(initialReserve),
+        ],
       });
 
-      console.log('waitForTransaction', waitForTransaction);
+      console.log('result', result.result);
 
       toast({
         title: 'Vault Created',
@@ -109,6 +122,7 @@ export default function ProfileMenu() {
           name,
           symbol,
           chainId,
+          address: result.result,
           coin,
           vaultCreatorTreasury,
           devTreasury,
