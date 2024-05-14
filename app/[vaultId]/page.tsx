@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react'
 import { useAccount, useReadContract } from 'wagmi';
 import { readContract } from '@wagmi/core';
 import { config } from '@/utils/config'
+import { HodlCoinAbi } from '@/utils/contracts/HodlCoin';
 
 // @ts-ignore
 export default function VaultPage({ params: { vaultId } }) {
@@ -16,9 +17,62 @@ export default function VaultPage({ params: { vaultId } }) {
   const [vault, setVault] = useState<vaultsProps | null>(null);
   const [coinContract, setCoinContract] = useState<`0x${string}`>('0x0');
 
+
   const [coinBalance, setCoinBalance] = useState<BigInt>(BigInt(0));
   const [hodlCoinBalance, setHodlCoinBalance] = useState<BigInt>(BigInt(0));
+  const [coinReserve, setCoinReserve] = useState<BigInt>(BigInt(0));
+  const [hodlCoinSupply, setHodlCoinSupply] = useState<BigInt>(BigInt(0));
+  const [priceHodl, setPriceHodl] = useState<BigInt>(BigInt(0));
+  const [priceUnhodl, setPriceUnhodl] = useState<BigInt>(BigInt(0));
   const account = useAccount();
+
+  async function getReservesPrices(){
+    try{
+      const coinReserveOnChain = await readContract(config as any, {
+        abi: ERC20Abi,
+        address: coinContract,
+        functionName: 'balanceOf',
+        args: [vaultId]
+      }) as number;
+      setCoinReserve(BigInt(coinReserveOnChain)/BigInt(10**18));
+
+      const hodlCoinSupplyOnChain = await readContract(config as any, {
+        abi: ERC20Abi,
+        address: vaultId,
+        functionName: 'totalSupply',
+        args: []
+      }) as number;
+
+      setHodlCoinSupply(BigInt(hodlCoinSupplyOnChain)/BigInt(10**18));
+
+      const priceHodlOnChain = await readContract(config as any, {
+        abi: HodlCoinAbi,
+        address: vaultId,
+        functionName: 'priceHodl',
+        args: []
+      }) as number;
+
+      setPriceHodl(BigInt(priceHodlOnChain));
+
+      const priceUnhodldOnChain = await readContract(config as any, {
+        abi: HodlCoinAbi,
+        address: vaultId,
+        functionName: 'priceUnhodl',
+        args: []
+      }) as number;
+
+      setPriceUnhodl(BigInt(priceUnhodldOnChain));
+
+      console.log("coinReserveOnChain", coinReserveOnChain)
+      console.log("hodlCoinSupplyOnChain", hodlCoinSupplyOnChain)
+      console.log("priceHodlOnChain", priceHodlOnChain)
+      console.log("priceUnhodldOnChain", priceUnhodldOnChain)
+
+
+    } catch(err){
+      console.error(err);
+    }
+  }
 
   async function getBalances(){
     try{
@@ -80,6 +134,9 @@ export default function VaultPage({ params: { vaultId } }) {
     }
   }    
 
+  useEffect(() => {
+    getReservesPrices();
+  }, [coinContract, account.address]);
 
   useEffect(() => {
     getBalances();
@@ -94,6 +151,14 @@ export default function VaultPage({ params: { vaultId } }) {
     <div className='w-full pt-32'>
       <div className='w-full md:px-24 lg:px-24 mb-12'>
         <HeroVault vault={vault} />
+        <br/>
+        <p>Price Hodl: {priceHodl.toString()} {vault?.coinName}/ {vault?.name}</p>
+        <p>Price Unhodl:  {priceUnhodl.toString()} {vault?.coinName} / {vault?.name} </p>
+
+        <p>Reserve: {coinReserve.toString()} {vault?.coinName}</p>
+        <p>Supply: {hodlCoinSupply.toString()} {vault?.name}</p>
+
+
         <ActionsVault 
         getBalances={getBalances}
         coinBalance={coinBalance}  hodlCoinBalance={hodlCoinBalance} vault={vault} />
