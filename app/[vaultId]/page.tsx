@@ -20,10 +20,10 @@ export default function VaultPage({ params: { vaultId } }) {
 
   const [coinBalance, setCoinBalance] = useState<BigInt>(BigInt(0));
   const [hodlCoinBalance, setHodlCoinBalance] = useState<BigInt>(BigInt(0));
-  const [coinReserve, setCoinReserve] = useState<BigInt>(BigInt(0));
-  const [hodlCoinSupply, setHodlCoinSupply] = useState<BigInt>(BigInt(0));
-  const [priceHodl, setPriceHodl] = useState<BigInt>(BigInt(0));
-  const [priceUnhodl, setPriceUnhodl] = useState<BigInt>(BigInt(0));
+  const [coinReserve, setCoinReserve] = useState<number>(0);
+  const [hodlCoinSupply, setHodlCoinSupply] = useState<number>(0);
+  const [priceHodl, setPriceHodl] = useState<number>(0);
+  const [priceUnhodl, setPriceUnhodl] = useState<number>(0);
   const account = useAccount();
 
   async function getReservesPrices(){
@@ -34,7 +34,7 @@ export default function VaultPage({ params: { vaultId } }) {
         functionName: 'balanceOf',
         args: [vaultId]
       }) as number;
-      setCoinReserve(BigInt(coinReserveOnChain)/BigInt(10**18));
+      setCoinReserve(Number(coinReserveOnChain)/10**18);
 
       const hodlCoinSupplyOnChain = await readContract(config as any, {
         abi: ERC20Abi,
@@ -43,7 +43,7 @@ export default function VaultPage({ params: { vaultId } }) {
         args: []
       }) as number;
 
-      setHodlCoinSupply(BigInt(hodlCoinSupplyOnChain)/BigInt(10**18));
+      setHodlCoinSupply(Number(hodlCoinSupplyOnChain)/10**18);
 
       const priceHodlOnChain = await readContract(config as any, {
         abi: HodlCoinAbi,
@@ -52,7 +52,7 @@ export default function VaultPage({ params: { vaultId } }) {
         args: []
       }) as number;
 
-      setPriceHodl(BigInt(priceHodlOnChain));
+      setPriceHodl(Number(priceHodlOnChain));
 
       const priceUnhodldOnChain = await readContract(config as any, {
         abi: HodlCoinAbi,
@@ -61,7 +61,7 @@ export default function VaultPage({ params: { vaultId } }) {
         args: []
       }) as number;
 
-      setPriceUnhodl(BigInt(priceUnhodldOnChain));
+      setPriceUnhodl(Number(priceUnhodldOnChain));
 
       console.log("coinReserveOnChain", coinReserveOnChain)
       console.log("hodlCoinSupplyOnChain", hodlCoinSupplyOnChain)
@@ -152,11 +152,11 @@ export default function VaultPage({ params: { vaultId } }) {
       <div className='w-full md:px-24 lg:px-24 mb-12'>
         <HeroVault vault={vault} />
         <br/>
-        <p>Price Hodl: {priceHodl.toString()} {vault?.coinName}/ {vault?.name}</p>
-        <p>Price Unhodl:  {priceUnhodl.toString()} {vault?.coinName} / {vault?.name} </p>
+        <p>Price Hodl: {priceHodl.toFixed(6)} {vault?.coinName}/ {vault?.name}</p>
+        <p>Price Unhodl:  {priceUnhodl.toFixed(6)} {vault?.coinName} / {vault?.name} </p>
 
-        <p>Reserve: {coinReserve.toString()} {vault?.coinName}</p>
-        <p>Supply: {hodlCoinSupply.toString()} {vault?.name}</p>
+        <p>Reserve: {coinReserve.toFixed(6)} {vault?.coinName}</p>
+        <p>Supply: {hodlCoinSupply.toFixed(6)} {vault?.name}</p>
 
 
         <ActionsVault 
