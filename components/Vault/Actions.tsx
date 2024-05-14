@@ -13,8 +13,8 @@ export default function ActionsVault({
   getBalances
 }: { 
   vault: vaultsProps | null,
-  coinBalance: BigInt,
-  hodlCoinBalance: BigInt,
+  coinBalance: number,
+  hodlCoinBalance: number,
   getBalances: Function
 }) {
 

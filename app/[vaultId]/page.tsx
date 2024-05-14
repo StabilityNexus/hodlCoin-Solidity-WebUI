@@ -16,13 +16,13 @@ export default function VaultPage({ params: { vaultId } }) {
   const [vault, setVault] = useState<vaultsProps | null>(null)
   const [coinContract, setCoinContract] = useState<`0x${string}`>('0x0')
 
-  const [coinBalance, setCoinBalance] = useState<BigInt>(BigInt(0))
-  const [hodlCoinBalance, setHodlCoinBalance] = useState<BigInt>(BigInt(0))
-  const [coinReserve, setCoinReserve] = useState<number>(0)
-  const [hodlCoinSupply, setHodlCoinSupply] = useState<number>(0)
-  const [priceHodl, setPriceHodl] = useState<number>(0)
-  const [priceUnhodl, setPriceUnhodl] = useState<number>(0)
-  const account = useAccount()
+  const [coinBalance, setCoinBalance] = useState<number>(0);
+  const [hodlCoinBalance, setHodlCoinBalance] = useState<number>(0);
+  const [coinReserve, setCoinReserve] = useState<number>(0);
+  const [hodlCoinSupply, setHodlCoinSupply] = useState<number>(0);
+  const [priceHodl, setPriceHodl] = useState<number>(0);
+  const [priceUnhodl, setPriceUnhodl] = useState<number>(0);
+  const account = useAccount();
 
   async function getReservesPrices() {
     try {
@@ -77,20 +77,21 @@ export default function VaultPage({ params: { vaultId } }) {
         abi: ERC20Abi,
         address: coinContract,
         functionName: 'balanceOf',
-        args: [account.address],
-      })) as number
-      setCoinBalance(BigInt(coinBalanceOnChain) / BigInt(10 ** 18))
-
-      const hodlCoinBalanceOnChain = (await readContract(config as any, {
+        args: [account.address]
+      }) as number;
+      setCoinBalance(Number(coinBalanceOnChain)/10**18);
+      
+      const hodlCoinBalanceOnChain = await readContract(config as any, {
         abi: ERC20Abi,
         address: vaultId,
         functionName: 'balanceOf',
         args: [account.address],
       })) as number
 
-      setHodlCoinBalance(BigInt(hodlCoinBalanceOnChain) / BigInt(10 ** 18))
-    } catch (err) {
-      console.error(err)
+      setHodlCoinBalance(Number(hodlCoinBalanceOnChain)/10**18);
+
+    } catch(err){
+      console.error(err);
     }
   }
 
