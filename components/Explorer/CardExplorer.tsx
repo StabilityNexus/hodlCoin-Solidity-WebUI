@@ -35,9 +35,9 @@ export default function CardExplorer({
           </div>
           <div className='p-4 flex flex-col items-start justify-center'>
             <h3 className='text-xl font-bold text-foreground'>{name}</h3>
-            <p className='text-sm text-foreground'>{address}</p>
+            <p className='text-sm text-foreground truncate'>{address}</p>
           </div>
-          <div className='py-4 px-16 flex flex-col items-start justify-center'>
+          <div className='py-4 px-4 flex flex-col items-start justify-center'>
             <p className='text-sm text-foreground'>Supply: {supply}</p>
             <p className='text-sm text-foreground'>Reserve: {reserve}</p>
             <p className='text-sm text-foreground'>Price: {price}</p>

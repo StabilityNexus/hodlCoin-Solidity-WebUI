@@ -2441,6 +2441,11 @@ binary-extensions@^2.0.0:
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-2.3.0.tgz#f6e14a97858d327252200242d4ccfe522c445522"
   integrity sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==
 
+blockies@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/blockies/-/blockies-0.0.2.tgz#22ad58da4f6b382bc79bf4386c5820c70047e4ed"
+  integrity sha512-D9kUW071jJxjp+8w99Bcf7TxJAnhoNfglLHAVHn2dmacbZcULCq4Zi2w8/NZpPQ8lsiX1E+LiEhZITJhxNmo6g==
+
 bn.js@^4.11.9:
   version "4.12.0"
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-4.12.0.tgz#775b3f278efbb9718eec7361f483fb36fbbfea88"
@@ -5204,7 +5209,7 @@ process@^0.11.10:
   resolved "https://registry.yarnpkg.com/process/-/process-0.11.10.tgz#7332300e840161bda3e69a1d1d91a7d4bc16f182"
   integrity sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A==
 
-prop-types@^15.8.1:
+prop-types@^15.5.10, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -5289,6 +5294,13 @@ randombytes@^2.1.0:
   integrity sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==
   dependencies:
     safe-buffer "^5.1.0"
+
+react-blockies@^1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/react-blockies/-/react-blockies-1.4.1.tgz#d4f0faf95ac197213a297a370a4d7f77ea3d0b08"
+  integrity sha512-4N015X5oPNnD3xQPsiqolOFzPZSSWyc5mJhJUZShUCHtiGUxVN+1qsWTcglkHMNySux9hUofaispqcw9QkWP5Q==
+  dependencies:
+    prop-types "^15.5.10"
 
 react-dom@^18:
   version "18.3.1"
