@@ -1,6 +1,14 @@
 import ExplorerVaults from '@/components/Explorer/ExplorerVaults'
+import { redirect } from 'next/navigation'
 
 export default function ExplorerPage() {
+
+  const isPageDisabled = true; // Set this flag to disable the page
+
+  if (isPageDisabled) {
+    redirect('/');
+  }
+
   return (
     <div className='w-full'>
       <div className='w-full h-36'>
