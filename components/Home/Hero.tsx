@@ -27,7 +27,10 @@ export function Hero() {
               <Link href='/createVault'>
                 <Button>Create Vault</Button>
               </Link>
-              <Link href='/explorer'>
+              {/* <Link href='/explorer'>
+                <Button>Play the game</Button>
+              </Link> */}
+              <Link href='/'>
                 <Button>Play the game</Button>
               </Link>
             </div>
