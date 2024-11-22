@@ -11,7 +11,16 @@ import { config } from '@/utils/config'
 import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
 
 // @ts-ignore
-export default function GetData({ params: { vaultId } }) {
+export default function InteractionClient(initialVaultId ) {
+
+  const [vaultId, setVaultId] = useState<any>(initialVaultId)
+
+  useEffect(() => {
+    const hash = window.location.hash.replace('#', '')
+    if (hash) {
+      setVaultId(hash)
+    }
+  }, [])
 
   const [loading, setLoading] = useState<boolean>(false)
   const [vault, setVault] = useState<vaultsProps | null>(null)
@@ -23,22 +32,21 @@ export default function GetData({ params: { vaultId } }) {
   const [hodlCoinSupply, setHodlCoinSupply] = useState<number>(0)
   const [priceHodl, setPriceHodl] = useState<number>(0)
 
-  const [devFee, setDevFee] = useState<number>(0);
-  const [vaultCreatorFee, setVaultCreatorFee] = useState<number>(0);
-  const [reserveFee, setReserveFee] = useState<number>(0);
+  const [devFee, setDevFee] = useState<number>(0)
+  const [vaultCreatorFee, setVaultCreatorFee] = useState<number>(0)
+  const [reserveFee, setReserveFee] = useState<number>(0)
 
   const account = useAccount()
 
   async function getFees() {
-    try{
-
+    try {
       const devFeeOnChain = (await readContract(config as any, {
         abi: HodlCoinAbi,
         address: vaultId,
         functionName: 'devFee',
         args: [],
       })) as number
-      setDevFee(Number(devFeeOnChain)/1000)
+      setDevFee(Number(devFeeOnChain) / 1000)
 
       console.log('devFee', Number(devFeeOnChain))
 
@@ -79,11 +87,9 @@ export default function GetData({ params: { vaultId } }) {
         functionName: 'totalSupply',
         args: [],
       })) as number
-
       setHodlCoinSupply(Number(hodlCoinSupplyOnChain) / 10 ** 18)
 
       const priceHodlOnChain = (await readContract(config as any, {
-        
         abi: HodlCoinAbi,
         address: vaultId,
         functionName: 'priceHodl',
@@ -169,18 +175,27 @@ export default function GetData({ params: { vaultId } }) {
 
   useEffect(() => {
     getFees()
-  }, [account.address]) 
+  }, [account.address])
 
-  return {
-    vault,
-    priceHodl,
-    coinReserve,
-    hodlCoinSupply,
-    devFee,
-    vaultCreatorFee,
-    reserveFee,
-    getBalances,
-    coinBalance,
-    hodlCoinBalance
-  }
+  return (
+    <div className='w-full pt-32'>
+      <div className='w-full md:px-24 lg:px-24 mb-12'>
+        <HeroVault
+          vault={vault}
+          priceHodl={priceHodl}
+          reserve={coinReserve}
+          supply={hodlCoinSupply}
+          devFee={devFee}
+          vaultCreatorFee={vaultCreatorFee}
+          reserveFee={reserveFee}
+        />
+        <ActionsVault
+          getBalances={getBalances}
+          coinBalance={coinBalance}
+          hodlCoinBalance={hodlCoinBalance}
+          vault={vault}
+        />
+      </div>
+    </div>
+  )
 }

@@ -1,58 +1,14 @@
-import ActionsVault from '@/components/Vault/Actions'
-import HeroVault from '@/components/Vault/HeroVault'
-import GetData from "./GetData";
+import InteractionClient from './InteractionClient'
 
 
 export async function generateStaticParams() {
-  try {
-    const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/vaults')
-    const data = await response.json()
-
-    return data.vaults.map((vault: any) => ({
-      vaultId: vault.address,
-    }))
-  } catch (error) {
-    console.error('Error generating static params:', error)
-    return []
-  }
+  return [
+    { vaultId: 'vaultId' }, // This should be a string, not an array
+  ]
 }
-
 
 // @ts-ignore
 export default function VaultPage({ params: { vaultId } }) {
-
-  const {
-    vault,
-    priceHodl,
-    coinReserve,
-    hodlCoinSupply,
-    devFee,
-    vaultCreatorFee,
-    reserveFee,
-    getBalances,
-    coinBalance,
-    hodlCoinBalance,
-  } = GetData(vaultId)
-  
-  return (
-    <div className='w-full pt-32'>
-      <div className='w-full md:px-24 lg:px-24 mb-12'>
-        <HeroVault
-          vault={vault}
-          priceHodl={priceHodl}
-          reserve={coinReserve}
-          supply={hodlCoinSupply}
-          devFee={devFee}
-          vaultCreatorFee={vaultCreatorFee}
-          reserveFee={reserveFee}
-        />
-        <ActionsVault
-          getBalances={getBalances}
-          coinBalance={coinBalance}
-          hodlCoinBalance={hodlCoinBalance}
-          vault={vault}
-        />
-      </div>
-    </div>
-  )
+  const deploymentId = vaultId // Direct use of vaultId
+  return <InteractionClient initialVaultId={deploymentId} />
 }
