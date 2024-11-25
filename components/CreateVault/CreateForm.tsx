@@ -115,29 +115,29 @@ export default function ProfileMenu() {
         description: 'Your vault has been successfully created',
       })
 
-      const options = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          symbol,
-          chainId,
-          address: result.result,
-          coin,
-          vaultCreatorTreasury,
-          devTreasury,
-          reserveFee,
-          vaultCreatorFee,
-          devFee
-        })
-      }
+      // const options = {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({
+      //     name,
+      //     symbol,
+      //     chainId,
+      //     address: result.result,
+      //     coin,
+      //     vaultCreatorTreasury,
+      //     devTreasury,
+      //     reserveFee,
+      //     vaultCreatorFee,
+      //     devFee,
+      //   }),
+      // }
 
-      const url = process.env.NEXT_PUBLIC_API_URL + '/vault';
+      // const url = process.env.NEXT_PUBLIC_API_URL + '/vault'
 
-      const response = await fetch(url, options);
-      const data = await response.json();
+      // const response = await fetch(url, options)
+      // const data = await response.json()
 
-      console.log(data);
+      // console.log(data)
 
       setSubmitted(true);
     } catch (err) {
@@ -272,7 +272,7 @@ export default function ProfileMenu() {
                   </p>
                   <Link href='/'>
                     <Button 
-                    onClick={() => window.open(`https://sepolia.scrollscan.com/tx/${hashTx}`)}
+                      onClick={() => window.open(`https://sepolia.scrollscan.com/tx/${hashTx}`)}
                     variant='outline'>See the transaction on-chain</Button>
                   </Link>
                 </div>
