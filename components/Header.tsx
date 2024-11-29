@@ -1,7 +1,7 @@
 'use client'
 
-import Pic from '../assets/logo_black.png'
-import Pic2 from '../assets/logo_white.png'
+// import Pic from '../assets/logo_black.png'
+// import Pic2 from '../assets/logo_white.png'
 import Image from 'next/image'
 import React from 'react'
 import { useTheme } from 'next-themes'
