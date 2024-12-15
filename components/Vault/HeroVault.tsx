@@ -10,18 +10,17 @@ export default function HeroVault({
   priceHodl,
   reserve,
   supply,
-  devFee,
+  vaultFee,
   vaultCreatorFee,
-  reserveFee,
+  stableOrderFee,
 }: {
   vault: vaultsProps | null
   priceHodl: any
   reserve: any
   supply: any
-  devFee: number
+  vaultFee: number
   vaultCreatorFee: number
-  reserveFee: number
-
+  stableOrderFee: number
 }) {
   return (
     <div className='w-full flex flex-col items-center justify-center'>
@@ -29,19 +28,19 @@ export default function HeroVault({
         <div className='aspect-[10/1] shadow-xl overflow-hidden border-secondary border-[1px]'>
           <div className='w-full h-full flex flex-row justify-between'>
             <div className='h-full aspect-square overflow-hidden'>
-              <Image
+              {/* <Image
                 src={vault?.avatar as string}
                 alt=''
                 className='aspect-square h-full'
                 width={200}
                 height={200}
-              />
+              /> */}
             </div>
             <div className='p-4 flex flex-col items-start justify-center'>
               <h3 className='text-xl font-bold text-foreground'>
                 {vault?.name}
               </h3>
-              <p className='text-sm text-foreground'>{vault?.address}</p>
+              <p className='text-sm text-foreground'>{vault?.coinAddress}</p>
             </div>
             <div className='py-4 px-16 flex flex-col items-start justify-center'>
               <p className='text-sm text-foreground'>
@@ -55,13 +54,13 @@ export default function HeroVault({
                 Supply: {supply.toFixed(6)} {vault?.name}
               </p>
               <p className='text-sm text-foreground'>
-                Dev Fee: {devFee.toFixed(3)}%
+                Vault Fee: {vaultFee.toFixed(3)}%
               </p>
               <p className='text-sm text-foreground'>
                 Vault Creator Fee: {vaultCreatorFee.toFixed(3)}%
               </p>
               <p className='text-sm text-foreground'>
-                Reserve Fee: {reserveFee.toFixed(3)}%
+                Stable Order Fee: {stableOrderFee.toFixed(3)}%
               </p>
             </div>
           </div>

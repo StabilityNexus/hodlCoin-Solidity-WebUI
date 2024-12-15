@@ -32,23 +32,23 @@ export default function InteractionClient(initialVaultId ) {
   const [hodlCoinSupply, setHodlCoinSupply] = useState<number>(0)
   const [priceHodl, setPriceHodl] = useState<number>(0)
 
-  const [devFee, setDevFee] = useState<number>(0)
+  const [vaultFee, setvaultFee] = useState<number>(0)
   const [vaultCreatorFee, setVaultCreatorFee] = useState<number>(0)
-  const [reserveFee, setReserveFee] = useState<number>(0)
+  const [stableOrderFee, setstableOrderFee] = useState<number>(0)
 
   const account = useAccount()
 
   async function getFees() {
     try {
-      const devFeeOnChain = (await readContract(config as any, {
+      const vaultFeeOnChain = (await readContract(config as any, {
         abi: HodlCoinAbi,
         address: vaultId,
-        functionName: 'devFee',
+        functionName: 'vaultFee',
         args: [],
       })) as number
-      setDevFee(Number(devFeeOnChain) / 1000)
+      setvaultFee(Number(vaultFeeOnChain) / 1000)
 
-      console.log('devFee', Number(devFeeOnChain))
+      console.log('vaultFee', Number(vaultFeeOnChain))
 
       const vaultCreatorFeeOnChain = (await readContract(config as any, {
         abi: HodlCoinAbi,
@@ -58,14 +58,14 @@ export default function InteractionClient(initialVaultId ) {
       })) as number
       setVaultCreatorFee(Number(vaultCreatorFeeOnChain) / 1000)
 
-      const reserveFeeOnChain = (await readContract(config as any, {
+      const stableOrderFeeOnChain = (await readContract(config as any, {
         abi: HodlCoinAbi,
         address: vaultId,
-        functionName: 'reserveFee',
+        functionName: 'stableOrderFee',
         args: [],
       })) as number
 
-      setReserveFee(Number(reserveFeeOnChain) / 1000)
+      setstableOrderFee(Number(stableOrderFeeOnChain) / 1000)
     } catch (err) {
       console.error(err)
     }
@@ -127,39 +127,39 @@ export default function InteractionClient(initialVaultId ) {
     }
   }
 
-  const getVaultsData = async () => {
-    try {
-      setLoading(true)
+  // const getVaultsData = async () => {
+  //   try {
+  //     setLoading(true)
 
-      const options = {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
+  //     const options = {
+  //       method: 'GET',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //     }
 
-      const url = process.env.NEXT_PUBLIC_API_URL + '/vault/' + vaultId
-      const response = await fetch(url, options)
-      const data = await response.json()
+  //     const url = process.env.NEXT_PUBLIC_API_URL + '/vault/' + vaultId
+  //     const response = await fetch(url, options)
+  //     const data = await response.json()
 
-      setCoinContract(data.vault.coin_contract)
-      const objVault = {
-        id: data.vault.address,
-        chainId: data.vault.id,
-        name: data.vault.name,
-        avatar: '/images/avatar1.jpeg',
-        address: data.vault.address,
-        coinAddress: data.vault.coin_contract,
-        coinName: data.vault.coin_name,
-      }
-      setVault({ ...objVault })
+  //     setCoinContract(data.vault.coin_contract)
+  //     const objVault = {
+  //       id: data.vault.address,
+  //       chainId: data.vault.id,
+  //       name: data.vault.name,
+  //       avatar: '/images/avatar1.jpeg',
+  //       address: data.vault.address,
+  //       coinAddress: data.vault.coin_contract,
+  //       coinName: data.vault.coin_name,
+  //     }
+  //     setVault({ ...objVault })
 
-      setCoinContract(data.vault.coin_contract)
-      setLoading(false)
-    } catch (error) {
-      console.error(error)
-    }
-  }
+  //     setCoinContract(data.vault.coin_contract)
+  //     setLoading(false)
+  //   } catch (error) {
+  //     console.error(error)
+  //   }
+  // }
 
   useEffect(() => {
     getReservesPrices()
@@ -169,9 +169,9 @@ export default function InteractionClient(initialVaultId ) {
     getBalances()
   }, [coinContract, account.address])
 
-  useEffect(() => {
-    getVaultsData()
-  }, [account.address])
+  // useEffect(() => {
+  //   getVaultsData()
+  // }, [account.address])
 
   useEffect(() => {
     getFees()
@@ -185,9 +185,9 @@ export default function InteractionClient(initialVaultId ) {
           priceHodl={priceHodl}
           reserve={coinReserve}
           supply={hodlCoinSupply}
-          devFee={devFee}
+          vaultFee={vaultFee}
           vaultCreatorFee={vaultCreatorFee}
-          reserveFee={reserveFee}
+          stableOrderFee={stableOrderFee}
         />
         <ActionsVault
           getBalances={getBalances}

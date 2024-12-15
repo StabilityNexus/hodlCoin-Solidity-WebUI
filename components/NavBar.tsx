@@ -67,7 +67,7 @@ export function NavBar() {
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem> */}
-        <NavigationMenuItem>
+        {/* <NavigationMenuItem>
           <NavigationMenuTrigger className='hover:text-foreground'>
             Application
           </NavigationMenuTrigger>
@@ -95,7 +95,7 @@ export function NavBar() {
               )}
             </ul>
           </NavigationMenuContent>
-        </NavigationMenuItem>
+        </NavigationMenuItem> */}
         {/* <NavigationMenuItem>
           <Link href='/' legacyBehavior passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>

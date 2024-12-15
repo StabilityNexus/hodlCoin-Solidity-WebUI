@@ -1,4 +1,4 @@
-import CreateForm from '@/components/CreateVault/CreateForm'
+import CreateForm from '@/components/VaultForm/CreateForm'
 
 export default function Createvault() {
   return (
