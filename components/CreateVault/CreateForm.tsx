@@ -8,6 +8,7 @@ import { Player } from '@lottiefiles/react-lottie-player'
 import Animation from '@/public/animations/congrats_animation.json'
 import { toast } from '../ui/use-toast'
 import Link from 'next/link'
+import { readContract } from '@wagmi/core'
 import { useState } from 'react'
 import { WagmiProvider, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import { getTransactionReceipt, simulateContract, writeContract } from '@wagmi/core'
@@ -22,89 +23,60 @@ import { ERC20Abi } from '@/utils/contracts/ERC20'
 export default function ProfileMenu() {
   //const { data: hash, writeContract } = useWriteContract()
 
-  const [name, setName] = useState<string>('')
+  const [coinName, setCoinName] = useState<string>('')
+  const [vaultName, setVaultName] = useState<string>('')
   const [symbol, setSymbol] = useState<string>('')
   const [coin, setCoin] = useState<string>('')
-  const [vaultCreatorTreasury, setVaultCreatorTreasury] = useState<string>('')
-  const [devTreasury, setDevTreasury] = useState<string>('')
-  const [reserveFee, setReserveFee] = useState<string>('')
+  const [vaultCreator, setVaultCreator] = useState<string>('')
+  const [stableOrder, setStableOrder] = useState<string>('')
+  const [vaultFee, setVaultFee] = useState<string>('')
   const [vaultCreatorFee, setVaultCreatorFee] = useState<string>('')
-  const [devFee, setDevFee] = useState<string>('')
-  const [initialReserve, setInitialReserve] = useState<string>('')
+  const [stableOrderFee, setStableOrderFee] = useState<string>('')
+  const [uniqueId, setUniqueId] = useState<number>(0)
 
   const [loadingCreation, setLoadingCreation] = useState<boolean>(false)
-  const [loadingApproval, setLoadingApproval] = useState<boolean>(false)
   const [submitted, setSubmitted] = useState<boolean>(false);
 
   const [hashTx, setHashTx] = useState<string>('');
-
-  async function approveInitialReserve() {
-    try {
-      setLoadingApproval(true)
-
-      console.log('Approving initial reserve')
-
-      const chainId = config.state.chainId
-
-      //const chainId = await getChainId(config)
-      const tx = await writeContract(config as any, {
-        address: coin as `0x${string}`,
-        abi: ERC20Abi,
-        functionName: 'approve',
-        args: [HodlCoinVaultFactories[chainId], BigInt(initialReserve)],
-      });
-
-      setHashTx(tx);
-
-      console.log('tx', tx)
-
-      toast({
-        title: 'Approval Done',
-        description: 'Your approval has been successfully completed',
-      })
-    } catch (err) {
-      console.log(err)
-    } finally {
-      setLoadingApproval(false);
-    }
-  }
 
   async function createVault() {
     try {
       setLoadingCreation(true)
       const chainId = config.state.chainId;
-
+      
       const tx = await writeContract(config as any, {
         address: HodlCoinVaultFactories[chainId],
         abi: HodlCoinFactoryAbi,
         functionName: 'createHodlCoin',
         args: [
-          name,
+          vaultName,
+          coinName,
           symbol,
           coin,
-          vaultCreatorTreasury,
-          devTreasury,
-          BigInt(reserveFee),
+          vaultCreator,
+          stableOrder,
+          BigInt(vaultFee),
           BigInt(vaultCreatorFee),
-          BigInt(devFee),
-          BigInt(initialReserve),
+          BigInt(stableOrderFee),
         ],
       });
+
+      setHashTx(tx);
 
       const result = await simulateContract(config as any, {
         address: HodlCoinVaultFactories[chainId],
         abi: HodlCoinFactoryAbi,
         functionName: 'createHodlCoin',
         args: [
-          name,
+          vaultName,
+          coinName,
           symbol,
           coin,
-          vaultCreatorTreasury,
-          devTreasury,
-          BigInt(reserveFee),
+          vaultCreator,
+          stableOrder,
+          BigInt(vaultFee),
           BigInt(vaultCreatorFee),
-          BigInt(devFee),
-          BigInt(initialReserve),
+          BigInt(stableOrderFee),
         ],
       });
 
@@ -115,29 +87,14 @@ export default function ProfileMenu() {
         description: 'Your vault has been successfully created',
       })
 
-      // const options = {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     name,
-      //     symbol,
-      //     chainId,
-      //     address: result.result,
-      //     coin,
-      //     vaultCreatorTreasury,
-      //     devTreasury,
-      //     reserveFee,
-      //     vaultCreatorFee,
-      //     devFee,
-      //   }),
-      // }
+      const uniqueIdOfVault = (await readContract(config as any, {
+        abi: HodlCoinFactoryAbi,
+        address: HodlCoinVaultFactories[chainId],
+        functionName: 'getTotalNumberOfVaults',
+        args: [],
+      })) as number
 
-      // const url = process.env.NEXT_PUBLIC_API_URL + '/vault'
-
-      // const response = await fetch(url, options)
-      // const data = await response.json()
-
-      // console.log(data)
+      setUniqueId(Number(uniqueIdOfVault))
 
       setSubmitted(true);
     } catch (err) {
@@ -159,15 +116,23 @@ export default function ProfileMenu() {
               <CardDescription className='mt-8 text-foreground'>
                 <Input
                   type='text'
-                  placeholder='Name'
+                  placeholder='Vault Name'
                   className='w-full'
-                  value={name}
-                  onChange={e => setName(e.target.value)}
+                  value={vaultName}
+                  onChange={e => setVaultName(e.target.value)}
                 />
 
                 <Input
                   type='text'
-                  placeholder='Symbol (ticker)'
+                  placeholder='Coin Name'
+                  className='w-full mt-4'
+                  value={coinName}
+                  onChange={e => setCoinName(e.target.value)}
+                />
+
+                <Input
+                  type='text'
+                  placeholder='Coin Symbol (ticker)'
                   className='w-full mt-4'
                   value={symbol}
                   onChange={e => setSymbol(e.target.value)}
@@ -185,24 +150,24 @@ export default function ProfileMenu() {
                   type='text'
                   placeholder='Vault Creator Treasury (address)'
                   className='w-full mt-4'
-                  value={vaultCreatorTreasury}
-                  onChange={e => setVaultCreatorTreasury(e.target.value)}
+                  value={vaultCreator}
+                  onChange={e => setVaultCreator(e.target.value)}
                 />
 
                 <Input
                   type='text'
                   placeholder='Dev Treasury (address)'
                   className='w-full mt-4'
-                  value={devTreasury}
-                  onChange={e => setDevTreasury(e.target.value)}
+                  value={stableOrder}
+                  onChange={e => setStableOrder(e.target.value)}
                 />
 
                 <Input
                   type='number'
-                  placeholder='Reserve Fee (in percentage)'
+                  placeholder='Vault Fee (in percentage)'
                   className='w-full mt-4'
-                  value={reserveFee}
-                  onChange={e => setReserveFee(e.target.value)}
+                  value={vaultFee}
+                  onChange={e => setVaultFee(e.target.value)}
                 />
 
                 <Input
@@ -215,35 +180,13 @@ export default function ProfileMenu() {
 
                 <Input
                   type='number'
-                  placeholder='Dev Fee (in percentage)'
+                  placeholder='Stable Order Fee (in percentage)'
                   className='w-full mt-4'
-                  value={devFee}
-                  onChange={e => setDevFee(e.target.value)}
+                  value={stableOrderFee}
+                  onChange={e => setStableOrderFee(e.target.value)}
                 />
 
-                <Input
-                  type='number'
-                  placeholder='Initial Reserve (THESE TOKENS WILL BECOME UNAVAILABLE)'
-                  className='w-full mt-4'
-                  value={initialReserve}
-                  onChange={e => setInitialReserve(e.target.value)}
-                />
                 <div className='mt-6'>
-                  {loadingApproval ? (
-                    <Button className='w-full mt-4' disabled>
-                      <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                      Approving your tokens...
-                    </Button>
-                  ) : (
-                    <Button
-                      className='w-full mt-4'
-                      onClick={approveInitialReserve}
-                    >
-                      Approve Initial Reserve (The tokens WILL BECOME
-                      UNAVAILABLE)
-                    </Button>
-                  )}
-
                   {loadingCreation ? (
                     <Button className='w-full mt-4' disabled>
                       <Loader2 className='mr-2 h-4 w-4 animate-spin' />
@@ -268,12 +211,19 @@ export default function ProfileMenu() {
                     autoplay
                   />
                   <p className='text-sm'>
-                    Your vault has been successfully created
+                    Your vault has been successfully created with Unique Id {uniqueId+1}
                   </p>
                   <Link href='/'>
-                    <Button 
-                      onClick={() => window.open(`https://sepolia.scrollscan.com/tx/${hashTx}`)}
-                    variant='outline'>See the transaction on-chain</Button>
+                    <Button
+                      onClick={() =>
+                        window.open(
+                          `https://sepolia.scrollscan.com/tx/${hashTx}`,
+                        )
+                      }
+                      variant='outline'
+                    >
+                      See the transaction on-chain
+                    </Button>
                   </Link>
                 </div>
               </CardDescription>
