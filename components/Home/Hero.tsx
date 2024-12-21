@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '../ui/button'
 import { Player } from '@lottiefiles/react-lottie-player'
-import PromptDialogBox from '../VaultForm/ExportVaultForm'
+import PromptDialogBox from '../Explorer/ExportVaultForm'
 
 export function Hero() {
   return (

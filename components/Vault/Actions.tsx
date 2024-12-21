@@ -5,6 +5,10 @@ import { vaultsProps } from '@/utils/props'
 import { useEffect, useState } from 'react'
 import HodlBox from './HodlBox'
 import UnholdBox from './UnhodlBox'
+import { Coins, LockKeyhole, TrendingUp } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input" 
 
 export default function ActionsVault({
   vault,
@@ -18,21 +22,21 @@ export default function ActionsVault({
   getBalances: Function
 }) {
   return (
-    <div className='w-full flex flex-col items-center justify-center'>
-      <div className='w-full max-w-screen-2xl py-12 grid grid-cols-1 lg:grid-cols-2 gap-12'>
+    <main className='container mx-auto p-4 space-y-6'>
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
         <HodlBox
           getBalances={getBalances}
           coinBalance={coinBalance}
-          id={vault?.address}
+          id={vault?.vaultAddress}
           vault={vault}
         />
         <UnholdBox
           getBalances={getBalances}
           hodlCoinBalance={hodlCoinBalance}
-          id={vault?.address}
+          id={vault?.vaultAddress}
           vault={vault}
         />
       </div>
-    </div>
+    </main>
   )
 }

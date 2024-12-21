@@ -1,9 +1,18 @@
 'use client'
 
-import { vaultsData } from '@/utils/mock'
 import { vaultsProps } from '@/utils/props'
-import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useAccount } from 'wagmi'
+import { useEffect, useRef, useState } from 'react'
+import { Coins, Loader2, LockKeyhole, TrendingUp } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { toast } from '../ui/use-toast'
+import { writeContract } from '@wagmi/core'
+import { config } from '@/utils/config'
+import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
+import { ERC20Abi } from '@/utils/contracts/ERC20'
+import { StylishButton } from '../StylishButton'
 
 export default function HeroVault({
   vault,
@@ -22,50 +31,273 @@ export default function HeroVault({
   vaultCreatorFee: number
   stableOrderFee: number
 }) {
+  const [isRewardPopupVisible, setIsRewardPopupVisible] = useState(false)
+  const [rewardAmount, setRewardAmount] = useState<number>(0)
+  const popupRef = useRef<HTMLDivElement>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [coinApproved, setCoinApproved] = useState<boolean>(false)
+
+  const account = useAccount()
+
+  const validateInputs = () => {
+    if (!vault?.vaultAddress || !vault?.coinAddress) {
+      toast({
+        title: 'Error',
+        description: 'Vault addresses not properly initialized',
+      })
+      return false
+    }
+
+    if (!account.address) {
+      toast({
+        title: 'Error',
+        description: 'Please connect your wallet',
+      })
+      return false
+    }
+
+    if (rewardAmount === null || rewardAmount <= 0) {
+      toast({
+        title: 'Amount Invalid',
+        description: 'Please input a valid amount',
+      })
+      return false
+    }
+
+    return true
+  }
+
+  const formatAmount = (amount: number) => {
+    try {
+      return BigInt(Math.floor(amount * 10 ** 18))
+    } catch (error) {
+      console.error('Error formatting amount:', error)
+      toast({
+        title: 'Error',
+        description: 'Error formatting amount',
+      })
+      return null
+    }
+  }
+
+  const handleRewardSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault() // Prevent default button behavior
+
+    try {
+      setIsLoading(true)
+
+      if (!validateInputs()) {
+        setIsLoading(false)
+        return
+      }
+
+      const formattedAmount = formatAmount(rewardAmount)
+      if (!formattedAmount) {
+        setIsLoading(false)
+        return
+      }
+
+      if (!coinApproved) {
+        try {
+          const tx = await writeContract(config as any, {
+            abi: ERC20Abi,
+            address: vault!.coinAddress as `0x${string}`,
+            functionName: 'approve',
+            args: [vault!.vaultAddress, formattedAmount],
+            account: account.address as `0x${string}`,
+          })
+
+          setCoinApproved(true)
+          toast({
+            title: 'Approval Success',
+            description: 'You have successfully approved your tokens',
+          })
+        } catch (error) {
+          console.error('Approval error:', error)
+          toast({
+            title: 'Approval Failed',
+            description:
+              error instanceof Error ? error.message : 'Error approving tokens',
+          })
+          setIsLoading(false)
+          return
+        }
+      } else {
+        try {
+          const tx = await writeContract(config as any, {
+            abi: HodlCoinAbi,
+            address: vault!.vaultAddress as `0x${string}`,
+            functionName: 'transferFrom',
+            args: [
+              account.address as `0x${string}`,
+              vault?.vaultAddress as `0x${string}`,
+              formattedAmount,
+            ],
+            account: account.address as `0x${string}`,
+          })
+
+          toast({
+            title: 'Reward Sent',
+            description: 'Your reward has been successfully transferred',
+          })
+
+          // Only reset form after successful transfer
+          setRewardAmount(0)
+          setCoinApproved(false)
+        } catch (error) {
+          console.error('Hodl error:', error)
+          toast({
+            title: 'Hodl Failed',
+            description:
+              error instanceof Error ? error.message : 'Error completing hodl',
+          })
+        }
+      }
+    } catch (error) {
+      console.error('Transaction error:', error)
+      toast({
+        title: 'Error',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'An unexpected error occurred',
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleClosePopup = () => {
+    if (!isLoading) {
+      setIsRewardPopupVisible(false)
+      setRewardAmount(0)
+      setCoinApproved(false)
+    }
+  }
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        popupRef.current &&
+        !popupRef.current.contains(event.target as Node) &&
+        !isLoading
+      ) {
+        handleClosePopup()
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isLoading])
+
   return (
-    <div className='w-full flex flex-col items-center justify-center'>
-      <div className='w-full max-w-screen-2xl'>
-        <div className='aspect-[10/1] shadow-xl overflow-hidden border-secondary border-[1px]'>
-          <div className='w-full h-full flex flex-row justify-between'>
-            <div className='h-full aspect-square overflow-hidden'>
-              {/* <Image
-                src={vault?.avatar as string}
-                alt=''
-                className='aspect-square h-full'
-                width={200}
-                height={200}
-              /> */}
+    <main className='container mx-auto p-4'>
+      <div className='relative'>
+        <Card className='bg-[#121212] border-gray-900'>
+          <CardHeader>
+            <div className='flex justify-between items-center'>
+              <CardTitle className='text-yellow-500'>Vault Overview</CardTitle>
+              <Button
+                className='hover:bg-yellow-600'
+                onClick={() => setIsRewardPopupVisible(true)}
+              >
+                Reward Stakers
+              </Button>
             </div>
-            <div className='p-4 flex flex-col items-start justify-center'>
-              <h3 className='text-xl font-bold text-foreground'>
-                {vault?.name}
-              </h3>
-              <p className='text-sm text-foreground'>{vault?.coinAddress}</p>
+          </CardHeader>
+          <CardContent>
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+              <div className='bg-[#181818] rounded-xl p-4'>
+                <div className='flex items-center gap-2 text-gray-400 mb-2'>
+                  <Coins className='h-4 w-4' />
+                  Price
+                </div>
+                <div className='text-2xl font-mono'>
+                  {priceHodl} {vault?.coinSymbol}
+                </div>
+              </div>
+              <div className='bg-[#181818] rounded-xl p-4'>
+                <div className='flex items-center gap-2 text-gray-400 mb-2'>
+                  <LockKeyhole className='h-4 w-4' />
+                  Total Value Locked
+                </div>
+                <div className='text-2xl font-mono'>
+                  {reserve} {vault?.coinSymbol}
+                </div>
+              </div>
+              <div className='bg-[#181818] rounded-xl p-4'>
+                <div className='flex items-center gap-2 text-gray-400 mb-2'>
+                  <TrendingUp className='h-4 w-4' />
+                  Supply
+                </div>
+                <div className='text-2xl font-mono'>
+                  {supply} {vault?.coinSymbol}
+                </div>
+              </div>
             </div>
-            <div className='py-4 px-16 flex flex-col items-start justify-center'>
-              <p className='text-sm text-foreground'>
-                Price Hodl: {priceHodl.toFixed(6)} {vault?.coinName}/{' '}
-                {vault?.name}
-              </p>
-              <p className='text-sm text-foreground'>
-                Reserve: {reserve.toFixed(6)} {vault?.coinName}
-              </p>
-              <p className='text-sm text-foreground'>
-                Supply: {supply.toFixed(6)} {vault?.name}
-              </p>
-              <p className='text-sm text-foreground'>
-                Vault Fee: {vaultFee.toFixed(3)}%
-              </p>
-              <p className='text-sm text-foreground'>
-                Vault Creator Fee: {vaultCreatorFee.toFixed(3)}%
-              </p>
-              <p className='text-sm text-foreground'>
-                Stable Order Fee: {stableOrderFee.toFixed(3)}%
-              </p>
+          </CardContent>
+        </Card>
+
+        {isRewardPopupVisible && (
+          <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+            <div
+              ref={popupRef}
+              className='bg-[#0a0a0a] border border-gray-800 rounded-xl p-6 w-full max-w-md'
+            >
+              <div className='flex justify-between items-center mb-4'>
+                <h3 className='text-xl font-semibold text-yellow-500'>
+                  Reward Stakers
+                </h3>
+                <Button
+                  variant='ghost'
+                  size='icon'
+                  onClick={handleClosePopup}
+                  disabled={isLoading}
+                  aria-label='Close reward popup'
+                >
+                  <p className='h-5 w-5'>x</p>
+                </Button>
+              </div>
+              <div className='space-y-4'>
+                <div>
+                  <Input
+                    id='reward-amount'
+                    type='number'
+                    value={rewardAmount}
+                    onChange={e => {
+                      const value = parseFloat(e.target.value)
+                      setRewardAmount(value)
+                    }}
+                    placeholder='Enter amount'
+                    className='bg-[#141414] border-gray-800 text-white'
+                    disabled={isLoading}
+                    min={0}
+                    step='any'
+                  />
+                </div>
+                {isLoading ? (
+                  <Button
+                    className='w-full hover:bg-yellow-600 text-black'
+                    disabled
+                  >
+                    <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                    Please wait
+                  </Button>
+                ) : (
+                  <Button
+                    className='w-full hover:bg-yellow-600 text-black'
+                    onClick={handleRewardSubmit}
+                  >
+                    {coinApproved ? 'Stake' : 'Approve Staking'}
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
-    </div>
+    </main>
   )
 }
