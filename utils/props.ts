@@ -1,15 +1,7 @@
 export type vaultsProps = {
-  id: number | string
-  chainId: number
-  name: string
-  avatar: string
-  address: string
-  coinAddress: string
+  vaultAddress: `0x${string}`
+  vaultName: string
   coinName: string
-  supply?: number
-  reserve?: number
-  hodlPrice?: number
-  unhodlPrice?: number
-  rate?: number
-  price?: number
+  coinAddress: `0x${string}`
+  coinSymbol: string
 }
