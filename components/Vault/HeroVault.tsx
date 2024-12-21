@@ -290,7 +290,7 @@ export default function HeroVault({
                     className='w-full hover:bg-yellow-600 text-black'
                     onClick={handleRewardSubmit}
                   >
-                    {coinApproved ? 'Stake' : 'Approve Staking'}
+                    {coinApproved ? 'Reward' : 'Approve Reward'}
                   </Button>
                 )}
               </div>
