@@ -11,6 +11,7 @@ import { useAccount } from 'wagmi'
 import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
 import { writeContract } from '@wagmi/core'
 import { config } from '@/utils/config'
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 
 export default function UnholdBox({
   id,
@@ -24,83 +25,131 @@ export default function UnholdBox({
   getBalances: Function
 }) {
   const { toast } = useToast()
-
   const [loadingUnhold, setLoadingUnhold] = useState<boolean>(false)
   const [unholdAmount, setUnholdAmount] = useState<number | null>(null)
-
   const account = useAccount()
 
-  // const conversion = (amount: number) => {
-  //   return amount * (1 + (vault?.rate ?? 0))
-  // }
+  const validateInputs = () => {
+    if (!vault?.vaultAddress) {
+      toast({
+        title: 'Error',
+        description: 'Vault address not properly initialized',
+      })
+      return false
+    }
+
+    if (!account.address) {
+      toast({
+        title: 'Error',
+        description: 'Please connect your wallet',
+      })
+      return false
+    }
+
+    if (unholdAmount === null || unholdAmount <= 0) {
+      toast({
+        title: 'Amount Invalid',
+        description: 'Please input a valid amount',
+      })
+      return false
+    }
+
+    if (unholdAmount > hodlCoinBalance) {
+      toast({
+        title: 'Insufficient Balance',
+        description: 'You do not have enough staked tokens to unhold',
+      })
+      return false
+    }
+
+    return true
+  }
+
+  const formatAmount = (amount: number) => {
+    try {
+      return BigInt(Math.floor(amount * 10 ** 18))
+    } catch (error) {
+      console.error('Error formatting amount:', error)
+      toast({
+        title: 'Error',
+        description: 'Error formatting amount',
+      })
+      return null
+    }
+  }
 
   const unholdAction = async () => {
+    if (!validateInputs()) {
+      return
+    }
+
     try {
       setLoadingUnhold(true)
-      if (unholdAmount === null || unholdAmount <= 0) {
-        toast({
-          title: 'Amount Null',
-          description: 'Please input a valid amount',
-        })
-        setLoadingUnhold(false)
+
+      const formattedAmount = formatAmount(unholdAmount!)
+      if (!formattedAmount) {
         return
       }
 
       const tx = await writeContract(config as any, {
         abi: HodlCoinAbi,
-        // @ts-ignore
-        address: vault?.address as string,
+        address: vault?.vaultAddress as `0x${string}`,
         functionName: 'unhodl',
-        args: [BigInt(unholdAmount * 10 ** 18)],
-        account: account?.address as '0x${string}',
+        args: [formattedAmount],
+        account: account.address as `0x${string}`,
       })
 
       await getBalances()
 
       toast({
-        title: 'Unhold Done',
-        description: 'Your unhold has been successfully completed',
+        title: 'Unhold Success',
+        description: 'Your tokens have been successfully unstaked',
       })
-      console.log('unhold', unholdAmount)
-      setLoadingUnhold(false)
+
+      setUnholdAmount(null) // Reset input after successful unhold
     } catch (error) {
+      console.error('Unhold error:', error)
       toast({
         title: 'Error',
-        description: String(error),
+        description:
+          error instanceof Error ? error.message : 'Failed to unhold tokens',
       })
-      console.error(error)
+    } finally {
+      setLoadingUnhold(false)
     }
   }
 
   return (
-    <div className='flex-1 shadow-xl overflow-hidden border-secondary border-[1px] p-12'>
-      <div className='flex flex-col space-y-4'>
-        <h1 className='text-2xl font-bold pb-6'>Unhold</h1>
+    <Card className='bg-[#121212] border-gray-900'>
+      <CardHeader>
+        <CardTitle className='text-yellow-500'>Unhold Tokens</CardTitle>
+      </CardHeader>
+      <CardContent className='space-y-8'>
         <Input
           type='number'
           placeholder='Amount'
-          className='w-full'
+          className='w-full bg-black'
           value={unholdAmount !== null ? unholdAmount.toString() : ''}
-          onChange={e => setUnholdAmount(Number(e.target.value))}
+          onChange={e => {
+            const value = parseFloat(e.target.value)
+            setUnholdAmount(isNaN(value) ? null : value)
+          }}
+          min={0}
+          max={hodlCoinBalance}
         />
-        <div className='flex flex-row space-x-2 px-2 pb-4 text-sm text-primary'>
-          <p
-            style={{ cursor: 'pointer' }}
-            onClick={() => setUnholdAmount(Number(hodlCoinBalance))}
-          >
-            {Number(hodlCoinBalance).toString()}
-          </p>
-          <p>{vault?.name}</p>
-        </div>
         {loadingUnhold ? (
           <Button className='w-full' disabled>
             <Loader2 className='mr-2 h-4 w-4 animate-spin' />
             Please wait
           </Button>
         ) : (
-          <StylishButton buttonCall={unholdAction}>unhodl</StylishButton>
+          <StylishButton
+            buttonCall={unholdAction}
+          >
+            Unstake
+          </StylishButton>
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }
