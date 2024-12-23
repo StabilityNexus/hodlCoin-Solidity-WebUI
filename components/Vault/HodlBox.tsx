@@ -15,19 +15,19 @@ import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 
 export default function HodlBox({
-  id,
+  priceHodl,
   vault,
   coinBalance,
   getBalances,
 }: {
-  id: any
+  priceHodl: any
   vault: vaultsProps | null
   coinBalance: number
   getBalances: Function
 }) {
   const { toast } = useToast()
   const [loadingHold, setLoadingHold] = useState<boolean>(false)
-  const [hodlAmount, setHodlAmount] = useState<number | null>(null)
+  const [hodlAmount, setHodlAmount] = useState<number>(0)
   const [coinApproved, setCoinApproved] = useState<boolean>(false)
 
   const account = useAccount()
@@ -137,7 +137,7 @@ export default function HodlBox({
             title: 'Hodl Success',
             description: 'Your hodl has been successfully completed',
           })
-          setCoinApproved(false) // Reset approval state after successful hodl
+          setCoinApproved(false) 
         } catch (error) {
           console.error('Hodl error:', error)
           toast({
@@ -164,9 +164,9 @@ export default function HodlBox({
   return (
     <Card className='bg-[#121212] border-gray-900'>
       <CardHeader>
-        <CardTitle className='text-yellow-500'>HODL Tokens</CardTitle>
+        <CardTitle className='text-yellow-500'>Stake Tokens</CardTitle>
       </CardHeader>
-      <CardContent className='space-y-8'>
+      <CardContent>
         <Input
           type='number'
           placeholder='Amount'
@@ -174,9 +174,18 @@ export default function HodlBox({
           value={hodlAmount !== null ? hodlAmount.toString() : ''}
           onChange={e => {
             const value = parseFloat(e.target.value)
-            setHodlAmount(isNaN(value) ? null : value)
+            setHodlAmount(value)
           }}
         />
+        <div className='font-mono flex flex-row space-x-2 px-1 pb-4 pt-3 text-sm text-green-400'>
+          {hodlAmount ? (<p>
+            {hodlAmount/priceHodl}
+          </p>):
+          (
+            <p>0</p>
+          )}
+          <p>h{vault?.coinSymbol}</p>
+        </div>
         {loadingHold ? (
           <Button className='w-full' disabled>
             <Loader2 className='mr-2 h-4 w-4 animate-spin' />

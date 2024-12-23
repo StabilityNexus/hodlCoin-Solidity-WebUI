@@ -1,22 +1,18 @@
 'use client'
 
-import { vaultsData } from '@/utils/mock'
 import { vaultsProps } from '@/utils/props'
-import { useEffect, useState } from 'react'
 import HodlBox from './HodlBox'
 import UnholdBox from './UnhodlBox'
-import { Coins, LockKeyhole, TrendingUp } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input" 
-
+ 
 export default function ActionsVault({
   vault,
+  priceHodl,
   coinBalance,
   hodlCoinBalance,
   getBalances,
 }: {
   vault: vaultsProps | null
+  priceHodl: any
   coinBalance: number
   hodlCoinBalance: number
   getBalances: Function
@@ -26,14 +22,14 @@ export default function ActionsVault({
       <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
         <HodlBox
           getBalances={getBalances}
+          priceHodl={priceHodl}
           coinBalance={coinBalance}
-          id={vault?.vaultAddress}
           vault={vault}
         />
         <UnholdBox
           getBalances={getBalances}
+          priceHodl={priceHodl}
           hodlCoinBalance={hodlCoinBalance}
-          id={vault?.vaultAddress}
           vault={vault}
         />
       </div>

@@ -12,24 +12,17 @@ import { writeContract } from '@wagmi/core'
 import { config } from '@/utils/config'
 import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
 import { ERC20Abi } from '@/utils/contracts/ERC20'
-import { StylishButton } from '../StylishButton'
 
 export default function HeroVault({
   vault,
   priceHodl,
   reserve,
   supply,
-  vaultFee,
-  vaultCreatorFee,
-  stableOrderFee,
 }: {
   vault: vaultsProps | null
   priceHodl: any
   reserve: any
   supply: any
-  vaultFee: number
-  vaultCreatorFee: number
-  stableOrderFee: number
 }) {
   const [isRewardPopupVisible, setIsRewardPopupVisible] = useState(false)
   const [rewardAmount, setRewardAmount] = useState<number>(0)
@@ -126,10 +119,9 @@ export default function HeroVault({
         try {
           const tx = await writeContract(config as any, {
             abi: HodlCoinAbi,
-            address: vault!.vaultAddress as `0x${string}`,
-            functionName: 'transferFrom',
+            address: vault?.vaultAddress as `0x${string}`,
+            functionName: 'transfer',
             args: [
-              account.address as `0x${string}`,
               vault?.vaultAddress as `0x${string}`,
               formattedAmount,
             ],
@@ -141,7 +133,6 @@ export default function HeroVault({
             description: 'Your reward has been successfully transferred',
           })
 
-          // Only reset form after successful transfer
           setRewardAmount(0)
           setCoinApproved(false)
         } catch (error) {
@@ -175,23 +166,6 @@ export default function HeroVault({
     }
   }
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        popupRef.current &&
-        !popupRef.current.contains(event.target as Node) &&
-        !isLoading
-      ) {
-        handleClosePopup()
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [isLoading])
-
   return (
     <main className='container mx-auto p-4'>
       <div className='relative'>
@@ -209,7 +183,7 @@ export default function HeroVault({
           </CardHeader>
           <CardContent>
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-              <div className='bg-[#181818] rounded-xl p-4'>
+              <div className='bg-[#181818] border border-gray-700 rounded-xl p-4'>
                 <div className='flex items-center gap-2 text-gray-400 mb-2'>
                   <Coins className='h-4 w-4' />
                   Price
@@ -218,7 +192,7 @@ export default function HeroVault({
                   {priceHodl} {vault?.coinSymbol}
                 </div>
               </div>
-              <div className='bg-[#181818] rounded-xl p-4'>
+              <div className='bg-[#181818] border border-gray-700 rounded-xl p-4'>
                 <div className='flex items-center gap-2 text-gray-400 mb-2'>
                   <LockKeyhole className='h-4 w-4' />
                   Total Value Locked
@@ -227,7 +201,7 @@ export default function HeroVault({
                   {reserve} {vault?.coinSymbol}
                 </div>
               </div>
-              <div className='bg-[#181818] rounded-xl p-4'>
+              <div className='bg-[#181818] border border-gray-700 rounded-xl p-4'>
                 <div className='flex items-center gap-2 text-gray-400 mb-2'>
                   <TrendingUp className='h-4 w-4' />
                   Supply

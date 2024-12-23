@@ -11,24 +11,25 @@ import { useAccount } from 'wagmi'
 import { readContract } from '@wagmi/core'
 import { config } from '@/utils/config'
 import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
-import { HodlCoinFactoryAbi } from '@/utils/contracts/HodlCoinFactory'
-import { HodlCoinVaultFactories } from '@/utils/addresses'
-import { init } from 'next/dist/compiled/webpack/webpack'
+import { useSearchParams } from 'next/navigation'
 
-interface InteractionClientProps {
-  initialVaultId: {
-    initialVaultId: number
-  }
-}
-export default function InteractionClient({
-  initialVaultId,
-}: InteractionClientProps) {
-  const [uniqueId, setUniqueId] = useState<number>(5)
-  const [loading, setLoading] = useState<boolean>(false)
-  const [vaultData, setVaultData] = useState({
+
+export default function InteractionClient() {
+
+  const searchParams = useSearchParams()
+  let chainId = searchParams.get('chainId')
+  let vaultAddress = searchParams.get('vault')
+
+  const [vaultCreator, setVaultCreator] = useState<`0x${string}`>('0x0')
+  const [coinAddress, setCoinAddress] = useState<`0x${string}`>('0x0')
+  const [coinName, setCoinName] = useState<string>('')
+  const [coinSymbol, setCoinSymbol] = useState<string>('')
+
+  const [vault, setVault] = useState<vaultsProps>({
+    coinAddress: '0x0' as `0x${string}`,
+    coinName: '',
+    coinSymbol: '',
     vaultAddress: '0x0' as `0x${string}`,
-    coinContract: '0x0' as `0x${string}`,
-    vault: null as vaultsProps | null,
   })
 
   const [balances, setBalances] = useState({
@@ -46,117 +47,123 @@ export default function InteractionClient({
   })
 
   const account = useAccount()
-  
-  // Initial setup - get vault data
-  useEffect(() => {
-    setUniqueId(initialVaultId.initialVaultId)
-    getVaultsData()
-  }, [initialVaultId.initialVaultId])
 
   const getVaultsData = async () => {
     try {
-      setLoading(true)
-      const chainId = config.state.chainId
-
-      const vaultDetails = (await readContract(config as any, {
-        abi: HodlCoinFactoryAbi,
-        address: HodlCoinVaultFactories[chainId],
-        functionName: 'getVaultDetails',
-        args: [uniqueId],
-      })) as vaultsProps
-
-      const newVaultData = {
-        vaultAddress: vaultDetails.vaultAddress,
-        coinContract: vaultDetails.coinAddress,
-        vault: {
-          vaultAddress: vaultDetails.vaultAddress,
-          vaultName: vaultDetails.vaultName,
-          coinName: vaultDetails.coinName,
-          coinAddress: vaultDetails.coinAddress,
-          coinSymbol: vaultDetails.coinSymbol,
-        },
+      if (!vaultAddress) {
+        console.error('No vault address provided')
+        return
       }
+  
+      const newCoinAddress = (await readContract(config as any, {
+        abi: HodlCoinAbi,
+        address: vaultAddress as `0x${string}`,
+        functionName: 'coin',
+        args: [],
+      })) as `0x${string}`
 
-      setVaultData(newVaultData)
-      setLoading(false)
+      const newVaultCreator = (await readContract(config as any, {
+        abi: HodlCoinAbi,
+        address: vaultAddress as `0x${string}`,
+        functionName: 'vaultCreator',
+        args: [],
+      })) as `0x${string}`
+
+      const [name, symbol] = await Promise.all([
+        readContract(config as any, {
+          abi: ERC20Abi,
+          address: newCoinAddress,
+          functionName: 'name',
+          args: [],
+        }),
+        readContract(config as any, {
+          abi: ERC20Abi,
+          address: newCoinAddress,
+          functionName: 'symbol',
+          args: [],
+        }),
+      ])
+
+      setVault({
+        coinAddress: newCoinAddress,
+        coinName: name as string,
+        coinSymbol: symbol as string,
+        vaultAddress: vaultAddress as `0x${string}`,
+      })
+
+      setVaultCreator(newVaultCreator)
+      setCoinAddress(newCoinAddress)
+      setCoinName(name as string)
+      setCoinSymbol(symbol as string)
+
     } catch (error) {
-      console.error(error)
-      setLoading(false)
+      console.error('Error fetching vault data:', error)
     }
   }
 
-  // Get fees once vault address is available
-  useEffect(() => {
-    if (vaultData.vaultAddress !== '0x0') {
-      getFees()
-    }
-  }, [vaultData.vaultAddress])
-
+  
   const getFees = async () => {
     try {
       const [vaultFeeOnChain, vaultCreatorFeeOnChain, stableOrderFeeOnChain] =
-        await Promise.all([
-          readContract(config as any, {
-            abi: HodlCoinAbi,
-            address: vaultData.vaultAddress,
-            functionName: 'vaultFee',
-            args: [],
-          }),
-          readContract(config as any, {
-            abi: HodlCoinAbi,
-            address: vaultData.vaultAddress,
-            functionName: 'vaultCreatorFee',
-            args: [],
-          }),
-          readContract(config as any, {
-            abi: HodlCoinAbi,
-            address: vaultData.vaultAddress,
-            functionName: 'stableOrderFee',
-            args: [],
-          }),
-        ])
-
+      await Promise.all([
+        readContract(config as any, {
+          abi: HodlCoinAbi,
+          address: vaultAddress as `0x${string}`,
+          functionName: 'vaultFee',
+          args: [],
+        }),
+        readContract(config as any, {
+          abi: HodlCoinAbi,
+          address: vaultAddress as `0x${string}`,
+          functionName: 'vaultCreatorFee',
+          args: [],
+        }),
+        readContract(config as any, {
+          abi: HodlCoinAbi,
+          address: vaultAddress as `0x${string}`,
+          functionName: 'stableOrderFee',
+          args: [],
+        }),
+      ])
+      
       setFees({
-        vaultFee: Number(vaultFeeOnChain) / 1000,
-        vaultCreatorFee: Number(vaultCreatorFeeOnChain) / 1000,
-        stableOrderFee: Number(stableOrderFeeOnChain) / 1000,
+        vaultFee: Number(vaultFeeOnChain),
+        vaultCreatorFee: Number(vaultCreatorFeeOnChain),
+        stableOrderFee: Number(stableOrderFeeOnChain),
       })
     } catch (err) {
       console.error('Error getting fees:', err)
     }
   }
-
-  // Get balances and reserves once vault and coin addresses are available
-  useEffect(() => {
-    if (
-      vaultData.vaultAddress !== '0x0' &&
-      vaultData.coinContract !== '0x0' &&
-      account.address
-    ) {
-      getBalances()
-      getReservesPrices()
-    }
-  }, [vaultData.vaultAddress, vaultData.coinContract, account.address])
-
+  
+  
   const getBalances = async () => {
     try {
-      const [coinBalanceOnChain, hodlCoinBalanceOnChain] = await Promise.all([
-        readContract(config as any, {
-          abi: ERC20Abi,
-          address: vaultData.coinContract,
-          functionName: 'balanceOf',
-          args: [account.address],
-        }),
-        readContract(config as any, {
-          abi: ERC20Abi,
-          address: vaultData.vaultAddress,
-          functionName: 'balanceOf',
-          args: [account.address],
-        }),
-      ])
-
+      const [coinReserveOnChain, coinBalanceOnChain, hodlCoinBalanceOnChain] =
+        await Promise.all([
+          readContract(config as any, {
+            abi: ERC20Abi,
+            address: coinAddress as `0x${string}`,
+            functionName: 'balanceOf',
+            args: [vaultAddress],
+          }),
+          readContract(config as any, {
+            abi: ERC20Abi,
+            address: coinAddress as `0x${string}`,
+            functionName: 'balanceOf',
+            args: [account.address],
+          }),
+          readContract(config as any, {
+            abi: ERC20Abi,
+            address: vaultAddress as `0x${string}`,
+            functionName: 'balanceOf',
+            args: [account.address],
+          }),
+        ])
+      
       setBalances(prev => ({
         ...prev,
+        coinReserve: Number(coinReserveOnChain) / 10 ** 18,
         coinBalance: Number(coinBalanceOnChain) / 10 ** 18,
         hodlCoinBalance: Number(hodlCoinBalanceOnChain) / 10 ** 18,
       }))
@@ -164,34 +171,27 @@ export default function InteractionClient({
       console.error('Error getting balances:', err)
     }
   }
-
+  
   const getReservesPrices = async () => {
     try {
-      const [coinReserveOnChain, hodlCoinSupplyOnChain, priceHodlOnChain] =
-        await Promise.all([
-          readContract(config as any, {
-            abi: ERC20Abi,
-            address: vaultData.coinContract,
-            functionName: 'balanceOf',
-            args: [vaultData.vaultAddress],
-          }),
-          readContract(config as any, {
-            abi: ERC20Abi,
-            address: vaultData.vaultAddress,
-            functionName: 'totalSupply',
-            args: [],
-          }),
-          readContract(config as any, {
-            abi: HodlCoinAbi,
-            address: vaultData.vaultAddress,
-            functionName: 'priceHodl',
-            args: [],
-          }),
-        ])
-
+      const [hodlCoinSupplyOnChain, priceHodlOnChain] =
+      await Promise.all([
+        readContract(config as any, {
+          abi: ERC20Abi,
+          address: vaultAddress as `0x${string}`,
+          functionName: 'totalSupply',
+          args: [],
+        }),
+        readContract(config as any, {
+          abi: HodlCoinAbi,
+          address: vaultAddress as `0x${string}`,
+          functionName: 'priceHodl',
+          args: [],
+        }),
+      ])
+      
       setBalances(prev => ({
         ...prev,
-        coinReserve: Number(coinReserveOnChain) / 10 ** 18,
         hodlCoinSupply: Number(hodlCoinSupplyOnChain) / 10 ** 18,
         priceHodl: Number(priceHodlOnChain) / 100000,
       }))
@@ -199,21 +199,43 @@ export default function InteractionClient({
       console.error('Error getting reserves and prices:', err)
     }
   }
-
+  
+  useEffect(() => {
+    if (vaultAddress) {
+      getVaultsData()
+    }
+  }, [vaultAddress])
+  
+  useEffect(() => {
+    if (vaultAddress && coinAddress) {
+      getReservesPrices()
+      getFees()
+    }
+      if (vaultAddress && coinAddress && account.address) {
+        getBalances()
+      }
+  }, [vaultAddress, coinAddress, account.address])
+  
   return (
     <div className='w-full pt-14'>
       <div className='w-full md:px-24 lg:px-24'>
         <div className='container mx-auto px-8 py-6 flex justify-between items-center'>
           <div className='flex items-center space-x-4'>
             <Coins className='h-8 w-8 text-yellow-400' />
-            <h1 className='text-2xl font-bold text-white'>
-              {vaultData.vault?.coinName} Vault
-            </h1>
+            <h1 className='text-2xl font-bold text-white'>{coinName} Vault</h1>
           </div>
-          <div className='bg-[#141414] border-gray-900 rounded-md px-5 py-3 text-centre'>
-            <div className='text-m text-gray-400'>Balance</div>
-            <div className='font-mono text-lg text-yellow-400'>
-              {balances.coinBalance} {vaultData.vault?.coinSymbol}
+          <div className='flex space-x-4'>
+            <div className='bg-[#141414] border border-gray-800 rounded-md px-5 py-3 text-center'>
+              <div className='text-sm text-gray-400'>Token Balance</div>
+              <div className='font-mono text-lg text-yellow-400'>
+                {balances.coinBalance} {coinSymbol}
+              </div>
+            </div>
+            <div className='bg-[#141414] border border-gray-800 rounded-md px-5 py-3 text-center'>
+              <div className='text-sm text-gray-400'>Staked Balance</div>
+              <div className='font-mono text-lg text-green-400'>
+                {balances.hodlCoinBalance} h{coinSymbol}
+              </div>
             </div>
           </div>
         </div>
@@ -221,28 +243,24 @@ export default function InteractionClient({
 
       <div className='w-full px-8'>
         <HeroVault
-          vault={vaultData.vault}
+          vault={vault}
           priceHodl={balances.priceHodl}
           reserve={balances.coinReserve}
           supply={balances.hodlCoinSupply}
-          vaultFee={fees.vaultFee}
-          vaultCreatorFee={fees.vaultCreatorFee}
-          stableOrderFee={fees.stableOrderFee}
         />
         <ActionsVault
+          vault={vault}
           getBalances={getBalances}
+          priceHodl={balances.priceHodl}
           coinBalance={balances.coinBalance}
           hodlCoinBalance={balances.hodlCoinBalance}
-          vault={vaultData.vault}
         />
         <VaultInformation
-          vault={vaultData.vault}
-          priceHodl={balances.priceHodl}
-          reserve={balances.coinReserve}
-          supply={balances.hodlCoinSupply}
+          vault={vault}
           vaultFee={fees.vaultFee}
           vaultCreatorFee={fees.vaultCreatorFee}
           stableOrderFee={fees.stableOrderFee}
+          vaultCreator={vaultCreator}
         />
       </div>
     </div>
