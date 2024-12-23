@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '../ui/button'
 import { Player } from '@lottiefiles/react-lottie-player'
-import PromptDialogBox from '../Explorer/ExportVaultForm'
+import FindVault from '../FindVault/FindVaultForm'
 
 export function Hero() {
   return (
@@ -31,7 +31,7 @@ export function Hero() {
               {/* <Link href='/explorer'>
                 <Button>Play the game</Button>
               </Link> */}
-                <PromptDialogBox>Play the game</PromptDialogBox>
+              <FindVault>Play the game</FindVault>
             </div>
             <div className='flex flex-row space-x-1 items-center'>
               <p>A project by</p>
