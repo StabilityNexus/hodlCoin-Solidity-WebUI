@@ -1,24 +1,26 @@
 import ExplorerVaults from '@/components/Explorer/ExplorerVaults'
-import { redirect } from 'next/navigation'
+import { Input } from '@/components/ui/input'
 
 export default function ExplorerPage() {
-
-  const isPageDisabled = true; // Set this flag to disable the page
-
-  if (isPageDisabled) {
-    redirect('/');
-  }
-
+ 
   return (
-    <div className='w-full'>
-      <div className='w-full h-36'>
-        <div className='flex flex-col items-center justify-end py-4 h-full space-y-6'>
-          <h1 className='text-primary font-bold text-xl'>Vaults</h1>
+    <main className='container mx-auto px-4 py-8'>
+      <div className='w-full'>
+        <div className='flex justify-between items-center pt-14 mb-8'>
+          <h2 className='text-2xl font-bold text-yellow-400'>Vaults Explorer</h2>
+          <div className='w-64'>
+            <div className='relative'>
+              <Input
+                placeholder='Search Vaults'
+                className='pl-8 bg-muted/50 border-none'
+              />
+            </div>
+          </div>
+        </div>
+        <div className='w-full flex justify-center pb-[20vh] oveflow-x-hidden'>
+          <ExplorerVaults />
         </div>
       </div>
-      <div className='w-full flex justify-center pb-[20vh] oveflow-x-hidden'>
-        <ExplorerVaults />
-      </div>
-    </div>
+    </main>
   )
 }
