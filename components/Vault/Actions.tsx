@@ -1,38 +1,38 @@
 'use client'
 
-import { vaultsData } from '@/utils/mock'
 import { vaultsProps } from '@/utils/props'
-import { useEffect, useState } from 'react'
 import HodlBox from './HodlBox'
 import UnholdBox from './UnhodlBox'
-
+ 
 export default function ActionsVault({
   vault,
+  priceHodl,
   coinBalance,
   hodlCoinBalance,
   getBalances,
 }: {
   vault: vaultsProps | null
+  priceHodl: any
   coinBalance: number
   hodlCoinBalance: number
   getBalances: Function
 }) {
   return (
-    <div className='w-full flex flex-col items-center justify-center'>
-      <div className='w-full max-w-screen-2xl py-12 grid grid-cols-1 lg:grid-cols-2 gap-12'>
+    <main className='container mx-auto p-4 space-y-6'>
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
         <HodlBox
           getBalances={getBalances}
+          priceHodl={priceHodl}
           coinBalance={coinBalance}
-          id={vault?.address}
           vault={vault}
         />
         <UnholdBox
           getBalances={getBalances}
+          priceHodl={priceHodl}
           hodlCoinBalance={hodlCoinBalance}
-          id={vault?.address}
           vault={vault}
         />
       </div>
-    </div>
+    </main>
   )
 }

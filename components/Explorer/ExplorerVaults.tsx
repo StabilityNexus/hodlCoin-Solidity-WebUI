@@ -1,69 +1,76 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { vaultsData } from '@/utils/mock'
 import { vaultsProps } from '@/utils/props'
 import CardExplorer from './CardExplorer'
-
+import { readContract } from '@wagmi/core'
+import { config } from '@/utils/config'
+import { HodlCoinVaultFactories } from '@/utils/addresses'
+import { HodlCoinFactoryAbi } from '@/utils/contracts/HodlCoinFactory'
 
 export default function ExplorerVaults() {
-  // const [loading, setLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState(false)
+  const [vaults, setVaults] = useState<vaultsProps[]>([])
 
-  // const [vaults, setVaults] = useState<vaultsProps[]>([])
+  const getVaults = async () => {
+    try {
+      setLoading(true)
+      const chainId = config.state.chainId
 
-  // const getVaultsData = async () => {
-  //   try {
-  //     setLoading(true)
+      const totalVaults = (await readContract(config as any, {
+        abi: HodlCoinFactoryAbi,
+        address: HodlCoinVaultFactories[chainId],
+        functionName: 'vaultId',
+        args: [],
+      })) as bigint
 
-  //     const options = {
-  //       method: 'GET',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       }, 
-  //     }
+      const vaultPromises = []
+      for (let i = 1; i <= Number(totalVaults); i++) {
+        vaultPromises.push(
+          readContract(config as any, {
+            abi: HodlCoinFactoryAbi,
+            address: HodlCoinVaultFactories[chainId],
+            functionName: 'vaults',
+            args: [BigInt(i)],
+          }),
+        )
+      }
 
-  //     const url = process.env.NEXT_PUBLIC_API_URL + '/vaults'
-  //     const response = await fetch(url, options)
-  //     const data = await response.json()
+      const allVaults = await Promise.all(vaultPromises)
 
-  //     setVaults(data.vaults)
+      const formattedVaults = allVaults.map((vault: any) => ({
+        vaultAddress: vault[0],
+        coinName: vault[1],
+        coinAddress: vault[2],
+        coinSymbol: vault[3],
+      }))
 
-  //     console.log(data.vaults)
-  //   } catch (error) {
-  //     console.error('Error fetching vaults data:', error)
-  //   } finally {
-  //     setLoading(false)
-  //   }
-  // }
+      setVaults(formattedVaults)
+    } catch (err) {
+      console.error('Error getting vaults:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
-  // useEffect(() => {
-  //   if (vaults.length > 0) return
-
-  //   getVaultsData()
-  // }, [])
+  useEffect(() => {
+    getVaults()
+  }, [])
 
   return (
-    <div className='w-full max-w-screen-2xl'>
-      <div className='p-6 w-full md:px-24 lg:px-24 mb-24'>
-        <div className='w-full grid grid-cols-2 gap-6'>
-          {/* {vaults.map((vault, index) => {
-            return (
-              <div key={index}>
-                <CardExplorer
-                  id={vault.id}
-                  name={vault.name}
-                  address={vault.address}
-                  avatar={'/images/avatar1.jpeg'}
-                  supply={vault.supply || 0}
-                  reserve={vault.reserve || 0}
-                  price={vault.price || 0}
-                  rate={vault.rate || 0}
-                />
-              </div>
-            )
-          })} */}
+    <div className='w-full space-y-4'>
+      {loading ? (
+        <div className='text-center'>Loading vaults...</div>
+      ) : (
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-7xl mx-auto'>
+          {vaults.map((vault, index) => (
+            <CardExplorer
+              key={`${vault.vaultAddress}-${index}`}
+              vault={vault}
+            />
+          ))}
         </div>
-      </div>
+      )}
     </div>
   )
 }
