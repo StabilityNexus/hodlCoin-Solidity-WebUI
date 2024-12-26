@@ -113,7 +113,7 @@ export default function VaultInformation({
                 </div>
                 <div>
                   <h2 className='text-sm font-medium text-gray-400 mb-2'>
-                    Fee paid to the Vault's Creator
+                    Fee paid to the Vault Creator
                   </h2>
                   <div className='bg-black rounded-xl p-3'>
                     <code className='font-mono text-l'>
