@@ -13,12 +13,17 @@ import { config } from '@/utils/config'
 import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
 import { useSearchParams } from 'next/navigation'
 
-
 export default function InteractionClient() {
-
   const searchParams = useSearchParams()
-  let chainId = searchParams.get('chainId')
-  let vaultAddress = searchParams.get('vault')
+  const [chainId, setChainId] = useState<string | null>(null)
+  const [vaultAddress, setVaultAddress] = useState<string | null>(null)
+
+  useEffect(() => {
+    const cid = searchParams.get('chainId')
+    const vAddr = searchParams.get('vault')
+    setChainId(cid)
+    setVaultAddress(vAddr)
+  }, [searchParams])
 
   const [vaultCreator, setVaultCreator] = useState<`0x${string}`>('0x0')
   const [coinAddress, setCoinAddress] = useState<`0x${string}`>('0x0')
@@ -54,7 +59,7 @@ export default function InteractionClient() {
         console.error('No vault address provided')
         return
       }
-  
+
       const newCoinAddress = (await readContract(config as any, {
         abi: HodlCoinAbi,
         address: vaultAddress as `0x${string}`,
@@ -95,37 +100,35 @@ export default function InteractionClient() {
       setCoinAddress(newCoinAddress)
       setCoinName(name as string)
       setCoinSymbol(symbol as string)
-
     } catch (error) {
       console.error('Error fetching vault data:', error)
     }
   }
 
-  
   const getFees = async () => {
     try {
       const [vaultFeeOnChain, vaultCreatorFeeOnChain, stableOrderFeeOnChain] =
-      await Promise.all([
-        readContract(config as any, {
-          abi: HodlCoinAbi,
-          address: vaultAddress as `0x${string}`,
-          functionName: 'vaultFee',
-          args: [],
-        }),
-        readContract(config as any, {
-          abi: HodlCoinAbi,
-          address: vaultAddress as `0x${string}`,
-          functionName: 'vaultCreatorFee',
-          args: [],
-        }),
-        readContract(config as any, {
-          abi: HodlCoinAbi,
-          address: vaultAddress as `0x${string}`,
-          functionName: 'stableOrderFee',
-          args: [],
-        }),
-      ])
-      
+        await Promise.all([
+          readContract(config as any, {
+            abi: HodlCoinAbi,
+            address: vaultAddress as `0x${string}`,
+            functionName: 'vaultFee',
+            args: [],
+          }),
+          readContract(config as any, {
+            abi: HodlCoinAbi,
+            address: vaultAddress as `0x${string}`,
+            functionName: 'vaultCreatorFee',
+            args: [],
+          }),
+          readContract(config as any, {
+            abi: HodlCoinAbi,
+            address: vaultAddress as `0x${string}`,
+            functionName: 'stableOrderFee',
+            args: [],
+          }),
+        ])
+
       setFees({
         vaultFee: Number(vaultFeeOnChain),
         vaultCreatorFee: Number(vaultCreatorFeeOnChain),
@@ -135,8 +138,7 @@ export default function InteractionClient() {
       console.error('Error getting fees:', err)
     }
   }
-  
-  
+
   const getBalances = async () => {
     try {
       const [coinReserveOnChain, coinBalanceOnChain, hodlCoinBalanceOnChain] =
@@ -160,7 +162,7 @@ export default function InteractionClient() {
             args: [account.address],
           }),
         ])
-      
+
       setBalances(prev => ({
         ...prev,
         coinReserve: Number(coinReserveOnChain) / 10 ** 18,
@@ -171,11 +173,10 @@ export default function InteractionClient() {
       console.error('Error getting balances:', err)
     }
   }
-  
+
   const getReservesPrices = async () => {
     try {
-      const [hodlCoinSupplyOnChain, priceHodlOnChain] =
-      await Promise.all([
+      const [hodlCoinSupplyOnChain, priceHodlOnChain] = await Promise.all([
         readContract(config as any, {
           abi: ERC20Abi,
           address: vaultAddress as `0x${string}`,
@@ -189,7 +190,7 @@ export default function InteractionClient() {
           args: [],
         }),
       ])
-      
+
       setBalances(prev => ({
         ...prev,
         hodlCoinSupply: Number(hodlCoinSupplyOnChain) / 10 ** 18,
@@ -199,23 +200,23 @@ export default function InteractionClient() {
       console.error('Error getting reserves and prices:', err)
     }
   }
-  
+
   useEffect(() => {
     if (vaultAddress) {
       getVaultsData()
     }
   }, [vaultAddress])
-  
+
   useEffect(() => {
     if (vaultAddress && coinAddress) {
       getReservesPrices()
       getFees()
     }
-      if (vaultAddress && coinAddress && account.address) {
-        getBalances()
-      }
+    if (vaultAddress && coinAddress && account.address) {
+      getBalances()
+    }
   }, [vaultAddress, coinAddress, account.address])
-  
+
   return (
     <div className='w-full pt-14'>
       <div className='w-full md:px-24 lg:px-24'>
