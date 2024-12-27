@@ -31,7 +31,7 @@ export function Hero() {
               {/* <Link href='/explorer'>
                 <Button>Play the game</Button>
               </Link> */}
-              <FindVault>Play the game</FindVault>
+              <FindVault>Explore the Vaults</FindVault>
             </div>
             <div className='flex flex-row space-x-1 items-center'>
               <p>A project by</p>
