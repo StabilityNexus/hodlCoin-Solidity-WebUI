@@ -5,10 +5,13 @@ import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
 import { vaultsProps } from '@/utils/props'
 import { config } from '@/utils/config'
 import { readContract } from '@wagmi/core'
+import { useRouter } from 'next/navigation'
+
 
 export default function CardExplorer({ vault }: { vault: vaultsProps }) {
   const [priceHodl, setPriceHodl] = useState<number | null>(null)
   const chainId = config.state.chainId
+  const router = useRouter();
 
   const getReservesPrices = async () => {
     try {
@@ -29,8 +32,14 @@ export default function CardExplorer({ vault }: { vault: vaultsProps }) {
     getReservesPrices()
   }, [vault.vaultAddress])
 
+  const handleContinue = () => {
+    if (vault.vaultAddress) {
+      router.push(`/v#${chainId}#${vault.vaultAddress}`)
+    }
+  }
+
   return (
-    <Link href={`/v?chainId=${chainId}&vault=${vault.vaultAddress}`}>
+    <div onClick={handleContinue}>
       <Card className='bg-zinc-900 border-zinc-800 hover:border-primary/50 transition-colors h-30'>
         <CardHeader className='flex flex-row items-center justify-between pb-2'>
           <h3
@@ -65,6 +74,6 @@ export default function CardExplorer({ vault }: { vault: vaultsProps }) {
           </div>
         </CardContent>
       </Card>
-    </Link>
+    </div>
   )
 }

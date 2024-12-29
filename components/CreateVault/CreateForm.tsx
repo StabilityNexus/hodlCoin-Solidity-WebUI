@@ -23,7 +23,6 @@ export default function ProfileMenu() {
   const [symbol, setSymbol] = useState<string>('')
   const [coin, setCoin] = useState<string>('')
   const [vaultCreator, setVaultCreator] = useState<string>('')
-  const [stableOrder, setStableOrder] = useState<string>('')
   const [vaultFee, setVaultFee] = useState<string>('')
   const [vaultCreatorFee, setVaultCreatorFee] = useState<string>('')
   const [stableOrderFee, setStableOrderFee] = useState<string>('')
@@ -48,7 +47,6 @@ export default function ProfileMenu() {
           symbol,
           coin,
           vaultCreator,
-          stableOrder,
           BigInt(vaultFee),
           BigInt(vaultCreatorFee),
           BigInt(stableOrderFee),
@@ -66,7 +64,6 @@ export default function ProfileMenu() {
           symbol,
           coin,
           vaultCreator,
-          stableOrder,
           BigInt(vaultFee),
           BigInt(vaultCreatorFee),
           BigInt(stableOrderFee),
@@ -139,14 +136,6 @@ export default function ProfileMenu() {
                     className='w-full h-12 text-lg'
                     value={vaultCreator}
                     onChange={e => setVaultCreator(e.target.value)}
-                  />
-
-                  <Input
-                    type='text'
-                    placeholder='Stable Order (address)'
-                    className='w-full h-12 text-lg'
-                    value={stableOrder}
-                    onChange={e => setStableOrder(e.target.value)}
                   />
 
                   <Input
