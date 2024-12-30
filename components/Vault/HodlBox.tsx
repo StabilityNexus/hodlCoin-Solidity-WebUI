@@ -162,32 +162,32 @@ export default function HodlBox({
   }
 
   return (
-    <Card className='bg-[#121212] border-gray-900'>
+    <Card className='bg-white dark:bg-[#121212] border-gray-200 dark:border-gray-900 transition-colors duration-200'>
       <CardHeader>
-        <CardTitle className='text-yellow-500'>Stake Tokens</CardTitle>
+        <CardTitle className='text-amber-600 dark:text-yellow-300 transition-colors duration-200'>
+          Stake Tokens
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <Input
           type='number'
           placeholder='Amount'
-          className='w-full bg-black'
+          className='w-full bg-gray-50 dark:bg-black border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white transition-colors duration-200'
           value={hodlAmount !== null ? hodlAmount.toString() : ''}
           onChange={e => {
             const value = parseFloat(e.target.value)
             setHodlAmount(value)
           }}
         />
-        <div className='font-mono flex flex-row space-x-2 px-1 pb-4 pt-3 text-sm text-green-400'>
-          {hodlAmount ? (<p>
-            {hodlAmount/priceHodl}
-          </p>):
-          (
-            <p>0</p>
-          )}
+        <div className='font-mono flex flex-row space-x-2 px-1 pb-4 pt-3 text-sm text-purple-700 dark:text-purple-500 transition-colors duration-200'>
+          {hodlAmount ? <p>{hodlAmount / priceHodl}</p> : <p>0</p>}
           <p>h{vault?.coinSymbol}</p>
         </div>
         {loadingHold ? (
-          <Button className='w-full' disabled>
+          <Button
+            className='w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white transition-colors duration-200'
+            disabled
+          >
             <Loader2 className='mr-2 h-4 w-4 animate-spin' />
             Please wait
           </Button>
