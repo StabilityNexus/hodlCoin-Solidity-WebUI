@@ -32,8 +32,44 @@ export default function ProfileMenu() {
   const [submitted, setSubmitted] = useState<boolean>(false);
 
   const [hashTx, setHashTx] = useState<string>('');
+  
+  // Error states for input validation
+  const [errors, setErrors] = useState<{
+    coinName?: string;
+    symbol?: string;
+    coin?: string;
+    vaultCreator?: string;
+    vaultFee?: string;
+    vaultCreatorFee?: string;
+    stableOrderFee?: string;
+  }>({});
+
+  // Function to validate the inputs before submitting
+  const validateInputs = () => {
+    const Errors: any = {};
+    
+    if (!coinName) Errors.coinName = "Name for hodlCoin is required";
+    if (!symbol) Errors.symbol = "Symbol for hodlCoin is required";
+    if (!coin) Errors.coin = "Underlying asset is required";
+    if (!vaultCreator) Errors.vaultCreator = "Vault creator address is required";
+    if (!vaultFee || Number(vaultFee) <= 0) Errors.vaultFee = "Vault fee must be a positive number";
+    if (!vaultCreatorFee || Number(vaultCreatorFee) <= 0) Errors.vaultCreatorFee = "Vault creator fee must be a positive number";
+    if (!stableOrderFee || Number(stableOrderFee) <= 0) Errors.stableOrderFee = "Stable order fee must be a positive number";
+
+    setErrors(Errors);
+    return Object.keys(Errors).length === 0;  // Returns true if no errors
+  }
 
   async function createVault() {
+    if (!validateInputs()) {
+      toast({
+        title: 'Error',
+        description: 'Please fix the errors before submitting.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     try {
       setLoadingCreation(true)
       const chainId = config.state.chainId;
@@ -75,20 +111,25 @@ export default function ProfileMenu() {
       toast({
         title: 'Vault Created',
         description: 'Your vault has been successfully created',
-      })
+      });
 
       const uniqueIdOfVault = (await readContract(config as any, {
         abi: HodlCoinFactoryAbi,
         address: HodlCoinVaultFactories[chainId],
         functionName: 'vaultId',
         args: [],
-      })) as number
+      })) as number;
 
-      setUniqueId(Number(uniqueIdOfVault))
+      setUniqueId(Number(uniqueIdOfVault));
 
       setSubmitted(true);
-    } catch (err) {
+    } catch (err: any) {
       console.log(err)
+      toast({
+        title: 'Error',
+        description: err.message || 'An unexpected error occurred while creating the vault.',
+        variant: 'destructive',
+      });
     } finally {
       setLoadingCreation(false)
     }
@@ -109,58 +150,65 @@ export default function ProfileMenu() {
                   <Input
                     type='text'
                     placeholder='Coin Name'
-                    className='w-full h-12 text-lg'
+                    className={`w-full h-12 text-lg ${errors.coinName ? 'border-red-500' : ''}`}
                     value={coinName}
                     onChange={e => setCoinName(e.target.value)}
                   />
+                  {errors.coinName && <p className="text-red-500 text-sm">{errors.coinName}</p>}
 
                   <Input
                     type='text'
                     placeholder='Coin Symbol (ticker)'
-                    className='w-full h-12 text-lg'
+                    className={`w-full h-12 text-lg ${errors.symbol ? 'border-red-500' : ''}`}
                     value={symbol}
                     onChange={e => setSymbol(e.target.value)}
                   />
+                  {errors.symbol && <p className="text-red-500 text-sm">{errors.symbol}</p>}
 
                   <Input
                     type='text'
                     placeholder='Underlying Asset (ERC 20)'
-                    className='w-full h-12 text-lg'
+                    className={`w-full h-12 text-lg ${errors.coin ? 'border-red-500' : ''}`}
                     value={coin}
                     onChange={e => setCoin(e.target.value)}
                   />
+                  {errors.coin && <p className="text-red-500 text-sm">{errors.coin}</p>}
 
                   <Input
                     type='text'
                     placeholder='Vault Creator (address)'
-                    className='w-full h-12 text-lg'
+                    className={`w-full h-12 text-lg ${errors.vaultCreator ? 'border-red-500' : ''}`}
                     value={vaultCreator}
                     onChange={e => setVaultCreator(e.target.value)}
                   />
+                  {errors.vaultCreator && <p className="text-red-500 text-sm">{errors.vaultCreator}</p>}
 
                   <Input
                     type='number'
                     placeholder='Vault Fee (in percentage)'
-                    className='w-full h-12 text-lg'
+                    className={`w-full h-12 text-lg ${errors.vaultFee ? 'border-red-500' : ''}`}
                     value={vaultFee}
                     onChange={e => setVaultFee(e.target.value)}
                   />
+                  {errors.vaultFee && <p className="text-red-500 text-sm">{errors.vaultFee}</p>}
 
                   <Input
                     type='number'
                     placeholder='Vault Creator Fee (in percentage)'
-                    className='w-full h-12 text-lg'
+                    className={`w-full h-12 text-lg ${errors.vaultCreatorFee ? 'border-red-500' : ''}`}
                     value={vaultCreatorFee}
                     onChange={e => setVaultCreatorFee(e.target.value)}
                   />
+                  {errors.vaultCreatorFee && <p className="text-red-500 text-sm">{errors.vaultCreatorFee}</p>}
 
                   <Input
                     type='number'
                     placeholder='Stable Order Fee (in percentage)'
-                    className='w-full h-12 text-lg'
+                    className={`w-full h-12 text-lg ${errors.stableOrderFee ? 'border-red-500' : ''}`}
                     value={stableOrderFee}
                     onChange={e => setStableOrderFee(e.target.value)}
                   />
+                  {errors.stableOrderFee && <p className="text-red-500 text-sm">{errors.stableOrderFee}</p>}
 
                   <div className='pt-4'>
                     {loadingCreation ? (
