@@ -20,10 +20,10 @@ export function Hero() {
                 style={{ height: '150px', width: '150px' }}
               />
             </div>
-            <h1 className='text-5xl font-bold text-center'>HodlCoin</h1>
+            <h1 className='text-5xl font-bold text-center'>HodlCoin Staking Platform</h1>
             <p className='text-lg text-center'>
-              Staking vaults where the price of the liquid staking token is mathematically proven to always increases! <br />
-              Fees paid by those who unstake early benefit those who keep staking longer.
+              Self-Stabilizing Staking vaults where the price is mathematically proven to always increase! <br />
+              Unstaking fees benefit vault creators and those who keep staking longer.
             </p>
             <div className='grid grid-cols-1 lg:grid-cols-2 gap-2 pb-12'>
               <Link href='/createVault'>
