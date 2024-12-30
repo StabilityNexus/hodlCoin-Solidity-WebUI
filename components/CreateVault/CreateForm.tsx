@@ -46,18 +46,18 @@ export default function ProfileMenu() {
 
   // Function to validate the inputs before submitting
   const validateInputs = () => {
-    const newErrors: any = {};
+    const Errors: any = {};
     
-    if (!coinName) newErrors.coinName = "Coin name is required";
-    if (!symbol) newErrors.symbol = "Coin symbol is required";
-    if (!coin) newErrors.coin = "Underlying asset is required";
-    if (!vaultCreator) newErrors.vaultCreator = "Vault creator address is required";
-    if (!vaultFee || Number(vaultFee) <= 0) newErrors.vaultFee = "Vault fee must be a positive number";
-    if (!vaultCreatorFee || Number(vaultCreatorFee) <= 0) newErrors.vaultCreatorFee = "Vault creator fee must be a positive number";
-    if (!stableOrderFee || Number(stableOrderFee) <= 0) newErrors.stableOrderFee = "Stable order fee must be a positive number";
+    if (!coinName) Errors.coinName = "Name for hodlCoin is required";
+    if (!symbol) Errors.symbol = "Symbol for hodlCoin is required";
+    if (!coin) Errors.coin = "Underlying asset is required";
+    if (!vaultCreator) Errors.vaultCreator = "Vault creator address is required";
+    if (!vaultFee || Number(vaultFee) <= 0) Errors.vaultFee = "Vault fee must be a positive number";
+    if (!vaultCreatorFee || Number(vaultCreatorFee) <= 0) Errors.vaultCreatorFee = "Vault creator fee must be a positive number";
+    if (!stableOrderFee || Number(stableOrderFee) <= 0) Errors.stableOrderFee = "Stable order fee must be a positive number";
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;  // Returns true if no errors
+    setErrors(Errors);
+    return Object.keys(Errors).length === 0;  // Returns true if no errors
   }
 
   async function createVault() {
