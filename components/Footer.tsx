@@ -4,6 +4,15 @@ import Link from 'next/link'
 const navigation = [
   {
     name: 'X',
+    href: 'https://x.com/hodlCoinStaking',
+    icon: (props: any) => (
+      <svg fill='currentColor' viewBox='0 0 24 24' {...props}>
+        <path d='M13.6823 10.6218L20.2391 3H18.6854L12.9921 9.61788L8.44486 3H3.2002L10.0765 13.0074L3.2002 21H4.75404L10.7663 14.0113L15.5685 21H20.8131L13.6819 10.6218H13.6823ZM11.5541 13.0956L10.8574 12.0991L5.31391 4.16971H7.70053L12.1742 10.5689L12.8709 11.5655L18.6861 19.8835H16.2995L11.5541 13.096V13.0956Z' />
+      </svg>
+    ),
+  },
+  {
+    name: 'X',
     href: 'https://x.com/StabilityNexus',
     icon: (props: any) => (
       <svg fill='currentColor' viewBox='0 0 24 24' {...props}>
@@ -99,7 +108,7 @@ export default function Footer() {
     <footer className='w-full px-24 py-10 space-y-4  bg-gradient-to-br from-yellow-100 to-green-100'>
       <div className='flex items-center justify-between'>
         <Link
-          href='https://news.stability.nexus/'
+          href='https://stability.nexus/'
           target='_blank'
           className='cursor-pointer'
         >
@@ -113,48 +122,6 @@ export default function Footer() {
             width={50}
           />
         </Link>
-        <div className='flex items-center gap-2'>
-          <svg
-            viewBox='0 0 24 24'
-            height={24}
-            width={24}
-            fill='none'
-            xmlns='http://www.w3.org/2000/svg'
-          >
-            <g id='SVGRepo_bgCarrier' strokeWidth='0' />
-            <g
-              id='SVGRepo_tracerCarrier'
-              strokeLinecap='round'
-              strokeLinejoin='round'
-            />
-            <g id='SVGRepo_iconCarrier'>
-              <path
-                opacity='0.1'
-                d='M3.09097 6.4173C3 6.76072 3 7.21507 3 7.99997V16C3 16.9319 3 17.3978 3.15224 17.7653C3.35523 18.2554 3.74458 18.6447 4.23463 18.8477C4.60218 19 5.06812 19 6 19H18C18.9319 19 19.3978 19 19.7654 18.8477C20.2554 18.6447 20.6448 18.2554 20.8478 17.7653C21 17.3978 21 16.9319 21 16V7.99997C21 7.21506 21 6.76072 20.909 6.4173C20.852 6.5418 20.7683 6.65652 20.6585 6.75255L13.9755 12.6002C12.8444 13.5899 11.1556 13.5899 10.0245 12.6002L3.3415 6.75255C3.23175 6.65652 3.14804 6.5418 3.09097 6.4173Z'
-              />
-              <path
-                d='M3 8C3 7.06812 3 6.60218 3.15224 6.23463C3.35523 5.74458 3.74458 5.35523 4.23463 5.15224C4.60218 5 5.06812 5 6 5V5H18V5C18.9319 5 19.3978 5 19.7654 5.15224C20.2554 5.35523 20.6448 5.74458 20.8478 6.23463C21 6.60218 21 7.06812 21 8V16C21 16.9319 21 17.3978 20.8478 17.7654C20.6448 18.2554 20.2554 18.6448 19.7654 18.8478C19.3978 19 18.9319 19 18 19V19H6V19C5.06812 19 4.60218 19 4.23463 18.8478C3.74458 18.6448 3.35523 18.2554 3.15224 17.7654C3 17.3978 3 16.9319 3 16V8Z'
-                stroke='#323232'
-                strokeWidth='2'
-                strokeLinejoin='round'
-              />
-              <path
-                d='M4 6L10.683 11.8476C11.437 12.5074 12.563 12.5074 13.317 11.8476L20 6'
-                stroke='#323232'
-                strokeWidth='2'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-              />
-            </g>
-          </svg>
-          <Link
-            href='mailto:djedalliance@gmail.com'
-            target='_blank'
-            className='font-medium'
-          >
-            contact@stability.nexus
-          </Link>
-        </div>
       </div>
       <div className='flex items-center justify-between'>
         <div className='flex items-center space-x-4 md:order-2'>
@@ -172,7 +139,14 @@ export default function Footer() {
         </div>
         <div className='flex items-center gap-3 md:order-1'>
           <Link
-            href='/research'
+            href='https://stability.nexus/protocols'
+            target='_blank'
+            className='font-medium hover:underline hover:decoration-primary hover:decoration-2'
+          >
+            Other Protocols
+          </Link>
+          <Link
+            href='https://stability.nexus/research'
             target='_blank'
             className='font-medium hover:underline hover:decoration-primary hover:decoration-2'
           >
