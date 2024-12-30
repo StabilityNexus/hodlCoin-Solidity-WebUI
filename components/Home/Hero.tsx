@@ -22,16 +22,17 @@ export function Hero() {
             </div>
             <h1 className='text-5xl font-bold text-center'>HodlCoin</h1>
             <p className='text-lg text-center'>
-              The best solution for staking and earning
+              Staking vaults where the price of the liquid staking token is mathematically proven to always increases! <br />
+              Fees paid by those who unstake early benefit those who keep staking longer.
             </p>
             <div className='grid grid-cols-1 lg:grid-cols-2 gap-2 pb-12'>
               <Link href='/createVault'>
-                <Button>Create Vault</Button>
+                <Button>Create a Vault</Button>
               </Link>
               {/* <Link href='/explorer'>
                 <Button>Play the game</Button>
               </Link> */}
-              <FindVault>Explore the Vaults</FindVault>
+              <FindVault>Use a Vault</FindVault>
             </div>
             <div className='flex flex-row space-x-1 items-center'>
               <p>A project by</p>
@@ -45,19 +46,6 @@ export function Hero() {
                   width={40}
                   height={40}
                   className='cursor-pointer mx-1 py-2 hidden lg:inline-block'
-                />
-              </Link>
-              <p>and</p>
-              <Link href='https://whalebr.com/' target='_blank'>
-                <Image
-                  unoptimized
-                  fetchPriority='high'
-                  loading='lazy'
-                  src='/images/whale_logo_green.png'
-                  alt=''
-                  width={50}
-                  height={50}
-                  className='cursor-pointer py-2 hidden lg:inline-block'
                 />
               </Link>
             </div>
