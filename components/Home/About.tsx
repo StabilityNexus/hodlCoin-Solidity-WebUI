@@ -35,7 +35,7 @@ export function About() {
                 About HodlCoin
               </h1>
               <p className='text-md'>
-                hodlCoin is a staking protocol that encourages staking ("hodling")
+                hodlCoin is a staking protocol that encourages staking (&quot;hodling&quot;)
                 assets for long periods of time. When hodling, users deposit coins of
                 a given asset in a vault and receive a proportional amount of corresponding hodlCoins. 
                 When unhodling, users must pay an unstaking fee that benefits the vault's creator and users
