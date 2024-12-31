@@ -35,10 +35,12 @@ export function About() {
                 About HodlCoin
               </h1>
               <p className='text-md'>
-                The hodlCoin is a financial mechanism where the goal is to hodl
-                an asset for long periods of time. By hodling, a user deposits
-                coins of a given asset in a common reserve and receives a
-                proportional amount of hodlCoins
+                hodlCoin is a staking protocol that encourages staking (&quot;hodling&quot;)
+                assets for long periods of time. When hodling, users deposit coins of
+                a given asset in a vault and receive a proportional amount of corresponding hodlCoins. 
+                When unhodling, users must pay an unstaking fee that benefits the vault&apos;s creator and users
+                who continue hodling longer. Moreover, anyone (especially vault creators) can 
+                distribute rewards to hodlers, to further incentivize hodling.
               </p>
             </div>
           </div>

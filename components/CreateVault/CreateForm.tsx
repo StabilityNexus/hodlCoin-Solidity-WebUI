@@ -70,8 +70,8 @@ export default function ProfileMenu() {
         title: 'Error',
         description: 'Please fix the errors before submitting.',
         variant: 'destructive',
-      })
-      return
+      });
+      return;
     }
 
     try {
@@ -115,27 +115,24 @@ export default function ProfileMenu() {
       toast({
         title: 'Vault Created',
         description: 'Your vault has been successfully created',
-      })
+      });
 
       const uniqueIdOfVault = (await readContract(config as any, {
         abi: HodlCoinFactoryAbi,
         address: HodlCoinVaultFactories[chainId],
         functionName: 'vaultId',
         args: [],
-      })) as number
+      })) as number;
 
-      setUniqueId(Number(uniqueIdOfVault))
-
-      setSubmitted(true)
+      setUniqueId(Number(uniqueIdOfVault));
+      setSubmitted(true);
     } catch (err: any) {
       console.log(err)
       toast({
         title: 'Error',
-        description:
-          err.message ||
-          'An unexpected error occurred while creating the vault.',
+        description: err.message || 'An unexpected error occurred while creating the vault.',
         variant: 'destructive',
-      })
+      });
     } finally {
       setLoadingCreation(false)
     }
