@@ -159,16 +159,18 @@ export default function UnholdBox({
   }, [unholdAmount])
 
   return (
-    <Card className='bg-[#121212] border-gray-900'>
+    <Card className='bg-white dark:bg-[#121212] border-gray-200 dark:border-gray-900 transition-colors duration-200'>
       <CardHeader>
-        <CardTitle className='text-yellow-500'>UnStake Tokens</CardTitle>
+        <CardTitle className='text-amber-600 dark:text-yellow-300 transition-colors duration-200'>
+          UnStake Tokens
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className='relative'>
           <Input
             type='number'
             placeholder='Amount'
-            className='w-full bg-black pr-16'
+            className='w-full bg-gray-50 dark:bg-black border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white pr-16 transition-colors duration-200'
             value={unholdAmount !== null ? unholdAmount.toString() : ''}
             onChange={e => {
               const value = parseFloat(e.target.value)
@@ -179,13 +181,13 @@ export default function UnholdBox({
           />
           <Button
             variant='ghost'
-            className='absolute right-2 top-1/2 -translate-y-1/2 text-xs text-yellow-500 hover:text-yellow-600 px-2 py-1'
+            className='absolute right-2 top-1/2 -translate-y-1/2 text-xs text-amber-600 hover:text-amber-700 dark:text-yellow-500 dark:hover:text-yellow-600 px-2 py-1 transition-colors duration-200'
             onClick={handleMaxClick}
           >
             MAX
           </Button>
         </div>
-        <div className='font-mono flex flex-row space-x-2 px-1 pb-4 pt-3 text-sm text-green-400'>
+        <div className='font-mono flex flex-row space-x-2 px-1 pb-4 pt-3 text-sm text-purple-800 dark:text-purple-500 transition-colors duration-200'>
           {unholdAmount > 0 ? (
             <p>
               {unholdAmount * priceHodl -
@@ -199,13 +201,16 @@ export default function UnholdBox({
           <p> {vault?.coinSymbol}</p>
         </div>
         {loadingUnhold ? (
-          <Button className='w-full' disabled>
+          <Button
+            className='w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white transition-colors duration-200'
+            disabled
+          >
             <Loader2 className='mr-2 h-4 w-4 animate-spin' />
             Please wait
           </Button>
         ) : (
           <StylishButton buttonCall={unholdAction}>
-            {isMaxAmount ? 'Unstake All' : 'Unstake'}
+            {isMaxAmount && unholdAmount !== 0 ? 'Unstake All' : 'Unstake'}
           </StylishButton>
         )}
       </CardContent>

@@ -228,19 +228,25 @@ export default function InteractionClient({
       <div className='w-full md:px-24 lg:px-24'>
         <div className='container mx-auto px-8 py-6 flex justify-between items-center'>
           <div className='flex items-center space-x-4'>
-            <Coins className='h-8 w-8 text-yellow-400' />
-            <h1 className='text-2xl font-bold text-white'>{coinName} Vault</h1>
+            <Coins className='h-8 w-8 text-amber-500 dark:text-yellow-400 transition-colors duration-200' />
+            <h1 className='text-3xl font-bold text-gray-900 dark:text-white transition-colors duration-200'>
+              {coinName} Vault
+            </h1>
           </div>
           <div className='flex space-x-4'>
-            <div className='bg-[#141414] border border-gray-800 rounded-md px-5 py-3 text-center'>
-              <div className='text-sm text-gray-400'>Token Balance</div>
-              <div className='font-mono text-lg text-yellow-400'>
+            <div className='bg-white dark:bg-[#141414] border border-gray-200 dark:border-gray-800 rounded-md px-5 py-3 text-center transition-colors duration-200'>
+              <div className='text-sm text-gray-600 dark:text-gray-400 font-bold transition-colors duration-200'>
+                Token Balance
+              </div>
+              <div className='font-mono text-lg text-amber-500 dark:text-yellow-400 transition-colors duration-200'>
                 {balances.coinBalance} {coinSymbol}
               </div>
             </div>
-            <div className='bg-[#141414] border border-gray-800 rounded-md px-5 py-3 text-center'>
-              <div className='text-sm text-gray-400'>Staked Balance</div>
-              <div className='font-mono text-lg text-green-400'>
+            <div className='bg-white dark:bg-[#141414] border border-gray-200 dark:border-gray-800 rounded-md px-5 py-3 text-center transition-colors duration-200'>
+              <div className='text-sm text-gray-600 dark:text-gray-400 font-bold transition-colors duration-200'>
+                Staked Balance
+              </div>
+              <div className='font-mono text-lg text-purple-600 dark:text-purple-500 transition-colors duration-200'>
                 {balances.hodlCoinBalance} h{coinSymbol}
               </div>
             </div>

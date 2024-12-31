@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Card, CardContent, CardHeader } from '../ui/card'
@@ -7,11 +9,10 @@ import { config } from '@/utils/config'
 import { readContract } from '@wagmi/core'
 import { useRouter } from 'next/navigation'
 
-
 export default function CardExplorer({ vault }: { vault: vaultsProps }) {
   const [priceHodl, setPriceHodl] = useState<number | null>(null)
   const chainId = config.state.chainId
-  const router = useRouter();
+  const router = useRouter()
 
   const getReservesPrices = async () => {
     try {
@@ -39,11 +40,21 @@ export default function CardExplorer({ vault }: { vault: vaultsProps }) {
   }
 
   return (
-    <div onClick={handleContinue}>
-      <Card className='bg-zinc-900 border-zinc-800 hover:border-primary/50 transition-colors h-30'>
+    <div
+      onClick={handleContinue}
+      className='cursor-pointer transform transition-all duration-200 hover:scale-105'
+    >
+      <Card
+        className='dark:bg-zinc-900 bg-purple-50 
+        dark:border-zinc-800 border-purple-200
+        dark:hover:border-yellow-300 hover:border-yellow-500
+        transition-all duration-200 h-30
+        hover:shadow-lg'
+      >
         <CardHeader className='flex flex-row items-center justify-between pb-2'>
           <h3
-            className='text-lg font-semibold truncate max-w-[200px]'
+            className='text-lg font-semibold truncate max-w-[200px]
+              dark:text-purple-50 text-purple-900'
             title={`${vault.coinName} Vault`}
           >
             {vault.coinName} Vault
@@ -53,13 +64,16 @@ export default function CardExplorer({ vault }: { vault: vaultsProps }) {
           <div className='space-y-2'>
             <div className='flex justify-between items-center'>
               <span
-                className='text-sm text-muted-foreground truncate max-w-[150px]'
+                className='text-sm truncate max-w-[150px]
+                  dark:text-purple-400 text-purple-600'
                 title={`Price of 1 ${vault.coinSymbol}`}
               >
                 Price of 1 {vault.coinSymbol}
               </span>
               <span
-                className='font-mono text-yellow-500 truncate max-w-[100px]'
+                className='font-mono truncate max-w-[100px]
+                  dark:text-yellow-400 text-amber-500
+                  font-medium'
                 title={
                   priceHodl !== null
                     ? `${Number(priceHodl) / 100000}`

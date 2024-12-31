@@ -10,7 +10,11 @@ import { toast } from '../ui/use-toast'
 import Link from 'next/link'
 import { readContract } from '@wagmi/core'
 import { useState } from 'react'
-import { getTransactionReceipt, simulateContract, writeContract } from '@wagmi/core'
+import {
+  getTransactionReceipt,
+  simulateContract,
+  writeContract,
+} from '@wagmi/core'
 
 import { HodlCoinVaultFactories } from '@/utils/addresses'
 import { HodlCoinFactoryAbi } from '@/utils/contracts/HodlCoinFactory'
@@ -18,7 +22,6 @@ import { HodlCoinFactoryAbi } from '@/utils/contracts/HodlCoinFactory'
 import { config } from '@/utils/config'
 
 export default function ProfileMenu() {
-
   const [coinName, setCoinName] = useState<string>('')
   const [symbol, setSymbol] = useState<string>('')
   const [coin, setCoin] = useState<string>('')
@@ -29,35 +32,36 @@ export default function ProfileMenu() {
   const [uniqueId, setUniqueId] = useState<number>(0)
 
   const [loadingCreation, setLoadingCreation] = useState<boolean>(false)
-  const [submitted, setSubmitted] = useState<boolean>(false);
+  const [submitted, setSubmitted] = useState<boolean>(false)
 
-  const [hashTx, setHashTx] = useState<string>('');
-  
-  // Error states for input validation
+  const [hashTx, setHashTx] = useState<string>('')
+
   const [errors, setErrors] = useState<{
-    coinName?: string;
-    symbol?: string;
-    coin?: string;
-    vaultCreator?: string;
-    vaultFee?: string;
-    vaultCreatorFee?: string;
-    stableOrderFee?: string;
-  }>({});
+    coinName?: string
+    symbol?: string
+    coin?: string
+    vaultCreator?: string
+    vaultFee?: string
+    vaultCreatorFee?: string
+    stableOrderFee?: string
+  }>({})
 
-  // Function to validate the inputs before submitting
   const validateInputs = () => {
-    const Errors: any = {};
-    
-    if (!coinName) Errors.coinName = "Name for hodlCoin is required";
-    if (!symbol) Errors.symbol = "Symbol for hodlCoin is required";
-    if (!coin) Errors.coin = "Underlying asset is required";
-    if (!vaultCreator) Errors.vaultCreator = "Vault creator address is required";
-    if (!vaultFee || Number(vaultFee) <= 0) Errors.vaultFee = "Vault fee must be a positive number";
-    if (!vaultCreatorFee || Number(vaultCreatorFee) <= 0) Errors.vaultCreatorFee = "Vault creator fee must be a positive number";
-    if (!stableOrderFee || Number(stableOrderFee) <= 0) Errors.stableOrderFee = "Stable order fee must be a positive number";
+    const Errors: any = {}
 
-    setErrors(Errors);
-    return Object.keys(Errors).length === 0;  // Returns true if no errors
+    if (!coinName) Errors.coinName = 'Name for hodlCoin is required'
+    if (!symbol) Errors.symbol = 'Symbol for hodlCoin is required'
+    if (!coin) Errors.coin = 'Underlying asset is required'
+    if (!vaultCreator) Errors.vaultCreator = 'Vault creator address is required'
+    if (!vaultFee || Number(vaultFee) <= 0)
+      Errors.vaultFee = 'Vault fee must be a positive number'
+    if (!vaultCreatorFee || Number(vaultCreatorFee) <= 0)
+      Errors.vaultCreatorFee = 'Vault creator fee must be a positive number'
+    if (!stableOrderFee || Number(stableOrderFee) <= 0)
+      Errors.stableOrderFee = 'Stable order fee must be a positive number'
+
+    setErrors(Errors)
+    return Object.keys(Errors).length === 0
   }
 
   async function createVault() {
@@ -72,8 +76,8 @@ export default function ProfileMenu() {
 
     try {
       setLoadingCreation(true)
-      const chainId = config.state.chainId;
-      
+      const chainId = config.state.chainId
+
       const tx = await writeContract(config as any, {
         address: HodlCoinVaultFactories[chainId],
         abi: HodlCoinFactoryAbi,
@@ -87,9 +91,9 @@ export default function ProfileMenu() {
           BigInt(vaultCreatorFee),
           BigInt(stableOrderFee),
         ],
-      });
+      })
 
-      setHashTx(tx);
+      setHashTx(tx)
 
       const result = await simulateContract(config as any, {
         address: HodlCoinVaultFactories[chainId],
@@ -104,9 +108,9 @@ export default function ProfileMenu() {
           BigInt(vaultCreatorFee),
           BigInt(stableOrderFee),
         ],
-      });
+      })
 
-      console.log('result', result.result);
+      console.log('result', result.result)
 
       toast({
         title: 'Vault Created',
@@ -121,7 +125,6 @@ export default function ProfileMenu() {
       })) as number;
 
       setUniqueId(Number(uniqueIdOfVault));
-
       setSubmitted(true);
     } catch (err: any) {
       console.log(err)
@@ -149,66 +152,82 @@ export default function ProfileMenu() {
                 <CardDescription className='space-y-6'>
                   <Input
                     type='text'
-                    placeholder='Coin Name'
+                    placeholder='Name of the hodlCoin that will be created'
                     className={`w-full h-12 text-lg ${errors.coinName ? 'border-red-500' : ''}`}
                     value={coinName}
                     onChange={e => setCoinName(e.target.value)}
                   />
-                  {errors.coinName && <p className="text-red-500 text-sm">{errors.coinName}</p>}
+                  {errors.coinName && (
+                    <p className='text-red-500 text-sm'>{errors.coinName}</p>
+                  )}
 
                   <Input
                     type='text'
-                    placeholder='Coin Symbol (ticker)'
+                    placeholder='Ticker Symbol of the hodlCoin that will be created'
                     className={`w-full h-12 text-lg ${errors.symbol ? 'border-red-500' : ''}`}
                     value={symbol}
                     onChange={e => setSymbol(e.target.value)}
                   />
-                  {errors.symbol && <p className="text-red-500 text-sm">{errors.symbol}</p>}
+                  {errors.symbol && (
+                    <p className='text-red-500 text-sm'>{errors.symbol}</p>
+                  )}
 
                   <Input
                     type='text'
-                    placeholder='Underlying Asset (ERC 20)'
+                    placeholder='Address of the ERC20 token that will be staked in the vault'
                     className={`w-full h-12 text-lg ${errors.coin ? 'border-red-500' : ''}`}
                     value={coin}
                     onChange={e => setCoin(e.target.value)}
                   />
-                  {errors.coin && <p className="text-red-500 text-sm">{errors.coin}</p>}
+                  {errors.coin && (
+                    <p className='text-red-500 text-sm'>{errors.coin}</p>
+                  )}
 
                   <Input
                     type='text'
-                    placeholder='Vault Creator (address)'
+                    placeholder="Address where you would like to receive the vault creator's portion of the unstaking fee"
                     className={`w-full h-12 text-lg ${errors.vaultCreator ? 'border-red-500' : ''}`}
                     value={vaultCreator}
                     onChange={e => setVaultCreator(e.target.value)}
                   />
-                  {errors.vaultCreator && <p className="text-red-500 text-sm">{errors.vaultCreator}</p>}
+                  {errors.vaultCreator && (
+                    <p className='text-red-500 text-sm'>
+                      {errors.vaultCreator}
+                    </p>
+                  )}
 
-                  <Input
-                    type='number'
-                    placeholder='Vault Fee (in percentage)'
-                    className={`w-full h-12 text-lg ${errors.vaultFee ? 'border-red-500' : ''}`}
-                    value={vaultFee}
-                    onChange={e => setVaultFee(e.target.value)}
-                  />
-                  {errors.vaultFee && <p className="text-red-500 text-sm">{errors.vaultFee}</p>}
-
-                  <Input
-                    type='number'
-                    placeholder='Vault Creator Fee (in percentage)'
-                    className={`w-full h-12 text-lg ${errors.vaultCreatorFee ? 'border-red-500' : ''}`}
-                    value={vaultCreatorFee}
-                    onChange={e => setVaultCreatorFee(e.target.value)}
-                  />
-                  {errors.vaultCreatorFee && <p className="text-red-500 text-sm">{errors.vaultCreatorFee}</p>}
-
-                  <Input
-                    type='number'
-                    placeholder='Stable Order Fee (in percentage)'
-                    className={`w-full h-12 text-lg ${errors.stableOrderFee ? 'border-red-500' : ''}`}
-                    value={stableOrderFee}
-                    onChange={e => setStableOrderFee(e.target.value)}
-                  />
-                  {errors.stableOrderFee && <p className="text-red-500 text-sm">{errors.stableOrderFee}</p>}
+                  <div className='relative w-full'>
+                    <Input
+                      type='number'
+                      placeholder='Unstaking fee that remains in the vault'
+                      className='w-full h-12 text-lg pr-10'
+                      value={vaultFee}
+                      onChange={e => setVaultFee(e.target.value)}
+                    />
+                    {errors.vaultFee && (
+                      <p className='text-red-500 text-sm'>{errors.vaultFee}</p>
+                    )}
+                    <span className='absolute inset-y-0 right-4 flex items-center text-gray-500'>
+                      %
+                    </span>
+                  </div>
+                  <div className='relative w-full'>
+                    <Input
+                      type='number'
+                      placeholder="Unstaking fee that is sent to this vault's creator"
+                      className={`w-full h-12 text-lg ${errors.vaultCreatorFee ? 'border-red-500' : ''}`}
+                      value={vaultCreatorFee}
+                      onChange={e => setVaultCreatorFee(e.target.value)}
+                    />
+                    {errors.vaultCreatorFee && (
+                      <p className='text-red-500 text-sm'>
+                        {errors.vaultCreatorFee}
+                      </p>
+                    )}
+                    <span className='absolute inset-y-0 right-4 flex items-center text-gray-500'>
+                      %
+                    </span>
+                  </div>
 
                   <div className='pt-4'>
                     {loadingCreation ? (

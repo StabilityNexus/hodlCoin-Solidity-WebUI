@@ -137,7 +137,7 @@ export default function Footer() {
             </Link>
           ))}
         </div>
-        <div className='flex items-center gap-3 md:order-1'>
+        <div className='text-black flex items-center gap-3 md:order-1'>
           <Link
             href='https://stability.nexus/protocols'
             target='_blank'
@@ -155,14 +155,14 @@ export default function Footer() {
           <Link
             href='https://news.stability.nexus/'
             target='_blank'
-            className='font-medium hover:underline hover:decoration-primary hover:decoration-2'
+            className='text-black font-medium hover:underline hover:decoration-primary hover:decoration-2'
           >
             News
           </Link>
           <Link
             href='https://docs.stability.nexus/'
             target='_blank'
-            className='font-medium hover:underline hover:decoration-primary hover:decoration-2'
+            className='text-black font-medium hover:underline hover:decoration-primary hover:decoration-2'
           >
             Docs
           </Link>
