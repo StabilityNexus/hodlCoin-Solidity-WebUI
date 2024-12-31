@@ -11,26 +11,13 @@ import { useAccount } from 'wagmi'
 import { readContract } from '@wagmi/core'
 import { config } from '@/utils/config'
 import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
+import { useSearchParams } from 'next/navigation'
 
+export default function InteractionClient() {
+  const searchParams = useSearchParams()
 
-export default function InteractionClient({
-  initialChainId,
-  initialAddress,
-}: {
-  initialChainId: string
-  initialAddress: string
-}) {
-  const [chainId, setChainId] = useState<string>(initialChainId)
-  const [vaultAddress, setVaultAddress] = useState<string>(initialAddress)
-
-  useEffect(() => {
-    const hash = window.location.hash.replace('#', '')
-    const [parsedChainId, parsedAddress] = hash.split('#')
-    if (parsedChainId && parsedAddress) {
-      setChainId(parsedChainId)
-      setVaultAddress(parsedAddress)
-    }
-  }, [])
+  const [chainId, setChainId] = useState<number>(0)
+  const [vaultAddress, setVaultAddress] = useState<`0x${string}`>('0x0')
 
   const [vaultCreator, setVaultCreator] = useState<`0x${string}`>('0x0')
   const [coinAddress, setCoinAddress] = useState<`0x${string}`>('0x0')
@@ -58,6 +45,16 @@ export default function InteractionClient({
     vaultCreatorFee: 0,
     stableOrderFee: 0,
   })
+
+  useEffect(() => {
+    const vault = searchParams.get('vault')
+    const chain = searchParams.get('chainId')
+
+    if (vault && chain) {
+      setVaultAddress(vault as `0x${string}`)
+      setChainId(Number(chain))
+    }
+  }, [searchParams])
 
   const getVaultsData = async () => {
     try {
@@ -224,7 +221,7 @@ export default function InteractionClient({
   }, [vaultAddress, coinAddress, account.address])
 
   return (
-    <div className='w-full pt-14'>
+    <div className='w-full pt-14 bg-gray-50 dark:bg-black'>
       <div className='w-full md:px-24 lg:px-24'>
         <div className='container mx-auto px-8 py-6 flex justify-between items-center'>
           <div className='flex items-center space-x-4'>
