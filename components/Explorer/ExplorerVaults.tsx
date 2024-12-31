@@ -99,7 +99,7 @@ export default function ExplorerVaults() {
           <SelectTrigger
             onClick={() => setIsOpen(prev => !prev)}
             isOpen={isOpen}
-            className='w-[200px] dark:bg-zinc-900 bg-purple-50 border-none 
+            className='w-[200px] dark:bg-zinc-900 bg-white border-none 
             dark:text-purple-50 text-purple-900 
             dark:hover:border-purple-500 hover:border-purple-300
             transition-colors duration-200'
@@ -135,9 +135,9 @@ export default function ExplorerVaults() {
           <Search className='absolute left-3 top-3 h-4 w-4 dark:text-purple-400 text-purple-600' />
           <Input
             placeholder='Search vaults...'
-            className='pl-10 dark:bg-zinc-900 bg-purple-50 border-none 
+            className='pl-10 dark:bg-zinc-900 bg-white-50 border-none 
             dark:text-purple-50 text-purple-900
-            dark:placeholder-purple-400 placeholder-purple-600
+            dark:placeholder-gray-300 placeholder-gray-900
             dark:hover:border-purple-500 hover:border-purple-300
             transition-colors duration-200 h-10'
           />

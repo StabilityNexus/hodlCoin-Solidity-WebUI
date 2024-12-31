@@ -35,7 +35,7 @@ export default function CardExplorer({ vault }: { vault: vaultsProps }) {
 
   const handleContinue = () => {
     if (vault.vaultAddress) {
-      router.push(`/v#${chainId}#${vault.vaultAddress}`)
+      router.push(`/v?chainId=${chainId}&vault=${vault.vaultAddress}`)
     }
   }
 
@@ -45,7 +45,7 @@ export default function CardExplorer({ vault }: { vault: vaultsProps }) {
       className='cursor-pointer transform transition-all duration-200 hover:scale-105'
     >
       <Card
-        className='dark:bg-zinc-900 bg-purple-50 
+        className='dark:bg-zinc-900 bg-white 
         dark:border-zinc-800 border-purple-200
         dark:hover:border-yellow-300 hover:border-yellow-500
         transition-all duration-200 h-30
@@ -54,7 +54,7 @@ export default function CardExplorer({ vault }: { vault: vaultsProps }) {
         <CardHeader className='flex flex-row items-center justify-between pb-2'>
           <h3
             className='text-lg font-semibold truncate max-w-[200px]
-              dark:text-purple-50 text-purple-900'
+              dark:text-purple-50 text-gray-900'
             title={`${vault.coinName} Vault`}
           >
             {vault.coinName} Vault
