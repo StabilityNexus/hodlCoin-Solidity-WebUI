@@ -13,6 +13,7 @@ export default function ExplorerPage() {
   };
 
   return (
+
     <main className="container mx-auto px-4 py-8">
       <div className="w-full">
         {/* Header Section */}
@@ -38,12 +39,15 @@ export default function ExplorerPage() {
                 </div>
                 <div className="text-sm dark:text-white text-purple-700">
                   Create your new vault
+
                 </div>
-              </div>
-            </Button>
+              </Button>
+            </div>
+          </div>
+          <div className='w-full flex justify-center pb-[20vh] overflow-x-hidden'>
+            <ExplorerVaults />
           </div>
         </div>
-
         {/* Vault Explorer Section */}
         <div className="w-full flex justify-center pb-[20vh] overflow-x-hidden">
           <ExplorerVaults />
@@ -51,4 +55,5 @@ export default function ExplorerPage() {
       </div>
     </main>
   );
+
 }
