@@ -25,13 +25,16 @@ export function Hero() {
               Self-Stabilizing Staking vaults where the price is mathematically proven to always increase! <br />
               Unstaking fees benefit vault creators and those who keep staking longer.
             </p>
-            <div className='grid grid-cols-1 lg:grid-cols-2 gap-2 pb-12'>
+            <div className='grid grid-cols-1 lg:grid-cols-3 pb-12'>
               <Link href='/createVault'>
                 <Button>Create a Vault</Button>
               </Link>
               {/* <Link href='/explorer'>
                 <Button>Play the game</Button>
               </Link> */}
+              <Link href='/explorer'>
+                <Button className='mr-8'>View your Vaults</Button>
+              </Link>
               <FindVault>Use a Vault</FindVault>
             </div>
             <div className='flex flex-row space-x-1 items-center'>
