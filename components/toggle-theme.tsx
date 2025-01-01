@@ -4,56 +4,46 @@ import * as React from 'react'
 import { Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 
-import { Button } from '@/components/ui/button'
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuList,
-  NavigationMenuItem,
-  NavigationMenuTrigger,
-} from '@/components/ui/navigation-menu'
-
 export function ModeToggle() {
-  const { setTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
 
-  function toggleDarkMode() {
-    localStorage.setItem('color-scheme', 'dark')
-    setTheme('dark')
-  }
-
-  function toggleLightMode() {
-    localStorage.setItem('color-scheme', 'light')
-    setTheme('light')
+  function toggleTheme() {
+    const newTheme = theme === 'light' ? 'dark' : 'light'
+    localStorage.setItem('color-scheme', newTheme)
+    setTheme(newTheme)
   }
 
   return (
-    <NavigationMenu>
-      <NavigationMenuList>
-        <NavigationMenuItem>
-          <NavigationMenuTrigger>
-            <div className='h-full pt-[2px] relative flex flex-col w-[20px]'>
-              <Sun className='absolute h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0' />
-              <Moon className='absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100' />
-            </div>
-          </NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul className='grid gap-1 p-1'>
-              <div
-                className='px-8 cursor-pointer text-sm font-medium leading-none block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground'
-                onClick={toggleLightMode}
-              >
-                Light
-              </div>
-              <div
-                className='px-8 cursor-pointer text-sm font-medium leading-none block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground'
-                onClick={toggleDarkMode}
-              >
-                Dark
-              </div>
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-      </NavigationMenuList>
-    </NavigationMenu>
+    <div
+      className="flex items-center space-x-4"
+      onClick={toggleTheme}
+      aria-label="Toggle theme"
+      role="button"
+    >
+      <div className="flex items-center w-20 h-10 rounded-full bg-gray-300 dark:bg-gray-600 relative p-1 cursor-pointer transition-colors active:scale-95">
+        <div
+          className={`w-8 h-8 rounded-full shadow-md transform transition-transform duration-300 ease-in-out ${
+            theme === 'light'
+              ? 'translate-x-0 bg-white'
+              : 'translate-x-10 bg-black'
+          }`}
+        ></div>
+
+        <Sun
+          className={`absolute left-2 top-1/2 transform -translate-y-1/2 transition-opacity duration-300 ease-in-out ${
+            theme === 'light' ? 'opacity-100' : 'opacity-0'
+          }`}
+          size={24}
+          color="orange"
+        />
+        <Moon
+          className={`absolute right-2 top-1/2 transform -translate-y-1/2 transition-opacity duration-300 ease-in-out ${
+            theme === 'light' ? 'opacity-0' : 'opacity-100'
+          }`}
+          size={24} 
+          color="yellow"
+        />
+      </div>
+    </div>
   )
 }
