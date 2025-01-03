@@ -188,17 +188,20 @@ export default function ExplorerVaults() {
         </Select>
 
         <div className='relative w-[300px]'>
-          <Search className='absolute left-3 top-3 h-4 w-4 dark:text-purple-400 text-purple-600' />
+          <Search className='absolute left-3 top-3 h-4 w-4 dark:text-purple-800 text-purple-700' />
           <Input
             placeholder='Search vaults...'
             value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
-            className='pl-10 dark:bg-zinc-900 bg-purple-50 border-none 
-
-            dark:text-purple-50 text-purple-900
-            dark:placeholder-gray-300 placeholder-gray-900
-            dark:hover:border-purple-500 hover:border-purple-300
-            transition-colors duration-200 h-10'
+            onChange={e => handleSearch(e.target.value)}
+            className='
+              pl-10 
+              dark:bg-zinc-900 bg-purple-50 
+              dark:text-white text-gray-900 
+              dark:placeholder-gray-300 placeholder-gray-900 
+              border border-gray-800 dark:border-white 
+              rounded-md
+              dark:hover:border-purple-400 hover:border-purple-500 
+              transition-colors duration-200 h-10'
           />
         </div>
       </div>
