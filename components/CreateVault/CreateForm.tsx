@@ -43,7 +43,6 @@ export default function ProfileMenu() {
     vaultCreator?: string
     vaultFee?: string
     vaultCreatorFee?: string
-    stableOrderFee?: string
   }>({})
 
   const validateInputs = () => {
@@ -57,8 +56,6 @@ export default function ProfileMenu() {
       Errors.vaultFee = 'Vault fee must be a positive number'
     if (!vaultCreatorFee || Number(vaultCreatorFee) <= 0)
       Errors.vaultCreatorFee = 'Vault creator fee must be a positive number'
-    if (!stableOrderFee || Number(stableOrderFee) <= 0)
-      Errors.stableOrderFee = 'Stable order fee must be a positive number'
 
     setErrors(Errors)
     return Object.keys(Errors).length === 0
