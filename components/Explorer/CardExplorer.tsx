@@ -1,37 +1,46 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader } from '../ui/card'
 import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
 import { vaultsProps } from '@/utils/props'
 import { config } from '@/utils/config'
-import { readContract } from '@wagmi/core'
+import { readContract, getPublicClient } from '@wagmi/core'
 import { useRouter } from 'next/navigation'
 
 export default function CardExplorer({ vault }: { vault: vaultsProps }) {
   const [priceHodl, setPriceHodl] = useState<number | null>(null)
-  const chainId = config.state.chainId
+  const [loading, setLoading] = useState(true)
+  const chainId = vault.chainId
   const router = useRouter()
 
-  const getReservesPrices = async () => {
-    try {
-      const price = (await readContract(config as any, {
-        abi: HodlCoinAbi,
-        address: vault.vaultAddress as `0x${string}`,
-        functionName: 'priceHodl',
-        args: [],
-      })) as number
+  const getReservesPrices = useCallback(async () => {
+    if (!vault.vaultAddress) return
 
-      setPriceHodl(price)
+    try {
+      setLoading(true)
+
+      // Get the public client for the specific chain
+      const publicClient = getPublicClient(config, { chainId })
+
+      const price = await publicClient?.readContract({
+        address: vault.vaultAddress as `0x${string}`,
+        abi: HodlCoinAbi,
+        functionName: 'priceHodl',
+      })
+
+      setPriceHodl(Number(price))
     } catch (err) {
-      console.error('Error getting reserves and prices:', err)
+      console.error(`Error getting price for vault ${vault.vaultAddress}:`, err)
+      setPriceHodl(null)
+    } finally {
+      setLoading(false)
     }
-  }
+  }, [vault.vaultAddress, chainId])
 
   useEffect(() => {
     getReservesPrices()
-  }, [vault.vaultAddress])
+  }, [getReservesPrices])
 
   const handleContinue = () => {
     if (vault.vaultAddress) {
@@ -75,12 +84,12 @@ export default function CardExplorer({ vault }: { vault: vaultsProps }) {
                   dark:text-yellow-400 text-amber-500
                   font-medium'
                 title={
-                  priceHodl !== null
+                  !loading && priceHodl !== null
                     ? `${Number(priceHodl) / 100000}`
                     : 'Loading...'
                 }
               >
-                {priceHodl !== null
+                {!loading && priceHodl !== null
                   ? `${Number(priceHodl) / 100000}`
                   : 'Loading...'}
               </span>
