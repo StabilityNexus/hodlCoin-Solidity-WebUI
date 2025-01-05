@@ -12,6 +12,10 @@ export default function ExplorerPage() {
     router.push('/createVault')
   }
 
+  const handleYourVault = () => {
+    router.push('/myVaults')
+  }
+
   return (
     <div className='w-full pt-6 bg-gray-50 dark:bg-black'>
       <main className='container mx-auto px-4 py-8'>
@@ -40,6 +44,7 @@ export default function ExplorerPage() {
                 className='flex gap-3 h-auto p-4 dark:bg-zinc-900 bg-white
               dark:hover:border-purple-500 hover:border-yellow-400
               duration-200'
+              onClick={handleYourVault}
               >
                 <Wallet className='h-5 w-5 dark:text-purple-400 text-purple-600' />
                 <div className='text-left'>
