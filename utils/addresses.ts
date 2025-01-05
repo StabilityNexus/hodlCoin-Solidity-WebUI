@@ -1,7 +1,8 @@
 export const NFTAddress = '0xfBAc93dD05a880634232883f92b9e1d4891c9700'
 
 export const HodlCoinVaultFactories = {
-  534351: '0x7C9541DeAA92c94894a798352CD317A8E43627Df',
+  534351: '0x3d957a94edf7b3fa09e70888cbd3f604daf9308f',
+  5115: '0x01BEe3b299489AD6637f88A1b5356DeeC736cd27',
 } as {
   [key: number]: `0x${string}`
 }
