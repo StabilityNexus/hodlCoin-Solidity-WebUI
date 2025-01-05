@@ -74,7 +74,7 @@ export default function ProfileMenu() {
     try {
       setLoadingCreation(true)
       const chainId = config.state.chainId
-
+      console.log(chainId)
       const tx = await writeContract(config as any, {
         address: HodlCoinVaultFactories[chainId],
         abi: HodlCoinFactoryAbi,

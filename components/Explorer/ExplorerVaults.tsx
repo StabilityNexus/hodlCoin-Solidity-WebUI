@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { vaultsProps } from '@/utils/props'
 import CardExplorer from './CardExplorer'
-import { readContract } from '@wagmi/core'
+import { readContract, getPublicClient } from '@wagmi/core'
 import { config } from '@/utils/config'
 import { HodlCoinVaultFactories } from '@/utils/addresses'
 import { HodlCoinFactoryAbi } from '@/utils/contracts/HodlCoinFactory'
@@ -26,75 +26,66 @@ export default function ExplorerVaults() {
   const [searchQuery, setSearchQuery] = useState('')
   const dropdownRef = useRef<HTMLDivElement>(null)
 
+  const fetchVaultsForChain = async (chainId: number) => {
+    try {
+      const publicClient = getPublicClient(config, { chainId })
+      const factoryAddress = HodlCoinVaultFactories[chainId]
+
+      if (!factoryAddress) {
+        console.error(`No factory address found for chain ${chainId}`)
+        return []
+      }
+
+      const totalVaults = (await publicClient?.readContract({
+        address: factoryAddress,
+        abi: HodlCoinFactoryAbi,
+        functionName: 'vaultId',
+      })) as bigint
+
+      const vaultPromises = []
+      for (let i = 1; i <= Number(totalVaults); i++) {
+        vaultPromises.push(
+          publicClient?.readContract({
+            address: factoryAddress,
+            abi: HodlCoinFactoryAbi,
+            functionName: 'vaults',
+            args: [BigInt(i)],
+          }),
+        )
+      }
+
+      const vaultData = await Promise.all(vaultPromises)
+
+      return vaultData.map((vault: any) => ({
+        vaultAddress: vault[0],
+        coinName: vault[1],
+        coinAddress: vault[2],
+        coinSymbol: vault[3],
+        chainId: chainId,
+      }))
+    } catch (error) {
+      console.error(`Error fetching vaults for chain ${chainId}:`, error)
+      return []
+    }
+  }
+
   const getVaults = async () => {
     try {
       setLoading(true)
-      const chainId = selectedChain || 'All chains'
-
       let allVaults: vaultsProps[] = []
 
-      if (chainId === 'All chains') {
-        // Fetch vaults from all chains
-        for (const chain in HodlCoinVaultFactories) {
-          const totalVaults = (await readContract(config as any, {
-            abi: HodlCoinFactoryAbi,
-            address: HodlCoinVaultFactories[chain as unknown as keyof typeof HodlCoinVaultFactories],
-            functionName: 'vaultId',
-            args: [],
-          })) as bigint
-
-          const vaultPromises = []
-          for (let i = 1; i <= Number(totalVaults); i++) {
-            vaultPromises.push(
-              readContract(config as any, {
-                abi: HodlCoinFactoryAbi,
-                address: HodlCoinVaultFactories[chain as unknown as keyof typeof HodlCoinVaultFactories],
-                functionName: 'vaults',
-                args: [BigInt(i)],
-              }),
-            )
-          }
-
-          const vaultData = await Promise.all(vaultPromises)
-
-          const formattedVaults = vaultData.map((vault: any) => ({
-            vaultAddress: vault[0],
-            coinName: vault[1],
-            coinAddress: vault[2],
-            coinSymbol: vault[3],
-          }))
-
-          allVaults = allVaults.concat(formattedVaults)
-        }
+      if (!selectedChain || selectedChain === 'All chains') {
+        // Fetch vaults from all chains in parallel
+        const chainIds = Object.keys(HodlCoinVaultFactories).map(Number)
+        const vaultPromises = chainIds.map(chainId =>
+          fetchVaultsForChain(chainId),
+        )
+        const results = await Promise.all(vaultPromises)
+        allVaults = results.flat()
       } else {
-        // Fetch vaults for selected chain
-        const totalVaults = (await readContract(config as any, {
-          abi: HodlCoinFactoryAbi,
-          address: HodlCoinVaultFactories[chainId as unknown as keyof typeof HodlCoinVaultFactories],
-          functionName: 'vaultId',
-          args: [],
-        })) as bigint
-
-        const vaultPromises = []
-        for (let i = 1; i <= Number(totalVaults); i++) {
-          vaultPromises.push(
-            readContract(config as any, {
-              abi: HodlCoinFactoryAbi,
-              address: HodlCoinVaultFactories[chainId as unknown as keyof typeof HodlCoinVaultFactories],
-              functionName: 'vaults',
-              args: [BigInt(i)],
-            }),
-          )
-        }
-
-        const vaultData = await Promise.all(vaultPromises)
-
-        allVaults = vaultData.map((vault: any) => ({
-          vaultAddress: vault[0],
-          coinName: vault[1],
-          coinAddress: vault[2],
-          coinSymbol: vault[3],
-        }))
+        // Fetch vaults for selected chain only
+        const chainId = parseInt(selectedChain)
+        allVaults = await fetchVaultsForChain(chainId)
       }
 
       setVaults(allVaults)
@@ -115,22 +106,6 @@ export default function ExplorerVaults() {
     setIsOpen(false)
   }
 
-  const handleClickOutside = (event: MouseEvent) => {
-    if (
-      dropdownRef.current &&
-      !dropdownRef.current.contains(event.target as Node)
-    ) {
-      setIsOpen(false)
-    }
-  }
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [])
-
   const handleSearch = (query: string) => {
     setSearchQuery(query)
     if (query.trim() === '') {
@@ -139,7 +114,7 @@ export default function ExplorerVaults() {
       const lowerCaseQuery = query.toLowerCase()
       setFilteredVaults(
         vaults.filter(
-          (vault) =>
+          vault =>
             vault.coinName.toLowerCase().includes(lowerCaseQuery) ||
             vault.coinSymbol.toLowerCase().includes(lowerCaseQuery),
         ),
@@ -152,11 +127,11 @@ export default function ExplorerVaults() {
       <div className='flex justify-between items-center mb-8'>
         <Select>
           <SelectTrigger
-            onClick={() => setIsOpen((prev) => !prev)}
+            onClick={() => setIsOpen(prev => !prev)}
             isOpen={isOpen}
             className='w-[200px] dark:bg-zinc-900 bg-white border-none 
             dark:text-purple-50 text-purple-900 
-            dark:hover:border-purple-500 hover:border-purple-300
+            dark:hover:border-white hover:border-gray-800
             transition-colors duration-200'
           >
             <SelectValue value={selectedChain || 'All chains'} />
@@ -173,7 +148,7 @@ export default function ExplorerVaults() {
             >
               All chains
             </SelectItem>
-            {Object.keys(HodlCoinVaultFactories).map((chain) => (
+            {Object.keys(HodlCoinVaultFactories).map(chain => (
               <SelectItem
                 key={chain}
                 onClick={() => handleSelect(chain)}
@@ -193,8 +168,7 @@ export default function ExplorerVaults() {
             placeholder='Search vaults...'
             value={searchQuery}
             onChange={e => handleSearch(e.target.value)}
-            className='
-              pl-10 
+            className='pl-10 
               dark:bg-zinc-900 bg-purple-50 
               dark:text-white text-gray-900 
               dark:placeholder-gray-300 placeholder-gray-900 
@@ -210,7 +184,7 @@ export default function ExplorerVaults() {
           Loading vaults...
         </div>
       ) : (
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-7xl mx-auto'>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-7xl mx-auto'>
           {filteredVaults.map((vault, index) => (
             <CardExplorer
               key={`${vault.vaultAddress}-${index}`}
