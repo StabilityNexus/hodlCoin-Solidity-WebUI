@@ -8,28 +8,31 @@ import { ERC20Abi } from '@/utils/contracts/ERC20'
 import { vaultsProps } from '@/utils/props'
 import { useEffect, useState } from 'react'
 import { useAccount } from 'wagmi'
-import { readContract } from '@wagmi/core'
+import { readContract, getPublicClient } from '@wagmi/core'
 import { config } from '@/utils/config'
 import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
 import { useSearchParams } from 'next/navigation'
 
 export default function InteractionClient() {
   const searchParams = useSearchParams()
+  const account = useAccount()
+
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const [chainId, setChainId] = useState<number>(0)
   const [vaultAddress, setVaultAddress] = useState<`0x${string}`>('0x0')
-
   const [vaultCreator, setVaultCreator] = useState<`0x${string}`>('0x0')
   const [coinAddress, setCoinAddress] = useState<`0x${string}`>('0x0')
   const [coinName, setCoinName] = useState<string>('')
   const [coinSymbol, setCoinSymbol] = useState<string>('')
-  const account = useAccount()
 
   const [vault, setVault] = useState<vaultsProps>({
     coinAddress: '0x0' as `0x${string}`,
     coinName: '',
     coinSymbol: '',
     vaultAddress: '0x0' as `0x${string}`,
+    chainId: 0,
   })
 
   const [balances, setBalances] = useState({
@@ -57,78 +60,94 @@ export default function InteractionClient() {
   }, [searchParams])
 
   const getVaultsData = async () => {
+    if (!vaultAddress || !chainId) {
+      setError('Invalid vault address or chain ID')
+      return
+    }
+
     try {
-      if (!vaultAddress) {
-        console.error('No vault address provided')
-        return
+      setIsLoading(true)
+      setError(null)
+
+      // Get chain-specific public client
+      const publicClient = getPublicClient(config, { chainId })
+
+      if (!publicClient) {
+        throw new Error(`No public client available for chain ${chainId}`)
       }
 
-      const newCoinAddress = (await readContract(config as any, {
-        abi: HodlCoinAbi,
-        address: vaultAddress as `0x${string}`,
-        functionName: 'coin',
-        args: [],
-      })) as `0x${string}`
-
-      const newVaultCreator = (await readContract(config as any, {
-        abi: HodlCoinAbi,
-        address: vaultAddress as `0x${string}`,
-        functionName: 'vaultCreator',
-        args: [],
-      })) as `0x${string}`
-
-      const [name, symbol] = await Promise.all([
-        readContract(config as any, {
-          abi: ERC20Abi,
-          address: newCoinAddress,
-          functionName: 'name',
-          args: [],
+      // Get coin address and vault creator
+      const [newCoinAddress, newVaultCreator] = await Promise.all([
+        publicClient.readContract({
+          abi: HodlCoinAbi,
+          address: vaultAddress,
+          functionName: 'coin',
         }),
-        readContract(config as any, {
-          abi: ERC20Abi,
-          address: newCoinAddress,
-          functionName: 'symbol',
-          args: [],
+        publicClient.readContract({
+          abi: HodlCoinAbi,
+          address: vaultAddress,
+          functionName: 'vaultCreator',
         }),
       ])
 
-      setVault({
-        coinAddress: newCoinAddress,
+      // Get token details
+      const [name, symbol] = await Promise.all([
+        publicClient.readContract({
+          abi: ERC20Abi,
+          address: newCoinAddress as `0x${string}`,
+          functionName: 'name',
+        }),
+        publicClient.readContract({
+          abi: ERC20Abi,
+          address: newCoinAddress as `0x${string}`,
+          functionName: 'symbol',
+        }),
+      ])
+
+      const vaultData = {
+        coinAddress: newCoinAddress as `0x${string}`,
         coinName: name as string,
         coinSymbol: symbol as string,
-        vaultAddress: vaultAddress as `0x${string}`,
-      })
+        vaultAddress: vaultAddress,
+        chainId: chainId,
+      }
 
-      setVaultCreator(newVaultCreator)
-      setCoinAddress(newCoinAddress)
+      setVault(vaultData)
+      setVaultCreator(newVaultCreator as `0x${string}`)
+      setCoinAddress(newCoinAddress as `0x${string}`)
       setCoinName(name as string)
       setCoinSymbol(symbol as string)
     } catch (error) {
       console.error('Error fetching vault data:', error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
   const getFees = async () => {
+    if (!vaultAddress || !chainId) return
+
     try {
+      const publicClient = getPublicClient(config, { chainId })
+
+      if (!publicClient) return
+
       const [vaultFeeOnChain, vaultCreatorFeeOnChain, stableOrderFeeOnChain] =
         await Promise.all([
-          readContract(config as any, {
+          publicClient.readContract({
             abi: HodlCoinAbi,
-            address: vaultAddress as `0x${string}`,
+            address: vaultAddress,
             functionName: 'vaultFee',
-            args: [],
           }),
-          readContract(config as any, {
+          publicClient.readContract({
             abi: HodlCoinAbi,
-            address: vaultAddress as `0x${string}`,
+            address: vaultAddress,
             functionName: 'vaultCreatorFee',
-            args: [],
           }),
-          readContract(config as any, {
+          publicClient.readContract({
             abi: HodlCoinAbi,
-            address: vaultAddress as `0x${string}`,
+            address: vaultAddress,
             functionName: 'stableOrderFee',
-            args: [],
           }),
         ])
 
@@ -143,24 +162,30 @@ export default function InteractionClient() {
   }
 
   const getBalances = async () => {
+    if (!vaultAddress || !coinAddress || !account.address || !chainId) return
+
     try {
+      const publicClient = getPublicClient(config, { chainId })
+
+      if (!publicClient) return
+
       const [coinReserveOnChain, coinBalanceOnChain, hodlCoinBalanceOnChain] =
         await Promise.all([
-          readContract(config as any, {
+          publicClient.readContract({
             abi: ERC20Abi,
-            address: coinAddress as `0x${string}`,
+            address: coinAddress,
             functionName: 'balanceOf',
             args: [vaultAddress],
           }),
-          readContract(config as any, {
+          publicClient.readContract({
             abi: ERC20Abi,
-            address: coinAddress as `0x${string}`,
+            address: coinAddress,
             functionName: 'balanceOf',
             args: [account.address],
           }),
-          readContract(config as any, {
+          publicClient.readContract({
             abi: ERC20Abi,
-            address: vaultAddress as `0x${string}`,
+            address: vaultAddress,
             functionName: 'balanceOf',
             args: [account.address],
           }),
@@ -178,19 +203,23 @@ export default function InteractionClient() {
   }
 
   const getReservesPrices = async () => {
+    if (!vaultAddress || !chainId) return
+
     try {
+      const publicClient = getPublicClient(config, { chainId })
+
+      if (!publicClient) return
+
       const [hodlCoinSupplyOnChain, priceHodlOnChain] = await Promise.all([
-        readContract(config as any, {
+        publicClient.readContract({
           abi: ERC20Abi,
-          address: vaultAddress as `0x${string}`,
+          address: vaultAddress,
           functionName: 'totalSupply',
-          args: [],
         }),
-        readContract(config as any, {
+        publicClient.readContract({
           abi: HodlCoinAbi,
-          address: vaultAddress as `0x${string}`,
+          address: vaultAddress,
           functionName: 'priceHodl',
-          args: [],
         }),
       ])
 
@@ -205,20 +234,38 @@ export default function InteractionClient() {
   }
 
   useEffect(() => {
-    if (vaultAddress) {
+    if (vaultAddress && chainId) {
       getVaultsData()
     }
-  }, [vaultAddress])
+  }, [vaultAddress, chainId])
 
   useEffect(() => {
-    if (vaultAddress && coinAddress) {
+    if (vaultAddress && coinAddress && chainId) {
       getReservesPrices()
       getFees()
     }
-    if (vaultAddress && coinAddress && account.address) {
+    if (vaultAddress && coinAddress && account.address && chainId) {
       getBalances()
     }
-  }, [vaultAddress, coinAddress, account.address])
+  }, [vaultAddress, coinAddress, account.address, chainId])
+
+  if (isLoading) {
+    return (
+      <div className='w-full h-screen flex items-center justify-center bg-gray-50 dark:bg-black'>
+        <div className='text-xl text-gray-900 dark:text-white'>
+          Loading vault data...
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className='w-full h-screen flex items-center justify-center bg-gray-50 dark:bg-black'>
+        <div className='text-xl text-red-600 dark:text-red-400'>{error}</div>
+      </div>
+    )
+  }
 
   return (
     <div className='w-full pt-14 bg-gray-50 dark:bg-black'>
