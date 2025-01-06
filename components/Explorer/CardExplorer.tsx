@@ -21,7 +21,7 @@ export default function CardExplorer({ vault }: { vault: vaultsProps }) {
       setLoading(true)
 
       // Get the public client for the specific chain
-      const publicClient = getPublicClient(config, { chainId })
+      const publicClient = getPublicClient(config as any, { chainId })
 
       const price = await publicClient?.readContract({
         address: vault.vaultAddress as `0x${string}`,
