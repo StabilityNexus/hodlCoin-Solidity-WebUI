@@ -28,7 +28,7 @@ export default function ExplorerVaults() {
 
   const fetchVaultsForChain = async (chainId: number) => {
     try {
-      const publicClient = getPublicClient(config, { chainId })
+      const publicClient = getPublicClient(config as any, { chainId })
       const factoryAddress = HodlCoinVaultFactories[chainId]
 
       if (!factoryAddress) {

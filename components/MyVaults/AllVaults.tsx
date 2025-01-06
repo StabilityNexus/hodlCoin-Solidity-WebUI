@@ -51,7 +51,7 @@ const VaultDashboard = () => {
     factoryAddress: string,
   ) => {
     try {
-      const publicClient = getPublicClient(config, {
+      const publicClient = getPublicClient(config as any, {
         chainId: parseInt(chainId),
       })
 

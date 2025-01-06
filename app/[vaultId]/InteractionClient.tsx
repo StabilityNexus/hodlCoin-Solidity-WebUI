@@ -70,7 +70,7 @@ export default function InteractionClient() {
       setError(null)
 
       // Get chain-specific public client
-      const publicClient = getPublicClient(config, { chainId })
+      const publicClient = getPublicClient(config as any, { chainId })
 
       if (!publicClient) {
         throw new Error(`No public client available for chain ${chainId}`)
@@ -128,7 +128,7 @@ export default function InteractionClient() {
     if (!vaultAddress || !chainId) return
 
     try {
-      const publicClient = getPublicClient(config, { chainId })
+      const publicClient = getPublicClient(config as any, { chainId })
 
       if (!publicClient) return
 
@@ -165,7 +165,7 @@ export default function InteractionClient() {
     if (!vaultAddress || !coinAddress || !account.address || !chainId) return
 
     try {
-      const publicClient = getPublicClient(config, { chainId })
+      const publicClient = getPublicClient(config as any, { chainId })
 
       if (!publicClient) return
 
@@ -206,7 +206,7 @@ export default function InteractionClient() {
     if (!vaultAddress || !chainId) return
 
     try {
-      const publicClient = getPublicClient(config, { chainId })
+      const publicClient = getPublicClient(config as any, { chainId })
 
       if (!publicClient) return
 
