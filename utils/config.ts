@@ -6,49 +6,26 @@ import {
   polygon,
   scrollSepolia,
   sepolia,
-
+  Chain,
 } from 'wagmi/chains'
 import {
   getDefaultConfig,
   RainbowKitProvider,
   darkTheme,
-  Chain,
 } from '@rainbow-me/rainbowkit'
 import { citreaTestnet } from '@/components/CitreaTestnet'
-
-export const milkomeda = {
-  id: 2001, // Milkomeda C1 (Cardano sidechain) chain ID
-  name: 'Milkomeda',
-  network: 'milkomeda',
-  nativeCurrency: {
-    name: 'MilkADA',
-    symbol: 'mADA',
-    decimals: 18,
-  },
-  rpcUrls: {
-    default: {
-      http: ['https://rpc-mainnet-cardano-evm.c1.milkomeda.com'],
-    },
-    public: {
-      http: ['https://rpc-mainnet-cardano-evm.c1.milkomeda.com'],
-    },
-  },
-  blockExplorers: {
-    default: {
-      name: 'Milkomeda Explorer',
-      url: 'https://explorer-mainnet-cardano-evm.c1.milkomeda.com',
-    },
-  },
-}
+import { ethereumClassic } from '@/components/EthereumClassic'
+import { milkomeda } from '@/components/Milkomeda'
 
 export const config = getDefaultConfig({
-  appName: 'hodlCoin',
+  appName: 'hodlcoin',
   projectId: process.env.NEXT_PUBLIC_PROJECT_ID ?? '',
   chains: [
     scrollSepolia,
     polygon,
     mainnet,
     citreaTestnet,
+    ethereumClassic,
     milkomeda,
   ],
   ssr: true,
