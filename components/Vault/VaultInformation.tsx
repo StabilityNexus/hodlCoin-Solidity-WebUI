@@ -3,6 +3,14 @@ import { Coins, Info, ExternalLink } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
+const BLOCK_EXPLORERS: { [key: number]: string } = {
+  1: 'https://etherscan.io',
+  61: 'https://blockscout.com/etc/mainnet',
+  2001: 'https://explorer-mainnet-cardano-evm.c1.milkomeda.com',
+  534351: 'https://sepolia.scrollscan.com',
+  5115: 'https://explorer.testnet.citrea.xyz',
+}
+
 export default function VaultInformation({
   vault,
   vaultFee,
@@ -16,12 +24,18 @@ export default function VaultInformation({
   stableOrderFee: number
   vaultCreator: string
 }) {
+  const getBlockExplorerUrl = (address: string) => {
+    const chainId = vault?.chainId ?? 534351; 
+    const baseUrl = BLOCK_EXPLORERS[chainId] || 'https://etherscan.io'
+    return `${baseUrl}/address/${address}`
+  }
+
   const openExplorer = (address: string) => {
-    window.open(`https://sepolia.scrollscan.com/address/${address}`, '_blank')
+    window.open(getBlockExplorerUrl(address), '_blank')
   }
 
   const formatFee = (fee: number) => {
-    return (fee / 1000)
+    return fee / 1000
   }
 
   return (
@@ -92,7 +106,6 @@ export default function VaultInformation({
               </div>
             </div>
 
-            {/* Vertical Divider */}
             <div className='hidden md:block w-px bg-gray-200 dark:bg-gray-800 transition-colors duration-200' />
 
             <div className='flex-1'>

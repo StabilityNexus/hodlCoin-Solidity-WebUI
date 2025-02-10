@@ -61,7 +61,8 @@ export default function HeroVault({
 
   const formatAmount = (amount: number) => {
     try {
-      return BigInt(Math.floor(amount * 10 ** 18))
+      const decimals = vault?.decimals ?? 18;
+      return BigInt(Math.floor(amount * 10 ** decimals))
     } catch (error) {
       console.error('Error formatting amount:', error)
       toast({
