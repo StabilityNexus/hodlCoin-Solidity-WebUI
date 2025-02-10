@@ -21,6 +21,14 @@ import { HodlCoinFactoryAbi } from '@/utils/contracts/HodlCoinFactory'
 
 import { config } from '@/utils/config'
 
+const BLOCK_EXPLORERS: { [key: number]: string } = {
+  1: 'https://etherscan.io',
+  61: 'https://blockscout.com/etc/mainnet',
+  2001: 'https://explorer-mainnet-cardano-evm.c1.milkomeda.com',
+  534351: 'https://sepolia.scrollscan.com',
+  5115: 'https://explorer.testnet.citrea.xyz',
+}
+
 export default function ProfileMenu() {
   const [coinName, setCoinName] = useState<string>('')
   const [symbol, setSymbol] = useState<string>('')
@@ -45,6 +53,11 @@ export default function ProfileMenu() {
     vaultCreatorFee?: string
   }>({})
 
+  const convertFeeToNumerator = (fee: string): bigint => {
+    const feeNumber = parseFloat(fee)
+    return BigInt(Math.round(feeNumber * 1000))
+  }
+
   const validateInputs = () => {
     const Errors: any = {}
 
@@ -52,13 +65,20 @@ export default function ProfileMenu() {
     if (!symbol) Errors.symbol = 'Symbol for hodlCoin is required'
     if (!coin) Errors.coin = 'Underlying asset is required'
     if (!vaultCreator) Errors.vaultCreator = 'Vault creator address is required'
-    if (!vaultFee || Number(vaultFee) <= 0)
-      Errors.vaultFee = 'Vault fee must be a positive number'
-    if (!vaultCreatorFee || Number(vaultCreatorFee) <= 0)
-      Errors.vaultCreatorFee = 'Vault creator fee must be a positive number'
+    if (vaultFee === '') Errors.vaultFee = 'Vault fee is required'
+    if (vaultCreatorFee === '')
+      Errors.vaultCreatorFee = 'Vault creator fee is required'
+    if (Number(vaultFee) < 0) Errors.vaultFee = 'Vault fee cannot be negative'
+    if (Number(vaultCreatorFee) < 0)
+      Errors.vaultCreatorFee = 'Vault creator fee cannot be negative'
 
     setErrors(Errors)
     return Object.keys(Errors).length === 0
+  }
+
+  const getBlockExplorerUrl = (chainId: number, txHash: string) => {
+    const baseUrl = BLOCK_EXPLORERS[chainId] || 'https://etherscan.io'
+    return `${baseUrl}/tx/${txHash}`
   }
 
   async function createVault() {
@@ -74,7 +94,10 @@ export default function ProfileMenu() {
     try {
       setLoadingCreation(true)
       const chainId = config.state.chainId
-      console.log(chainId)
+
+      const vaultFeeNumerator = convertFeeToNumerator(vaultFee)
+      const vaultCreatorFeeNumerator = convertFeeToNumerator(vaultCreatorFee)
+
       const tx = await writeContract(config as any, {
         address: HodlCoinVaultFactories[chainId],
         abi: HodlCoinFactoryAbi,
@@ -84,8 +107,8 @@ export default function ProfileMenu() {
           symbol,
           coin,
           vaultCreator,
-          BigInt(vaultFee),
-          BigInt(vaultCreatorFee),
+          vaultFeeNumerator,
+          vaultCreatorFeeNumerator,
           BigInt(stableOrderFee),
         ],
       })
@@ -101,35 +124,35 @@ export default function ProfileMenu() {
           symbol,
           coin,
           vaultCreator,
-          BigInt(vaultFee),
-          BigInt(vaultCreatorFee),
+          vaultFeeNumerator,
+          vaultCreatorFeeNumerator,
           BigInt(stableOrderFee),
         ],
       })
 
-      console.log('result', result.result)
-
       toast({
         title: 'Vault Created',
         description: 'Your vault has been successfully created',
-      });
+      })
 
       const uniqueIdOfVault = (await readContract(config as any, {
         abi: HodlCoinFactoryAbi,
         address: HodlCoinVaultFactories[chainId],
         functionName: 'vaultId',
         args: [],
-      })) as number;
+      })) as number
 
-      setUniqueId(Number(uniqueIdOfVault));
-      setSubmitted(true);
+      setUniqueId(Number(uniqueIdOfVault))
+      setSubmitted(true)
     } catch (err: any) {
       console.log(err)
       toast({
         title: 'Error',
-        description: err.message || 'An unexpected error occurred while creating the vault.',
+        description:
+          err.message ||
+          'An unexpected error occurred while creating the vault.',
         variant: 'destructive',
-      });
+      })
     } finally {
       setLoadingCreation(false)
     }
@@ -196,6 +219,8 @@ export default function ProfileMenu() {
                   <div className='relative w-full'>
                     <Input
                       type='number'
+                      step='0.1'
+                      min='0'
                       placeholder='Unstaking fee that remains in the vault'
                       className='w-full h-12 text-lg pr-10'
                       value={vaultFee}
@@ -211,6 +236,8 @@ export default function ProfileMenu() {
                   <div className='relative w-full'>
                     <Input
                       type='number'
+                      step='0.1'
+                      min='0'
                       placeholder="Unstaking fee that is sent to this vault's creator"
                       className={`w-full h-12 text-lg ${errors.vaultCreatorFee ? 'border-red-500' : ''}`}
                       value={vaultCreatorFee}
@@ -253,7 +280,9 @@ export default function ProfileMenu() {
                 <Link href='/'>
                   <Button
                     onClick={() =>
-                      window.open(`https://sepolia.scrollscan.com/tx/${hashTx}`)
+                      window.open(
+                        getBlockExplorerUrl(config.state.chainId, hashTx),
+                      )
                     }
                     variant='outline'
                     className='h-12 text-lg'
