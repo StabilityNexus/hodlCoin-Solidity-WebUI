@@ -7,9 +7,10 @@ import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
 import { Loader2 } from 'lucide-react'
 import { StylishButton } from '../StylishButton'
+import { ERC20Abi } from '@/utils/contracts/ERC20'
 import { useAccount } from 'wagmi'
 import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
-import { readContract, writeContract } from '@wagmi/core'
+import { readContract, writeContract, getPublicClient } from '@wagmi/core'
 import { config } from '@/utils/config'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 
@@ -26,7 +27,7 @@ export default function UnholdBox({
 }) {
   const { toast } = useToast()
   const [loadingUnhold, setLoadingUnhold] = useState<boolean>(false)
-  const [unholdAmount, setUnholdAmount] = useState<number>(0)
+  const [unholdAmount, setUnholdAmount] = useState<string>('') // Changed to string
   const account = useAccount()
 
   const [feesAmount, setFeesAmount] = useState({
@@ -35,11 +36,12 @@ export default function UnholdBox({
     stableOrderFeeAmount: 0,
   })
 
-  const isMaxAmount = unholdAmount >= hodlCoinBalance
+  const isMaxAmount = parseFloat(unholdAmount) >= hodlCoinBalance
 
   const getFees = async () => {
     try {
-      const amountInWei = BigInt(Math.floor(unholdAmount * 10 ** 18))
+      const amountValue = parseFloat(unholdAmount) || 0
+      const amountInWei = BigInt(Math.floor(amountValue * 10 ** 18))
 
       const amount = (await readContract(config as any, {
         abi: HodlCoinAbi,
@@ -75,7 +77,8 @@ export default function UnholdBox({
       return false
     }
 
-    if (unholdAmount === null || unholdAmount <= 0) {
+    const amount = parseFloat(unholdAmount)
+    if (isNaN(amount) || amount <= 0) {
       toast({
         title: 'Amount Invalid',
         description: 'Please input a valid amount',
@@ -83,17 +86,19 @@ export default function UnholdBox({
       return false
     }
 
-    if (unholdAmount > hodlCoinBalance) {
-      setUnholdAmount(hodlCoinBalance)
+    if (amount > hodlCoinBalance) {
+      setUnholdAmount(hodlCoinBalance.toString())
       return false
     }
 
     return true
   }
 
-  const formatAmount = (amount: number) => {
+  const formatAmount = (amountStr: string) => {
     try {
-      return BigInt(Math.floor(amount * 10 ** 18))
+      const amount = parseFloat(amountStr)
+      const decimals = vault?.decimals ?? 18;
+      return BigInt(Math.floor(amount * 10 ** decimals))
     } catch (error) {
       console.error('Error formatting amount:', error)
       toast({
@@ -105,8 +110,10 @@ export default function UnholdBox({
   }
 
   const unholdAction = async () => {
-    const amountToUnhold = isMaxAmount ? hodlCoinBalance : unholdAmount
-    setUnholdAmount(hodlCoinBalance)
+    const amountToUnhold = isMaxAmount
+      ? hodlCoinBalance
+      : parseFloat(unholdAmount)
+    setUnholdAmount(hodlCoinBalance.toString())
 
     if (!validateInputs()) {
       return
@@ -115,7 +122,7 @@ export default function UnholdBox({
     try {
       setLoadingUnhold(true)
 
-      const formattedAmount = formatAmount(amountToUnhold)
+      const formattedAmount = formatAmount(amountToUnhold.toString())
       if (!formattedAmount) {
         return
       }
@@ -135,7 +142,7 @@ export default function UnholdBox({
         description: 'Your tokens have been successfully unstaked',
       })
 
-      setUnholdAmount(0)
+      setUnholdAmount('')
     } catch (error) {
       console.error('Unhold error:', error)
       toast({
@@ -149,11 +156,11 @@ export default function UnholdBox({
   }
 
   const handleMaxClick = () => {
-    setUnholdAmount(hodlCoinBalance)
+    setUnholdAmount(hodlCoinBalance.toString())
   }
 
   useEffect(() => {
-    if (unholdAmount > 0) {
+    if (unholdAmount && parseFloat(unholdAmount) > 0) {
       getFees()
     }
   }, [unholdAmount])
@@ -168,16 +175,17 @@ export default function UnholdBox({
       <CardContent>
         <div className='relative'>
           <Input
-            type='number'
+            type='text' // Changed from 'number' to 'text'
             placeholder='Amount'
             className='w-full bg-gray-50 dark:bg-black border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white pr-16 transition-colors duration-200'
-            value={unholdAmount !== null ? unholdAmount.toString() : ''}
+            value={unholdAmount}
             onChange={e => {
-              const value = parseFloat(e.target.value)
-              setUnholdAmount(isNaN(value) ? 0 : value)
+              const value = e.target.value
+              // Only allow numbers and decimal points
+              if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                setUnholdAmount(value)
+              }
             }}
-            min={0}
-            max={hodlCoinBalance}
           />
           <Button
             variant='ghost'
@@ -188,9 +196,9 @@ export default function UnholdBox({
           </Button>
         </div>
         <div className='font-mono flex flex-row space-x-2 px-1 pb-4 pt-3 text-sm text-purple-800 dark:text-purple-500 transition-colors duration-200'>
-          {unholdAmount > 0 ? (
+          {unholdAmount && parseFloat(unholdAmount) > 0 ? (
             <p>
-              {unholdAmount * priceHodl -
+              {parseFloat(unholdAmount) * priceHodl -
                 (feesAmount.vaultFeeAmount +
                   feesAmount.vaultCreatorFeeAmount +
                   feesAmount.stableOrderFeeAmount)}
@@ -210,7 +218,7 @@ export default function UnholdBox({
           </Button>
         ) : (
           <StylishButton buttonCall={unholdAction}>
-            {isMaxAmount && unholdAmount !== 0 ? 'Unstake All' : 'Unstake'}
+            {isMaxAmount && unholdAmount !== '' ? 'Unstake All' : 'Unstake'}
           </StylishButton>
         )}
       </CardContent>

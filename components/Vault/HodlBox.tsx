@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
 import { Loader2 } from 'lucide-react'
 import { StylishButton } from '../StylishButton'
-import { writeContract } from '@wagmi/core'
+import { writeContract, getPublicClient } from '@wagmi/core'
 import { config } from '@/utils/config'
 import { ERC20Abi } from '@/utils/contracts/ERC20'
 import { useAccount } from 'wagmi'
@@ -27,10 +27,10 @@ export default function HodlBox({
 }) {
   const { toast } = useToast()
   const [loadingHold, setLoadingHold] = useState<boolean>(false)
-  const [hodlAmount, setHodlAmount] = useState<number>(0)
+  const [hodlAmount, setHodlAmount] = useState<string>('') // Changed to string
   const [coinApproved, setCoinApproved] = useState<boolean>(false)
-
   const account = useAccount()
+
 
   const validateInputs = () => {
     if (!vault?.vaultAddress || !vault?.coinAddress) {
@@ -49,7 +49,8 @@ export default function HodlBox({
       return false
     }
 
-    if (hodlAmount === null || hodlAmount <= 0) {
+    const amount = parseFloat(hodlAmount)
+    if (isNaN(amount) || amount <= 0) {
       toast({
         title: 'Amount Invalid',
         description: 'Please input a valid amount',
@@ -57,8 +58,8 @@ export default function HodlBox({
       return false
     }
 
-    if (hodlAmount > coinBalance) {
-      console.log(coinBalance);
+    if (amount > coinBalance) {
+      console.log(coinBalance)
       toast({
         title: 'Insufficient Balance',
         description: 'You do not have enough tokens',
@@ -69,9 +70,11 @@ export default function HodlBox({
     return true
   }
 
-  const formatAmount = (amount: number) => {
+  const formatAmount = (amountStr: string) => {
     try {
-      return BigInt(Math.floor(amount * 10 ** 18))
+      const amount = parseFloat(amountStr)
+      const decimals = vault?.decimals ?? 18;
+      return BigInt(Math.floor(amount * 10 ** decimals))
     } catch (error) {
       console.error('Error formatting amount:', error)
       toast({
@@ -91,7 +94,7 @@ export default function HodlBox({
         return
       }
 
-      const formattedAmount = formatAmount(hodlAmount!)
+      const formattedAmount = formatAmount(hodlAmount)
       if (!formattedAmount) {
         setLoadingHold(false)
         return
@@ -137,7 +140,7 @@ export default function HodlBox({
             title: 'Hodl Success',
             description: 'Your hodl has been successfully completed',
           })
-          setCoinApproved(false) 
+          setCoinApproved(false)
         } catch (error) {
           console.error('Hodl error:', error)
           toast({
@@ -170,17 +173,20 @@ export default function HodlBox({
       </CardHeader>
       <CardContent>
         <Input
-          type='number'
+          type='text' // Changed from 'number' to 'text'
           placeholder='Amount'
           className='w-full bg-gray-50 dark:bg-black border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white transition-colors duration-200'
-          value={hodlAmount !== null ? hodlAmount.toString() : ''}
+          value={hodlAmount}
           onChange={e => {
-            const value = parseFloat(e.target.value)
-            setHodlAmount(value)
+            const value = e.target.value
+            // Only allow numbers and decimal points
+            if (value === '' || /^\d*\.?\d*$/.test(value)) {
+              setHodlAmount(value)
+            }
           }}
         />
         <div className='font-mono flex flex-row space-x-2 px-1 pb-4 pt-3 text-sm text-purple-700 dark:text-purple-500 transition-colors duration-200'>
-          {hodlAmount ? <p>{hodlAmount / priceHodl}</p> : <p>0</p>}
+          {hodlAmount ? <p>{parseFloat(hodlAmount) / priceHodl}</p> : <p>0</p>}
           <p>h{vault?.coinSymbol}</p>
         </div>
         {loadingHold ? (
