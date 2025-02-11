@@ -31,6 +31,7 @@ export default function InteractionClient() {
     coinAddress: '0x0' as `0x${string}`,
     coinName: '',
     coinSymbol: '',
+    decimals: 0,
     vaultAddress: '0x0' as `0x${string}`,
     chainId: 0,
   })
@@ -91,7 +92,7 @@ export default function InteractionClient() {
       ])
 
       // Get token details
-      const [name, symbol] = await Promise.all([
+      const [name, symbol, decimals] = await Promise.all([
         publicClient.readContract({
           abi: ERC20Abi,
           address: newCoinAddress as `0x${string}`,
@@ -102,12 +103,20 @@ export default function InteractionClient() {
           address: newCoinAddress as `0x${string}`,
           functionName: 'symbol',
         }),
+        publicClient.readContract({
+          abi: ERC20Abi,
+          address: newCoinAddress as `0x${string}`,
+          functionName: 'decimals',
+        }),
       ])
+
+      console.log(decimals);
 
       const vaultData = {
         coinAddress: newCoinAddress as `0x${string}`,
         coinName: name as string,
         coinSymbol: symbol as string,
+        decimals: decimals as number,
         vaultAddress: vaultAddress,
         chainId: chainId,
       }

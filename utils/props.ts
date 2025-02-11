@@ -3,6 +3,7 @@ export type vaultsProps = {
   vaultAddress: `0x${string}`
   coinName: string
   coinSymbol: string
+  decimals: number
   chainId: number
 }
 
