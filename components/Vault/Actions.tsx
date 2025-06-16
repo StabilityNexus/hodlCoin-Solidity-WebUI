@@ -18,8 +18,8 @@ export default function ActionsVault({
   getBalances: Function
 }) {
   return (
-    <main className='container mx-auto p-4 space-y-6'>
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+    <main className='container mx-auto p-4'>
+      <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-7xl mx-auto'>
         <HodlBox
           getBalances={getBalances}
           priceHodl={priceHodl}
