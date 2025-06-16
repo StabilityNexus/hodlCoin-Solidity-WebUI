@@ -1,10 +1,10 @@
-import  VaultDashboard  from '../../components/MyVaults/AllVaults'
+import AllVaults from '../../components/MyVaults/AllVaults'
 
-export default function Home() {
+export default function MyVaultsPage() {
   return (
-    <div className='w-full pt-6 bg-gray-50 dark:bg-black'>
-      <main className='flex min-h-screen flex-col items-center overflow-x-hidden w-full'>
-        <VaultDashboard />
+    <div className='min-h-screen bg-background'>
+      <main className='flex min-h-screen flex-col items-center w-full'>
+        <AllVaults />
       </main>
     </div>
   )
