@@ -3,7 +3,7 @@ import { Hero } from '@/components/Home/Hero'
 
 export default function Home() {
   return (
-    <main className='flex min-h-screen flex-col items-center overflow-x-hidden w-full'>
+    <main className="flex-1 min-h-screen mt-8">
       <Hero />
       <About />
     </main>

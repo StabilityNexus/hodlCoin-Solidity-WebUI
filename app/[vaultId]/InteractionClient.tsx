@@ -1,6 +1,6 @@
 'use client'
 
-import { Coins } from 'lucide-react'
+import { Coins, ArrowLeft, Loader2, AlertCircle } from 'lucide-react'
 import ActionsVault from '@/components/Vault/Actions'
 import HeroVault from '@/components/Vault/HeroVault'
 import VaultInformation from '@/components/Vault/VaultInformation'
@@ -11,11 +11,17 @@ import { useAccount } from 'wagmi'
 import { readContract, getPublicClient } from '@wagmi/core'
 import { config } from '@/utils/config'
 import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { useMatrixEffect } from '@/components/hooks/useMatrixEffect'
+import Link from 'next/link'
 
 export default function InteractionClient() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const account = useAccount()
+  const matrixRef = useMatrixEffect(0.15, 2)
 
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -128,6 +134,7 @@ export default function InteractionClient() {
       setCoinSymbol(symbol as string)
     } catch (error) {
       console.error('Error fetching vault data:', error)
+      setError('Failed to load vault data. Please check the vault address and chain ID.')
     } finally {
       setIsLoading(false)
     }
@@ -260,67 +267,105 @@ export default function InteractionClient() {
 
   if (isLoading) {
     return (
-      <div className='w-full h-screen flex items-center justify-center bg-gray-50 dark:bg-black'>
-        <div className='text-xl text-gray-900 dark:text-white'>
-          Loading vault data...
+      <div className="relative min-h-screen mt-16 flex items-center justify-center bg-background overflow-hidden">
+        {/* Matrix background effect */}
+        <div className="absolute inset-0 opacity-10">
+          <div ref={matrixRef} className="absolute inset-0 w-full h-full" />
+          <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-violet-500/15 rounded-full blur-2xl animate-pulse animation-delay-2000" />
         </div>
+        
+        <Card className="bg-background/50 backdrop-blur-xl border-primary/20 p-8 shadow-2xl shadow-primary/5">
+          <div className="flex flex-col items-center space-y-4">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-muted-foreground">Loading vault data...</p>
+          </div>
+        </Card>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className='w-full h-screen flex items-center justify-center bg-gray-50 dark:bg-black'>
-        <div className='text-xl text-red-600 dark:text-red-400'>{error}</div>
+      <div className="relative min-h-screen flex items-center justify-center bg-background overflow-hidden">
+        {/* Matrix background effect */}
+        <div className="absolute inset-0 opacity-10">
+          <div ref={matrixRef} className="absolute inset-0 w-full h-full" />
+        </div>
+        
+        <Card className="bg-background/50 backdrop-blur-xl border-red-500/20 p-8 shadow-2xl shadow-red-500/5 max-w-md mx-4">
+          <div className="flex flex-col items-center space-y-4 text-center">
+            <AlertCircle className="h-8 w-8 text-red-500" />
+            <h2 className="text-xl font-semibold text-foreground">Error Loading Vault</h2>
+            <p className="text-muted-foreground">{error}</p>
+            <Link href="/">
+              <Button variant="outline" className="border-primary/50 hover:bg-primary/10">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Go Back Home
+              </Button>
+            </Link>
+          </div>
+        </Card>
       </div>
     )
   }
 
   return (
-    <div className='w-full pt-14 bg-gray-50 dark:bg-black'>
-      <div className='w-full md:px-24 lg:px-24'>
-        <div className='container mx-auto px-8 py-6 flex justify-between items-center'>
-          <div className='flex items-center space-x-4'>
-            <Coins className='h-8 w-8 text-amber-500 dark:text-yellow-400 transition-colors duration-200' />
-            <h1 className='text-3xl font-bold text-gray-900 dark:text-white transition-colors duration-200'>
-              {coinName} Vault
-            </h1>
-          </div>
-          <div className='flex space-x-4'>
-            <div className='bg-white dark:bg-[#141414] border border-gray-200 dark:border-gray-800 rounded-md px-5 py-3 text-center transition-colors duration-200'>
-              <div className='text-sm text-gray-600 dark:text-gray-400 font-bold transition-colors duration-200'>
-                Token Balance
-              </div>
-              <div className='font-mono text-lg text-amber-500 dark:text-yellow-400 transition-colors duration-200'>
-                {balances.coinBalance} {coinSymbol}
-              </div>
-            </div>
-            <div className='bg-white dark:bg-[#141414] border border-gray-200 dark:border-gray-800 rounded-md px-5 py-3 text-center transition-colors duration-200'>
-              <div className='text-sm text-gray-600 dark:text-gray-400 font-bold transition-colors duration-200'>
-                Staked Balance
-              </div>
-              <div className='font-mono text-lg text-purple-600 dark:text-purple-500 transition-colors duration-200'>
-                {balances.hodlCoinBalance} h{coinSymbol}
-              </div>
-            </div>
-          </div>
-        </div>
+    <div className="relative min-h-screen mt-16 bg-background overflow-hidden">
+      {/* Matrix background effect */}
+      <div className="absolute inset-0 opacity-10">
+        <div ref={matrixRef} className="absolute inset-0 w-full h-full" />
+        
+        {/* Additional purple glow effects */}
+        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-violet-500/15 rounded-full blur-2xl animate-pulse animation-delay-2000" />
+        <div className="absolute top-1/2 right-1/3 w-20 h-20 bg-fuchsia-500/10 rounded-full blur-xl animate-pulse animation-delay-4000" />
+        
+        {/* Subtle grid overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-900/5 to-transparent" />
       </div>
 
-      <div className='w-full px-8'>
+      <div className="relative container mx-auto max-w-7xl px-4 py-8 space-y-4">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <Link href="/">
+            <Button 
+              variant="ghost" 
+              className="hover:bg-primary/10 transition-all duration-300 transform hover:scale-105"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Home
+            </Button>
+          </Link>
+          
+          <div className="text-center">
+            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-gradient">
+              {coinName} Vault
+            </h1>
+            <p className="text-muted-foreground mt-2">Chain ID: {chainId}</p>
+          </div>
+          
+          <div className="w-24" /> {/* Spacer for centering */}
+        </div>
+
+        {/* Hero Vault Section */}
         <HeroVault
           vault={vault}
           priceHodl={balances.priceHodl}
           reserve={balances.coinReserve}
           supply={balances.hodlCoinSupply}
         />
+
+        {/* Actions Section */}
         <ActionsVault
           vault={vault}
-          getBalances={getBalances}
           priceHodl={balances.priceHodl}
           coinBalance={balances.coinBalance}
           hodlCoinBalance={balances.hodlCoinBalance}
+          getBalances={getBalances}
         />
+
+        {/* Vault Information Section */}
         <VaultInformation
           vault={vault}
           vaultFee={fees.vaultFee}

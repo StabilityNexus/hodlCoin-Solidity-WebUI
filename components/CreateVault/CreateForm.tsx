@@ -1,9 +1,9 @@
 'use client'
 
-import { CardDescription } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Loader2 } from 'lucide-react'
+import { Loader2, ArrowRight } from 'lucide-react'
 import { Player } from '@lottiefiles/react-lottie-player'
 import Animation from '@/public/animations/congrats_animation.json'
 import { toast } from '../ui/use-toast'
@@ -29,14 +29,14 @@ const BLOCK_EXPLORERS: { [key: number]: string } = {
   5115: 'https://explorer.testnet.citrea.xyz',
 }
 
-export default function ProfileMenu() {
+export default function CreateForm() {
   const [coinName, setCoinName] = useState<string>('')
   const [symbol, setSymbol] = useState<string>('')
   const [coin, setCoin] = useState<string>('')
   const [vaultCreator, setVaultCreator] = useState<string>('')
   const [vaultFee, setVaultFee] = useState<string>('')
   const [vaultCreatorFee, setVaultCreatorFee] = useState<string>('')
-  const [stableOrderFee, setStableOrderFee] = useState<string>('')
+  const [stableOrderFee, ] = useState<string>('')
   const [uniqueId, setUniqueId] = useState<number>(0)
 
   const [loadingCreation, setLoadingCreation] = useState<boolean>(false)
@@ -159,140 +159,174 @@ export default function ProfileMenu() {
   }
 
   return (
-    <div className='min-h-screen bg-gradient-to-b from-background to-secondary/10 flex items-center justify-center p-4'>
-      <div className='w-full max-w-7xl'>
-        <div className='bg-background border border-secondary rounded-xl shadow-2xl'>
-          <div className='p-8 md:p-12'>
-            <h1 className='text-2xl md:text-3xl font-bold text-primary text-center mb-8'>
-              Create Vault Form
-            </h1>
+    <div className="relative min-h-screen mt-32 bg-background">
+      {/* Background Elements */}
+      <div className="absolute inset-0">
+        <div className="absolute top-0 -left-4 w-72 h-72 bg-primary/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob" />
+        <div className="absolute top-0 -right-4 w-72 h-72 bg-purple-300/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000" />
+      </div>
 
-            {!submitted ? (
-              <div className='space-y-6'>
-                <CardDescription className='space-y-6'>
-                  <Input
-                    type='text'
-                    placeholder='Name of the hodlCoin that will be created'
-                    className={`w-full h-12 text-lg ${errors.coinName ? 'border-red-500' : ''}`}
-                    value={coinName}
-                    onChange={e => setCoinName(e.target.value)}
-                  />
-                  {errors.coinName && (
-                    <p className='text-red-500 text-sm'>{errors.coinName}</p>
-                  )}
-
-                  <Input
-                    type='text'
-                    placeholder='Ticker Symbol of the hodlCoin that will be created'
-                    className={`w-full h-12 text-lg ${errors.symbol ? 'border-red-500' : ''}`}
-                    value={symbol}
-                    onChange={e => setSymbol(e.target.value)}
-                  />
-                  {errors.symbol && (
-                    <p className='text-red-500 text-sm'>{errors.symbol}</p>
-                  )}
-
-                  <Input
-                    type='text'
-                    placeholder='Address of the ERC20 token that will be staked in the vault'
-                    className={`w-full h-12 text-lg ${errors.coin ? 'border-red-500' : ''}`}
-                    value={coin}
-                    onChange={e => setCoin(e.target.value)}
-                  />
-                  {errors.coin && (
-                    <p className='text-red-500 text-sm'>{errors.coin}</p>
-                  )}
-
-                  <Input
-                    type='text'
-                    placeholder="Address where you would like to receive the vault creator's portion of the unstaking fee"
-                    className={`w-full h-12 text-lg ${errors.vaultCreator ? 'border-red-500' : ''}`}
-                    value={vaultCreator}
-                    onChange={e => setVaultCreator(e.target.value)}
-                  />
-                  {errors.vaultCreator && (
-                    <p className='text-red-500 text-sm'>
-                      {errors.vaultCreator}
-                    </p>
-                  )}
-
-                  <div className='relative w-full'>
-                    <Input
-                      type='number'
-                      step='0.1'
-                      min='0'
-                      placeholder='Unstaking fee that remains in the vault'
-                      className='w-full h-12 text-lg pr-10'
-                      value={vaultFee}
-                      onChange={e => setVaultFee(e.target.value)}
-                    />
-                    {errors.vaultFee && (
-                      <p className='text-red-500 text-sm'>{errors.vaultFee}</p>
-                    )}
-                    <span className='absolute inset-y-0 right-4 flex items-center text-gray-500'>
-                      %
-                    </span>
-                  </div>
-                  <div className='relative w-full'>
-                    <Input
-                      type='number'
-                      step='0.1'
-                      min='0'
-                      placeholder="Unstaking fee that is sent to this vault's creator"
-                      className={`w-full h-12 text-lg ${errors.vaultCreatorFee ? 'border-red-500' : ''}`}
-                      value={vaultCreatorFee}
-                      onChange={e => setVaultCreatorFee(e.target.value)}
-                    />
-                    {errors.vaultCreatorFee && (
-                      <p className='text-red-500 text-sm'>
-                        {errors.vaultCreatorFee}
-                      </p>
-                    )}
-                    <span className='absolute inset-y-0 right-4 flex items-center text-gray-500'>
-                      %
-                    </span>
-                  </div>
-
-                  <div className='pt-4'>
-                    {loadingCreation ? (
-                      <Button className='w-full h-12 text-lg' disabled>
-                        <Loader2 className='mr-3 h-5 w-5 animate-spin' />
-                        Creating Vault...
-                      </Button>
-                    ) : (
-                      <Button
-                        className='w-full h-12 text-lg'
-                        onClick={createVault}
-                      >
-                        Create HodlCoin Vault
-                      </Button>
-                    )}
-                  </div>
+      <div className="relative container mx-auto px-4 py-8">
+        <div className="max-w-3xl mx-auto">
+          {!submitted ? (
+            <Card className="bg-background/50 backdrop-blur-sm border-primary/20 bg-gray-50 dark:bg-gray-700">
+              <CardHeader className="space-y-2">
+                <CardTitle className="text-3xl font-extrabold tracking-tight text-center text-gradient">
+                  Create New Vault
+                </CardTitle>
+                <CardDescription className="text-center text-muted-foreground font-medium">
+                  Fill in the details below to create your new staking vault
                 </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Input
+                      type="text"
+                      placeholder="Name of the hodlCoin that will be created"
+                      className={`w-full h-12 text-sm bg-background/50 border-primary/20 focus:border-primary/40 font-medium ${errors.coinName ? 'border-red-500' : ''}`}
+                      value={coinName}
+                      onChange={e => setCoinName(e.target.value)}
+                    />
+                    {errors.coinName && (
+                      <p className="text-red-500 text-sm font-medium">{errors.coinName}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Input
+                      type="text"
+                      placeholder="Ticker Symbol of the hodlCoin that will be created"
+                      className={`w-full h-12 text-sm bg-background/50 border-primary/20 focus:border-primary/40 font-medium ${errors.symbol ? 'border-red-500' : ''}`}
+                      value={symbol}
+                      onChange={e => setSymbol(e.target.value)}
+                    />
+                    {errors.symbol && (
+                      <p className="text-red-500 text-sm font-medium">{errors.symbol}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Input
+                      type="text"
+                      placeholder="Address of the ERC20 token that will be staked in the vault"
+                      className={`w-full h-12 text-sm bg-background/50 border-primary/20 focus:border-primary/40 font-medium ${errors.coin ? 'border-red-500' : ''}`}
+                      value={coin}
+                      onChange={e => setCoin(e.target.value)}
+                    />
+                    {errors.coin && (
+                      <p className="text-red-500 text-sm font-medium">{errors.coin}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Input
+                      type="text"
+                      placeholder="Address where you would like to receive the vault creator's portion of the unstaking fee"
+                      className={`w-full h-12 text-sm bg-background/50 border-primary/20 focus:border-primary/40 font-medium ${errors.vaultCreator ? 'border-red-500' : ''}`}
+                      value={vaultCreator}
+                      onChange={e => setVaultCreator(e.target.value)}
+                    />
+                    {errors.vaultCreator && (
+                      <p className="text-red-500 text-sm font-medium">{errors.vaultCreator}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <Input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        placeholder="Unstaking fee that remains in the vault"
+                        className={`w-full h-12 text-sm bg-background/50 border-primary/20 focus:border-primary/40 pr-10 font-medium ${errors.vaultFee ? 'border-red-500' : ''}`}
+                        value={vaultFee}
+                        onChange={e => setVaultFee(e.target.value)}
+                      />
+                      <span className="absolute inset-y-0 right-4 flex items-center text-muted-foreground">
+                        %
+                      </span>
+                    </div>
+                    {errors.vaultFee && (
+                      <p className="text-red-500 text-sm font-medium">{errors.vaultFee}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <Input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        placeholder="Unstaking fee that is sent to this vault's creator"
+                        className={`w-full h-12 text-sm bg-background/50 border-primary/20 focus:border-primary/40 pr-10 font-medium ${errors.vaultCreatorFee ? 'border-red-500' : ''}`}
+                        value={vaultCreatorFee}
+                        onChange={e => setVaultCreatorFee(e.target.value)}
+                      />
+                      <span className="absolute inset-y-0 right-4 flex items-center text-muted-foreground">
+                        %
+                      </span>
+                    </div>
+                    {errors.vaultCreatorFee && (
+                      <p className="text-red-500 text-sm font-medium">{errors.vaultCreatorFee}</p>
+                    )}
+                  </div>
+                </div>
+
+                <Button
+                  className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground"
+                  onClick={createVault}
+                  disabled={loadingCreation}
+                >
+                  {loadingCreation ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Creating Vault...
+                    </>
+                  ) : (
+                    <>
+                      Create Vault
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="text-center space-y-8">
+              <div className="w-32 h-32 mx-auto">
+                <Player
+                  autoplay
+                  loop
+                  src={Animation}
+                  style={{ height: '100%', width: '100%' }}
+                />
               </div>
-            ) : (
-              <div className='flex flex-col items-center justify-center space-y-8 py-8'>
-                <Player src={Animation} className='player h-48' loop autoplay />
-                <p className='text-lg text-center'>
-                  Your vault has been successfully created with Unique Id{' '}
-                  {uniqueId + 1}
-                </p>
-                <Link href='/'>
-                  <Button
-                    onClick={() =>
-                      window.open(
-                        getBlockExplorerUrl(config.state.chainId, hashTx),
-                      )
-                    }
-                    variant='outline'
-                    className='h-12 text-lg'
-                  >
-                    See the transaction on-chain
-                  </Button>
+              <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-500">
+                Vault Created Successfully!
+              </h2>
+              <p className="text-muted-foreground">
+                Your vault has been created with ID: {uniqueId}
+              </p>
+              <div className="space-y-4">
+                <Link
+                  href={getBlockExplorerUrl(config.state.chainId, hashTx)}
+                  target="_blank"
+                  className="inline-flex items-center text-primary hover:text-primary/80 transition-colors"
+                >
+                  View Transaction
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
+                <div>
+                  <Link href="/explorer">
+                    <Button variant="outline" className="mt-4">
+                      Back to Explorer
+                    </Button>
+                  </Link>
+                </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

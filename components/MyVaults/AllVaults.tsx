@@ -1,6 +1,6 @@
 'use client'
 
-import { Plus } from 'lucide-react'
+import { Plus, ArrowRight } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { creatorToVaultProps } from '@/utils/props'
@@ -13,6 +13,7 @@ import { HodlCoinFactoryAbi } from '@/utils/contracts/HodlCoinFactory'
 import { HodlCoinVaultFactories } from '@/utils/addresses'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { Skeleton } from '@/components/ui/skeleton'
 
 const VaultDashboard = () => {
   const [vaults, setVaults] = useState<creatorToVaultProps[]>([])
@@ -142,58 +143,112 @@ const VaultDashboard = () => {
   }
 
   return (
-    <div className='w-full space-y-4 pt-20'>
-      <div className='mx-auto max-w-7xl mb-14'>
-        <div className='mb-8 flex items-center justify-between'>
-          <h1 className='text-2xl font-bold text-gray-900 dark:text-white md:text-3xl'>
-            Your Vaults
-          </h1>
-          <Link href='/createVault'>
-            <Button className='border border-black dark:border-white dark:bg-gray-50 bg-white hover:border-purple-600 hover:dark:border-purple-400'>
-              <Plus className='mr-2 h-4 w-4' />
-              New Vault
+    <div className="relative min-h-screen bg-background">
+      {/* Background Elements */}
+      <div className="absolute inset-0">
+        <div className="absolute top-0 -left-4 w-72 h-72 bg-primary/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob" />
+        <div className="absolute top-0 -right-4 w-72 h-72 bg-purple-300/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000" />
+      </div>
+
+      <div className="relative container mx-auto px-4 py-8">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-12 pt-20">
+          <div className="space-y-2">
+            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-gradient">
+              Your Vaults
+            </h1>
+            <p className="text-muted-foreground font-medium">
+              Manage and monitor your staking vaults across different chains
+            </p>
+          </div>
+          <Link href="/createVault">
+            <Button className="btn-gradient font-bold">
+              <Plus className="mr-2 h-4 w-4" />
+              Create New Vault
             </Button>
           </Link>
         </div>
-      </div>
-      <div className='mx-auto max-w-6xl'>
-        {isLoading ? (
-          <div className='text-center text-white'>Loading vaults...</div>
-        ) : error ? (
-          <div className='text-center text-red-500'>{error}</div>
-        ) : vaults.length === 0 ? (
-          <div className='text-center text-white'>No vaults found</div>
-        ) : (
-          <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-            {vaults.map(vault => (
+
+        {/* Vaults Grid */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {isLoading ? (
+            // Loading Skeletons
+            Array.from({ length: 6 }).map((_, i) => (
+              <Card key={i} className="bg-background/50 backdrop-blur-sm border-primary/20">
+                <CardHeader className="border-b border-primary/10 pb-3">
+                  <Skeleton className="h-6 w-3/4" />
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="space-y-4">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-1/2" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          ) : error ? (
+            <div className="col-span-full">
+              <Card className="bg-destructive/10 border-destructive/20">
+                <CardContent className="p-6 text-center">
+                  <p className="text-destructive">{error}</p>
+                </CardContent>
+              </Card>
+            </div>
+          ) : vaults.length === 0 ? (
+            <div className="col-span-full">
+              <Card className="bg-background/50 backdrop-blur-sm border-primary/20">
+                <CardContent className="p-12 text-center">
+                  <div className="space-y-4">
+                    <h3 className="text-xl font-semibold text-foreground">No Vaults Found</h3>
+                    <p className="text-muted-foreground">
+                      You haven't created any vaults yet. Start by creating your first vault!
+                    </p>
+                    <Link href="/createVault">
+                      <Button className="mt-4">
+                        Create Your First Vault
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ) : (
+            vaults.map(vault => (
               <Card
                 key={`${vault.chainId}-${vault.vaultAddress}`}
-                className='group relative overflow-hidden dark:bg-zinc-900 bg-white transition-all hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10 cursor-pointer'
-                onClick={() =>
-                  handleContinue(vault.chainId, vault.vaultAddress)
-                }
+                className="group relative overflow-hidden bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-1 cursor-pointer"
+                onClick={() => handleContinue(vault.chainId, vault.vaultAddress)}
               >
-                <CardHeader className='border-b border-zinc-800 pb-3'>
-                  <CardTitle className='text-gray-900 dark:text-zinc-100'>
-                    {vault.coinName}
-                    <span className='ml-2 text-sm text-zinc-500'>
-                      (Chain: {vault.chainId})
+                <CardHeader className="border-b border-primary/10 pb-3">
+                  <CardTitle className="flex items-center justify-between">
+                    <span className="text-foreground">{vault.coinName}</span>
+                    <span className="text-sm text-muted-foreground">
+                      Chain {vault.chainId}
                     </span>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className='pt-6'>
-                  <div className='flex items-baseline justify-between space-x-4'>
-                    <p className='text-sm text-purple-800 dark:text-purple-400 whitespace-nowrap'>
-                      Price of 1 {vault.coinSymbol}
-                    </p>
-                    <p className='text-sm text-yellow-500'>{vault.price}</p>
+                <CardContent className="pt-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">
+                        Price of 1 {vault.coinSymbol}
+                      </span>
+                      <span className="text-lg font-semibold text-primary">
+                        {vault.price}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                      <span>View Details</span>
+                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </div>
                   </div>
-                  <div className='absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-purple-500 to-yellow-500 opacity-0 transition-opacity group-hover:opacity-100' />
                 </CardContent>
+                <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-primary to-purple-500 opacity-0 transition-opacity group-hover:opacity-100" />
               </Card>
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </div>
       </div>
     </div>
   )

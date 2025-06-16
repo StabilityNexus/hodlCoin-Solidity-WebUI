@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
-import { Loader2 } from 'lucide-react'
+import { Loader2, TrendingDown, AlertTriangle, Coins, DollarSign } from 'lucide-react'
 import { StylishButton } from '../StylishButton'
 import { ERC20Abi } from '@/utils/contracts/ERC20'
 import { useAccount } from 'wagmi'
@@ -27,7 +27,7 @@ export default function UnholdBox({
 }) {
   const { toast } = useToast()
   const [loadingUnhold, setLoadingUnhold] = useState<boolean>(false)
-  const [unholdAmount, setUnholdAmount] = useState<string>('') // Changed to string
+  const [unholdAmount, setUnholdAmount] = useState<string>('')
   const account = useAccount()
 
   const [feesAmount, setFeesAmount] = useState({
@@ -165,62 +165,151 @@ export default function UnholdBox({
     }
   }, [unholdAmount])
 
+  const totalFees = feesAmount.vaultFeeAmount + feesAmount.vaultCreatorFeeAmount + feesAmount.stableOrderFeeAmount
+  const expectedReceive = unholdAmount && parseFloat(unholdAmount) > 0 
+    ? parseFloat(unholdAmount) * priceHodl - totalFees 
+    : 0
+
   return (
-    <Card className='bg-white dark:bg-[#121212] border-gray-200 dark:border-gray-900 transition-colors duration-200'>
+    <Card className='bg-background/50 backdrop-blur-xl border-primary/20 shadow-2xl shadow-primary/5 hover:border-primary/30 transition-all duration-300'>
       <CardHeader>
-        <CardTitle className='text-amber-600 dark:text-yellow-300 transition-colors duration-200'>
-          UnStake Tokens
+        <CardTitle className='font-extrabold tracking-tight text-gradient text-xl flex items-center gap-3'>
+          <div className="p-2 rounded-lg bg-gradient-to-r from-red-500/20 to-orange-500/20 border border-red-500/30">
+            <TrendingDown className="h-5 w-5 text-red-500" />
+          </div>
+          Unstake Tokens
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className='relative'>
-          <Input
-            type='text' // Changed from 'number' to 'text'
-            placeholder='Amount'
-            className='w-full bg-gray-50 dark:bg-black border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white pr-16 transition-colors duration-200'
-            value={unholdAmount}
-            onChange={e => {
-              const value = e.target.value
-              // Only allow numbers and decimal points
-              if (value === '' || /^\d*\.?\d*$/.test(value)) {
-                setUnholdAmount(value)
-              }
-            }}
-          />
-          <Button
-            variant='ghost'
-            className='absolute right-2 top-1/2 -translate-y-1/2 text-xs text-amber-600 hover:text-amber-700 dark:text-yellow-500 dark:hover:text-yellow-600 px-2 py-1 transition-colors duration-200'
-            onClick={handleMaxClick}
-          >
-            MAX
-          </Button>
+      <CardContent className="space-y-6">
+        {/* Balance Display */}
+        <div className="p-4 bg-background/30 backdrop-blur-sm border border-primary/20 rounded-xl">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">Staked Balance</span>
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-lg font-bold text-gradient">
+                {hodlCoinBalance.toFixed(6)}
+              </span>
+              <span className="text-sm text-muted-foreground">h{vault?.coinSymbol}</span>
+            </div>
+          </div>
         </div>
-        <div className='font-mono flex flex-row space-x-2 px-1 pb-4 pt-3 text-sm text-purple-800 dark:text-purple-500 transition-colors duration-200'>
-          {unholdAmount && parseFloat(unholdAmount) > 0 ? (
-            <p>
-              {parseFloat(unholdAmount) * priceHodl -
-                (feesAmount.vaultFeeAmount +
-                  feesAmount.vaultCreatorFeeAmount +
-                  feesAmount.stableOrderFeeAmount)}
-            </p>
-          ) : (
-            <p>0</p>
-          )}
-          <p> {vault?.coinSymbol}</p>
+
+        {/* Input Section */}
+        <div className="space-y-3">
+          <div className='text-sm font-semibold text-foreground flex items-center gap-2'>
+            <div className="w-2 h-2 bg-red-500 rounded-full" />
+            Amount to Unstake
+          </div>
+          <div className='relative'>
+            <Input
+              type='text'
+              placeholder='0.0'
+              className='w-full bg-background/50 backdrop-blur-sm border-primary/30 focus:border-primary/60 
+                transition-all duration-300 hover:border-primary/50 text-foreground pr-20 text-lg font-mono'
+              value={unholdAmount}
+              onChange={e => {
+                const value = e.target.value
+                if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                  setUnholdAmount(value)
+                }
+              }}
+            />
+            <div className="absolute inset-y-0 right-2 flex items-center gap-2">
+              <Button
+                variant='ghost'
+                size="sm"
+                className='text-xs text-red-500 hover:text-red-600 hover:bg-red-500/10 px-2 py-1 h-auto'
+                onClick={handleMaxClick}
+              >
+                MAX
+              </Button>
+              <span className="text-sm text-muted-foreground font-mono">
+                h{vault?.coinSymbol}
+              </span>
+            </div>
+          </div>
         </div>
+
+        {/* Fee Breakdown */}
+        {unholdAmount && parseFloat(unholdAmount) > 0 && (
+          <div className="space-y-3">
+            <div className="p-4 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-xl">
+              <div className="flex items-center gap-2 mb-3">
+                <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                <span className="text-sm font-semibold text-foreground">Unstaking Fees</span>
+              </div>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Vault Fee:</span>
+                  <span className="font-mono text-yellow-600">{feesAmount.vaultFeeAmount.toFixed(6)} {vault?.coinSymbol}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Creator Fee:</span>
+                  <span className="font-mono text-blue-600">{feesAmount.vaultCreatorFeeAmount.toFixed(6)} {vault?.coinSymbol}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Protocol Fee:</span>
+                  <span className="font-mono text-purple-600">{feesAmount.stableOrderFeeAmount.toFixed(6)} {vault?.coinSymbol}</span>
+                </div>
+                <div className="border-t border-muted-foreground/20 pt-2 flex justify-between font-semibold">
+                  <span className="text-foreground">Total Fees:</span>
+                  <span className="font-mono text-red-500">{totalFees.toFixed(6)} {vault?.coinSymbol}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Expected Output */}
+            <div className="p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4 text-green-500" />
+                  <span className="text-sm text-foreground">You will receive</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-lg font-bold text-green-500">
+                    {expectedReceive.toFixed(6)}
+                  </span>
+                  <span className="text-sm text-muted-foreground">{vault?.coinSymbol}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Action Button */}
         {loadingUnhold ? (
           <Button
-            className='w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white transition-colors duration-200'
+            className='w-full bg-muted hover:bg-muted text-muted-foreground cursor-not-allowed'
             disabled
           >
             <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-            Please wait
+            Unstaking...
           </Button>
         ) : (
-          <StylishButton buttonCall={unholdAction}>
-            {isMaxAmount && unholdAmount !== '' ? 'Unstake All' : 'Unstake'}
-          </StylishButton>
+          <Button
+            onClick={unholdAction}
+            disabled={!unholdAmount || parseFloat(unholdAmount) <= 0}
+            className='w-full bg-gradient-to-r from-red-500 to-orange-600 hover:from-orange-600 hover:to-red-500 
+              transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-red-500/25 
+              text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none'
+          >
+            <div className="flex items-center gap-2">
+              <TrendingDown className="h-4 w-4" />
+              {isMaxAmount && unholdAmount !== '' ? 'Unstake All' : 'Unstake Tokens'}
+            </div>
+          </Button>
         )}
+
+        {/* Warning Text */}
+        <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+          <div className="flex items-start gap-2">
+            <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5 flex-shrink-0" />
+            <p className="text-xs text-muted-foreground">
+              Unstaking incurs fees that benefit remaining stakers and the vault creator. 
+              Consider the timing of your unstaking to minimize fees.
+            </p>
+          </div>
+        </div>
       </CardContent>
     </Card>
   )

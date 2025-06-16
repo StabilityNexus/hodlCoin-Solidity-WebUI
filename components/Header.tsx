@@ -38,7 +38,12 @@ export function Header() {
               alt=''
             />
           )} */}
-          <p className='cursor-pointer font-semibold text-foreground mx-1 hidden lg:inline-block'>
+          <p
+            className="cursor-pointer font-extrabold text-2xl tracking-tight mx-1 hidden lg:inline-block 
+              bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent
+              dark:from-purple-400 dark:to-fuchsia-500 dark:bg-gradient-to-r dark:bg-clip-text dark:text-transparent"
+            style={{ letterSpacing: '0.01em' }}
+          >
             HodlCoin
           </p>
         </Link>

@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
-import { Loader2 } from 'lucide-react'
+import { Loader2, TrendingUp, Coins, CheckCircle } from 'lucide-react'
 import { StylishButton } from '../StylishButton'
 import { writeContract, getPublicClient } from '@wagmi/core'
 import { config } from '@/utils/config'
@@ -27,10 +27,9 @@ export default function HodlBox({
 }) {
   const { toast } = useToast()
   const [loadingHold, setLoadingHold] = useState<boolean>(false)
-  const [hodlAmount, setHodlAmount] = useState<string>('') // Changed to string
+  const [hodlAmount, setHodlAmount] = useState<string>('')
   const [coinApproved, setCoinApproved] = useState<boolean>(false)
   const account = useAccount()
-
 
   const validateInputs = () => {
     if (!vault?.vaultAddress || !vault?.coinAddress) {
@@ -141,6 +140,7 @@ export default function HodlBox({
             description: 'Your hodl has been successfully completed',
           })
           setCoinApproved(false)
+          setHodlAmount('')
         } catch (error) {
           console.error('Hodl error:', error)
           toast({
@@ -164,44 +164,125 @@ export default function HodlBox({
     }
   }
 
+  const handleMaxClick = () => {
+    setHodlAmount(coinBalance.toString())
+  }
+
+  const expectedHodlCoins = hodlAmount ? parseFloat(hodlAmount) / priceHodl : 0
+
   return (
-    <Card className='bg-white dark:bg-[#121212] border-gray-200 dark:border-gray-900 transition-colors duration-200'>
+    <Card className='bg-background/50 backdrop-blur-xl border-primary/20 shadow-2xl shadow-primary/5 hover:border-primary/30 transition-all duration-300'>
       <CardHeader>
-        <CardTitle className='text-amber-600 dark:text-yellow-300 transition-colors duration-200'>
+        <CardTitle className='font-extrabold tracking-tight text-gradient text-xl flex items-center gap-3'>
+          <div className="p-2 rounded-lg bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30">
+            <TrendingUp className="h-5 w-5 text-green-500" />
+          </div>
           Stake Tokens
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <Input
-          type='text' // Changed from 'number' to 'text'
-          placeholder='Amount'
-          className='w-full bg-gray-50 dark:bg-black border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white transition-colors duration-200'
-          value={hodlAmount}
-          onChange={e => {
-            const value = e.target.value
-            // Only allow numbers and decimal points
-            if (value === '' || /^\d*\.?\d*$/.test(value)) {
-              setHodlAmount(value)
-            }
-          }}
-        />
-        <div className='font-mono flex flex-row space-x-2 px-1 pb-4 pt-3 text-sm text-purple-700 dark:text-purple-500 transition-colors duration-200'>
-          {hodlAmount ? <p>{parseFloat(hodlAmount) / priceHodl}</p> : <p>0</p>}
-          <p>h{vault?.coinSymbol}</p>
+      <CardContent className="space-y-6">
+        {/* Balance Display */}
+        <div className="p-4 bg-background/30 backdrop-blur-sm border border-primary/20 rounded-xl">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">Available Balance</span>
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-lg font-bold text-gradient">
+                {coinBalance.toFixed(6)}
+              </span>
+              <span className="text-sm text-muted-foreground">{vault?.coinSymbol}</span>
+            </div>
+          </div>
         </div>
+
+        {/* Input Section */}
+        <div className="space-y-3">
+          <div className='text-sm font-semibold text-foreground flex items-center gap-2'>
+            <div className="w-2 h-2 bg-primary rounded-full" />
+            Amount to Stake
+          </div>
+          <div className='relative'>
+            <Input
+              type='text'
+              placeholder='0.0'
+              className='w-full bg-background/50 backdrop-blur-sm border-primary/30 focus:border-primary/60 
+                transition-all duration-300 hover:border-primary/50 text-foreground pr-20 text-lg font-mono'
+              value={hodlAmount}
+              onChange={e => {
+                const value = e.target.value
+                if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                  setHodlAmount(value)
+                }
+              }}
+            />
+            <div className="absolute inset-y-0 right-2 flex items-center gap-2">
+              <Button
+                variant='ghost'
+                size="sm"
+                className='text-xs text-primary hover:text-primary/80 hover:bg-primary/10 px-2 py-1 h-auto'
+                onClick={handleMaxClick}
+              >
+                MAX
+              </Button>
+              <span className="text-sm text-muted-foreground font-mono">
+                {vault?.coinSymbol}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Expected Output */}
+        {hodlAmount && parseFloat(hodlAmount) > 0 && (
+          <div className="p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Coins className="h-4 w-4 text-green-500" />
+                <span className="text-sm text-foreground">You will receive</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-lg font-bold text-green-500">
+                  {expectedHodlCoins.toFixed(6)}
+                </span>
+                <span className="text-sm text-muted-foreground">h{vault?.coinSymbol}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Action Button */}
         {loadingHold ? (
           <Button
-            className='w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white transition-colors duration-200'
+            className='w-full bg-muted hover:bg-muted text-muted-foreground cursor-not-allowed'
             disabled
           >
             <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-            Please wait
+            {coinApproved ? 'Staking...' : 'Approving...'}
           </Button>
         ) : (
-          <StylishButton buttonCall={hodlAction}>
-            {coinApproved ? 'Stake' : 'Approve Staking'}
-          </StylishButton>
+          <Button
+            onClick={hodlAction}
+            disabled={!hodlAmount || parseFloat(hodlAmount) <= 0}
+            className='w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-emerald-600 hover:to-green-500 
+              transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-green-500/25 
+              text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none'
+          >
+            {coinApproved ? (
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-4 w-4" />
+                Stake Tokens
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4" />
+                Approve & Stake
+              </div>
+            )}
+          </Button>
         )}
+
+        {/* Info Text */}
+        <p className="text-xs text-muted-foreground text-center">
+          Staking locks your tokens and mints hodlCoins. The longer you hold, the more you benefit from unstaking fees.
+        </p>
       </CardContent>
     </Card>
   )

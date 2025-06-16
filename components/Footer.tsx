@@ -105,7 +105,12 @@ const navigation = [
 
 export default function Footer() {
   return (
-    <footer className='w-full px-24 py-10 space-y-4  bg-gradient-to-br from-yellow-100 to-green-100'>
+    <footer 
+      className='w-full px-24 py-10 space-y-4 bg-cover bg-center bg-no-repeat relative'
+      style={{
+        backgroundImage: 'url(/footer.png)'
+      }}
+    >
       <div className='flex items-center justify-between'>
         <Link
           href='https://stability.nexus/'
@@ -137,7 +142,7 @@ export default function Footer() {
             </Link>
           ))}
         </div>
-        <div className='text-black flex items-center gap-3 md:order-1'>
+        <div className='text-white flex items-center gap-3 md:order-1'>
           <Link
             href='https://stability.nexus/protocols'
             target='_blank'
@@ -155,14 +160,14 @@ export default function Footer() {
           <Link
             href='https://news.stability.nexus/'
             target='_blank'
-            className='text-black font-medium hover:underline hover:decoration-primary hover:decoration-2'
+            className='font-medium hover:underline hover:decoration-primary hover:decoration-2'
           >
             News
           </Link>
           <Link
             href='https://docs.stability.nexus/'
             target='_blank'
-            className='text-black font-medium hover:underline hover:decoration-primary hover:decoration-2'
+            className='font-medium hover:underline hover:decoration-primary hover:decoration-2'
           >
             Docs
           </Link>

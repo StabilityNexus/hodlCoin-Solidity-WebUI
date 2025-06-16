@@ -3,7 +3,7 @@
 import { vaultsProps } from '@/utils/props'
 import { useAccount } from 'wagmi'
 import { useEffect, useRef, useState } from 'react'
-import { Coins, Loader2, LockKeyhole, TrendingUp } from 'lucide-react'
+import { Coins, Loader2, LockKeyhole, TrendingUp, Gift, X } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,6 +12,7 @@ import { writeContract } from '@wagmi/core'
 import { config } from '@/utils/config'
 import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
 import { ERC20Abi } from '@/utils/contracts/ERC20'
+import { useMatrixEffect } from '../hooks/useMatrixEffect'
 
 export default function HeroVault({
   vault,
@@ -28,6 +29,7 @@ export default function HeroVault({
   const [rewardAmount, setRewardAmount] = useState<number>(0)
   const popupRef = useRef<HTMLDivElement>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const matrixRef = useMatrixEffect(0.15, 2)
 
   const account = useAccount()
 
@@ -74,7 +76,7 @@ export default function HeroVault({
   }
 
   const handleRewardSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault() // Prevent default button behavior
+    e.preventDefault()
 
     try {
       setIsLoading(true)
@@ -106,6 +108,7 @@ export default function HeroVault({
       })
 
       setRewardAmount(0)
+      setIsRewardPopupVisible(false)
     } catch (error) {
       console.error('Transaction error:', error)
       toast({
@@ -128,48 +131,71 @@ export default function HeroVault({
   }
 
   return (
-    <main className='container mx-auto p-4'>
+    <main className='relative container mx-auto p-4 overflow-hidden'>
+      {/* Matrix background effect */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none">
+        <div ref={matrixRef} className="absolute inset-0 w-full h-full" />
+        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-purple-500/5 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-violet-500/8 rounded-full blur-2xl animate-pulse animation-delay-2000" />
+      </div>
+
       <div className='relative'>
-        <Card className='bg-white dark:bg-[#121212] border-gray-200 dark:border-gray-900 transition-colors duration-200'>
-          <CardHeader>
+        <Card className='bg-background/50 backdrop-blur-xl border-primary/20 shadow-2xl shadow-primary/5 hover:border-primary/30 transition-all duration-300'>
+          <CardHeader className="pb-4">
             <div className='flex justify-between items-center'>
-              <CardTitle className='font-bold text-amber-600 dark:text-yellow-300'>
+              <CardTitle className='font-extrabold tracking-tight text-gradient text-xl flex items-center gap-2'>
+                <div className="p-1.5 rounded-lg bg-gradient-to-r from-primary/20 to-purple-500/20 border border-primary/30">
+                  <Coins className="h-5 w-5 text-primary" />
+                </div>
                 Vault Overview
               </CardTitle>
               <Button
-                className='hover:bg-yellow-500'
+                className='relative overflow-hidden group bg-gradient-to-r from-primary to-purple-600 hover:from-purple-600 hover:to-primary 
+                  transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-primary/25 font-semibold text-sm px-4 py-2'
                 onClick={() => setIsRewardPopupVisible(true)}
               >
-                Reward Stakers
+                <span className="relative z-10 flex items-center gap-2">
+                  <Gift className="h-4 w-4" />
+                  Reward Stakers
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </Button>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-              <div className='bg-gray-50 dark:bg-[#181818] border border-gray-200 dark:border-gray-700 rounded-xl p-4 transition-colors duration-200'>
-                <div className='flex items-center gap-2 text-gray-600 font-bold dark:text-gray-400 mb-2'>
-                  <Coins className='h-4 w-4' />
-                  Price
+              <div className='bg-background/30 backdrop-blur-sm border border-primary/20 rounded-xl p-4 transition-all duration-300 hover:border-primary/40 hover:bg-background/40 group'>
+                <div className='flex items-center gap-2 text-muted-foreground font-medium mb-2 group-hover:text-primary transition-colors duration-300'>
+                  <div className="p-1.5 rounded-lg bg-gradient-to-r from-primary/10 to-purple-500/10 border border-primary/20">
+                    <Coins className='h-4 w-4 text-primary' />
+                  </div>
+                  Price per Token
                 </div>
-                <div className='text-2xl font-mono text-gray-900 dark:text-white'>
+                <div className='text-2xl font-mono font-bold text-gradient'>
                   {priceHodl} {vault?.coinSymbol}
                 </div>
               </div>
-              <div className='bg-gray-50 dark:bg-[#181818] border border-gray-200 dark:border-gray-700 rounded-xl p-4 transition-colors duration-200'>
-                <div className='flex items-center gap-2 text-gray-600 font-bold dark:text-gray-400 mb-2'>
-                  <LockKeyhole className='h-4 w-4' />
+              
+              <div className='bg-background/30 backdrop-blur-sm border border-primary/20 rounded-xl p-4 transition-all duration-300 hover:border-primary/40 hover:bg-background/40 group'>
+                <div className='flex items-center gap-2 text-muted-foreground font-medium mb-2 group-hover:text-primary transition-colors duration-300'>
+                  <div className="p-1.5 rounded-lg bg-gradient-to-r from-primary/10 to-purple-500/10 border border-primary/20">
+                    <LockKeyhole className='h-4 w-4 text-primary' />
+                  </div>
                   Total Value Locked
                 </div>
-                <div className='text-2xl font-mono text-gray-900 dark:text-white'>
+                <div className='text-2xl font-mono font-bold text-gradient'>
                   {reserve} {vault?.coinSymbol}
                 </div>
               </div>
-              <div className='bg-gray-50 dark:bg-[#181818] border border-gray-200 dark:border-gray-700 rounded-xl p-4 transition-colors duration-200'>
-                <div className='flex items-center gap-2 text-gray-600 font-bold dark:text-gray-400 mb-2'>
-                  <TrendingUp className='h-4 w-4' />
-                  Supply
+              
+              <div className='bg-background/30 backdrop-blur-sm border border-primary/20 rounded-xl p-4 transition-all duration-300 hover:border-primary/40 hover:bg-background/40 group'>
+                <div className='flex items-center gap-2 text-muted-foreground font-medium mb-2 group-hover:text-primary transition-colors duration-300'>
+                  <div className="p-1.5 rounded-lg bg-gradient-to-r from-primary/10 to-purple-500/10 border border-primary/20">
+                    <TrendingUp className='h-4 w-4 text-primary' />
+                  </div>
+                  Total Supply
                 </div>
-                <div className='text-2xl font-mono text-gray-900 dark:text-white'>
+                <div className='text-2xl font-mono font-bold text-gradient'>
                   {supply} h{vault?.coinSymbol}
                 </div>
               </div>
@@ -178,13 +204,16 @@ export default function HeroVault({
         </Card>
 
         {isRewardPopupVisible && (
-          <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+          <div className='fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4'>
             <div
               ref={popupRef}
-              className='bg-[#0a0a0a] border border-gray-800 rounded-xl p-6 w-full max-w-md'
+              className='bg-background/95 backdrop-blur-xl border border-primary/30 rounded-2xl p-8 w-full max-w-md shadow-2xl shadow-primary/10 animate-in fade-in-0 zoom-in-95 duration-300'
             >
-              <div className='flex justify-between items-center mb-4'>
-                <h3 className='text-xl font-semibold text-yellow-500'>
+              <div className='flex justify-between items-center mb-6'>
+                <h3 className='text-2xl font-extrabold tracking-tight text-gradient flex items-center gap-3'>
+                  <div className="p-2 rounded-lg bg-gradient-to-r from-primary/20 to-purple-500/20 border border-primary/30">
+                    <Gift className="h-5 w-5 text-primary" />
+                  </div>
                   Reward Stakers
                 </h3>
                 <Button
@@ -192,46 +221,57 @@ export default function HeroVault({
                   size='icon'
                   onClick={handleClosePopup}
                   disabled={isLoading}
+                  className="hover:bg-muted/50 rounded-full"
                   aria-label='Close reward popup'
                 >
-                  <p className='h-5 w-5'>x</p>
+                  <X className='h-5 w-5' />
                 </Button>
               </div>
-              <div className='space-y-4'>
-                <div className='relative'>
-                  <Input
-                    id='reward-amount'
-                    type='number'
-                    value={rewardAmount}
-                    onChange={e => {
-                      const value = parseFloat(e.target.value)
-                      setRewardAmount(value)
-                    }}
-                    placeholder='Enter amount'
-                    className='bg-[#141414] border-gray-800 text-white pr-12' // Add padding to the right
-                    disabled={isLoading}
-                    min={0}
-                    step='any'
-                  />
-                  <span className='absolute inset-y-0 right-4 flex items-center text-gray-200'>
-                    PTK
-                  </span>
+              
+              <div className='space-y-6'>
+                <div className='space-y-3'>
+                  <div className='text-sm font-semibold text-foreground flex items-center gap-2'>
+                    <div className="w-2 h-2 bg-primary rounded-full" />
+                    Reward Amount
+                  </div>
+                  <div className='relative'>
+                    <Input
+                      id='reward-amount'
+                      type='number'
+                      value={rewardAmount}
+                      onChange={e => {
+                        const value = parseFloat(e.target.value)
+                        setRewardAmount(value)
+                      }}
+                      placeholder='Enter amount'
+                      className='bg-background/50 backdrop-blur-sm border-primary/30 focus:border-primary/60 
+                        transition-all duration-300 hover:border-primary/50 text-foreground pr-16'
+                      disabled={isLoading}
+                      min={0}
+                      step='any'
+                    />
+                    <span className='absolute inset-y-0 right-4 flex items-center text-muted-foreground font-mono text-sm'>
+                      {vault?.coinSymbol}
+                    </span>
+                  </div>
                 </div>
 
                 {isLoading ? (
                   <Button
-                    className='w-full hover:bg-yellow-600 text-black'
+                    className='w-full bg-muted hover:bg-muted text-muted-foreground cursor-not-allowed'
                     disabled
                   >
                     <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                    Please wait
+                    Processing...
                   </Button>
                 ) : (
                   <Button
-                    className='w-full hover:bg-yellow-600 text-black'
+                    className='w-full bg-gradient-to-r from-primary to-purple-600 hover:from-purple-600 hover:to-primary 
+                      transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-primary/25 
+                      text-primary-foreground font-semibold'
                     onClick={handleRewardSubmit}
                   >
-                    Reward
+                    Send Reward
                   </Button>
                 )}
               </div>

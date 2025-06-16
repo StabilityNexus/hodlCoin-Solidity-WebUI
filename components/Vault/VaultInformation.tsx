@@ -1,6 +1,6 @@
 import { vaultsProps } from '@/utils/props'
-import { Coins, Info, ExternalLink } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
+import { Coins, Info, ExternalLink, User, Percent } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
 const BLOCK_EXPLORERS: { [key: number]: string } = {
@@ -38,113 +38,168 @@ export default function VaultInformation({
     return fee / 1000
   }
 
+  const formatAddress = (address: string) => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`
+  }
+
   return (
     <main className='container mx-auto p-4 mb-8'>
-      <Card className='bg-white dark:bg-[#141414] border-gray-200 dark:border-gray-900 transition-colors duration-200'>
+      <Card className='bg-background/50 max-w-7xl backdrop-blur-xl border-primary/20 shadow-2xl shadow-primary/5 hover:border-primary/30 transition-all duration-300'>
         <CardContent className='p-6'>
-          <div className='flex flex-col md:flex-row gap-8'>
-            <div className='flex-1'>
-              <div className='flex items-center gap-2 text-amber-600 dark:text-yellow-300 text-xl font-semibold mb-4 transition-colors duration-200'>
-                <Info className='h-5 w-5' />
-                Vault Information
+          <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
+            {/* Contract Information */}
+            <div className='space-y-6'>
+              <div className='flex items-center gap-3 mb-6'>
+                <div className="p-2 rounded-lg bg-gradient-to-r from-primary/10 to-purple-500/10 border border-primary/20">
+                  <Coins className="h-5 w-5 text-primary" />
+                </div>
+                <h3 className='text-xl font-bold text-gradient'>Contract Addresses</h3>
               </div>
+              
               <div className='space-y-4'>
-                <div>
-                  <h2 className='text-sm font-medium text-gray-600 dark:text-gray-400 mb-1 transition-colors duration-200'>
+                <div className="group">
+                  <h4 className='text-sm font-semibold text-foreground mb-2 flex items-center gap-2'>
+                    <div className="w-2 h-2 bg-primary rounded-full" />
                     {vault?.coinName} Token Contract
-                  </h2>
-                  <div className='bg-gray-50 dark:bg-black rounded-xl p-2 flex items-center justify-between transition-colors duration-200'>
-                    <code className='font-mono text-sm break-all mr-2 text-gray-900 dark:text-white'>
+                  </h4>
+                  <div className='bg-background/30 backdrop-blur-sm border border-primary/20 rounded-xl p-4 flex items-center justify-between transition-all duration-300 hover:border-primary/40 hover:bg-background/40'>
+                    <code className='font-mono text-sm break-all mr-2 text-foreground'>
                       {vault?.coinAddress}
                     </code>
                     <Button
                       variant='ghost'
                       size='sm'
-                      className='px-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200'
+                      className='px-3 hover:bg-primary/10 transition-all duration-300 transform hover:scale-105 rounded-lg'
                       onClick={() => openExplorer(vault?.coinAddress || '')}
                     >
-                      <ExternalLink className='h-4 w-4' />
+                      <ExternalLink className='h-4 w-4 text-primary' />
                     </Button>
                   </div>
                 </div>
-                <div>
-                  <h2 className='text-sm font-medium text-gray-600 dark:text-gray-400 mb-1 transition-colors duration-200'>
-                    h{vault?.coinSymbol} Token and Vault Contract
-                  </h2>
-                  <div className='bg-gray-50 dark:bg-black rounded-xl p-2 flex items-center justify-between transition-colors duration-200'>
-                    <code className='font-mono text-sm break-all mr-2 text-gray-900 dark:text-white'>
+                
+                <div className="group">
+                  <h4 className='text-sm font-semibold text-foreground mb-2 flex items-center gap-2'>
+                    <div className="w-2 h-2 bg-primary rounded-full" />
+                    h{vault?.coinSymbol} Vault Contract
+                  </h4>
+                  <div className='bg-background/30 backdrop-blur-sm border border-primary/20 rounded-xl p-4 flex items-center justify-between transition-all duration-300 hover:border-primary/40 hover:bg-background/40'>
+                    <code className='font-mono text-sm break-all mr-2 text-foreground'>
                       {vault?.vaultAddress}
                     </code>
                     <Button
                       variant='ghost'
                       size='sm'
-                      className='px-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200'
+                      className='px-3 hover:bg-primary/10 transition-all duration-300 transform hover:scale-105 rounded-lg'
                       onClick={() => openExplorer(vault?.vaultAddress || '')}
                     >
-                      <ExternalLink className='h-4 w-4' />
+                      <ExternalLink className='h-4 w-4 text-primary' />
                     </Button>
                   </div>
                 </div>
-                <div>
-                  <h2 className='text-sm font-medium text-gray-600 dark:text-gray-400 mb-1 transition-colors duration-200'>
+                
+                <div className="group">
+                  <h4 className='text-sm font-semibold text-foreground mb-2 flex items-center gap-2'>
+                    <div className="w-2 h-2 bg-primary rounded-full" />
                     Vault Creator
-                  </h2>
-                  <div className='bg-gray-50 dark:bg-black rounded-xl p-2 flex items-center justify-between transition-colors duration-200'>
-                    <code className='font-mono text-sm break-all mr-2 text-gray-900 dark:text-white'>
-                      {vaultCreator}
-                    </code>
+                  </h4>
+                  <div className='bg-background/30 backdrop-blur-sm border border-primary/20 rounded-xl p-4 flex items-center justify-between transition-all duration-300 hover:border-primary/40 hover:bg-background/40'>
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-gradient-to-r from-primary/10 to-purple-500/10 border border-primary/20">
+                        <User className="h-4 w-4 text-primary" />
+                      </div>
+                      <code className='font-mono text-sm break-all text-foreground'>
+                        {formatAddress(vaultCreator)}
+                      </code>
+                    </div>
                     <Button
                       variant='ghost'
                       size='sm'
-                      className='px-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200'
+                      className='px-3 hover:bg-primary/10 transition-all duration-300 transform hover:scale-105 rounded-lg'
                       onClick={() => openExplorer(vaultCreator)}
                     >
-                      <ExternalLink className='h-4 w-4' />
+                      <ExternalLink className='h-4 w-4 text-primary' />
                     </Button>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className='hidden md:block w-px bg-gray-200 dark:bg-gray-800 transition-colors duration-200' />
-
-            <div className='flex-1'>
-              <div className='flex items-center gap-2 text-amber-600 dark:text-yellow-300 text-xl font-semibold mb-4 transition-colors duration-200'>
-                <Coins className='h-5 w-5' />
-                Unstaking Fees
+            {/* Fee Information */}
+            <div className='space-y-6'>
+              <div className='flex items-center gap-3 mb-6'>
+                <div className="p-2 rounded-lg bg-gradient-to-r from-primary/10 to-purple-500/10 border border-primary/20">
+                  <Percent className="h-5 w-5 text-primary" />
+                </div>
+                <h3 className='text-xl font-bold text-gradient'>Unstaking Fees</h3>
               </div>
+              
               <div className='space-y-4'>
-                <div>
-                  <h2 className='text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 transition-colors duration-200'>
+                <div className="group">
+                  <h4 className='text-sm font-semibold text-foreground mb-2 flex items-center gap-2'>
+                    <div className="w-2 h-2 bg-green-500 rounded-full" />
                     Fee that stays in the Vault
-                  </h2>
-                  <div className='bg-gray-50 dark:bg-black rounded-xl p-3 transition-colors duration-200'>
-                    <code className='font-mono text-l text-gray-900 dark:text-white'>
-                      {formatFee(vaultFee)}%
-                    </code>
+                  </h4>
+                  <div className='bg-background/30 backdrop-blur-sm border border-green-500/20 rounded-xl p-4 transition-all duration-300 hover:border-green-500/40 hover:bg-background/40'>
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20">
+                        <Percent className="h-4 w-4 text-green-500" />
+                      </div>
+                      <span className='font-mono text-2xl font-bold text-gradient'>
+                        {formatFee(vaultFee)}%
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <h2 className='text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 transition-colors duration-200'>
+                
+                <div className="group">
+                  <h4 className='text-sm font-semibold text-foreground mb-2 flex items-center gap-2'>
+                    <div className="w-2 h-2 bg-blue-500 rounded-full" />
                     Fee paid to the Vault Creator
-                  </h2>
-                  <div className='bg-gray-50 dark:bg-black rounded-xl p-3 transition-colors duration-200'>
-                    <code className='font-mono text-l text-gray-900 dark:text-white'>
-                      {formatFee(vaultCreatorFee)}%
-                    </code>
+                  </h4>
+                  <div className='bg-background/30 backdrop-blur-sm border border-blue-500/20 rounded-xl p-4 transition-all duration-300 hover:border-blue-500/40 hover:bg-background/40'>
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20">
+                        <User className="h-4 w-4 text-blue-500" />
+                      </div>
+                      <span className='font-mono text-2xl font-bold text-gradient'>
+                        {formatFee(vaultCreatorFee)}%
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <h2 className='text-sm font-medium text-gray-600 dark:text-gray-400 mb-2 transition-colors duration-200'>
-                    hodlCoin Protocol Fee
-                  </h2>
-                  <div className='bg-gray-50 dark:bg-black rounded-xl p-3 transition-colors duration-200'>
-                    <code className='font-mono text-l text-gray-900 dark:text-white'>
-                      {formatFee(stableOrderFee)}%
-                    </code>
+                
+                <div className="group">
+                  <h4 className='text-sm font-semibold text-foreground mb-2 flex items-center gap-2'>
+                    <div className="w-2 h-2 bg-purple-500 rounded-full" />
+                    HodlCoin Protocol Fee
+                  </h4>
+                  <div className='bg-background/30 backdrop-blur-sm border border-purple-500/20 rounded-xl p-4 transition-all duration-300 hover:border-purple-500/40 hover:bg-background/40'>
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-gradient-to-r from-purple-500/10 to-fuchsia-500/10 border border-purple-500/20">
+                        <Coins className="h-4 w-4 text-purple-500" />
+                      </div>
+                      <span className='font-mono text-2xl font-bold text-gradient'>
+                        {formatFee(stableOrderFee)}%
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+          
+          {/* Total Fee Summary */}
+          <div className="mt-8 p-6 bg-gradient-to-r from-primary/10 to-purple-500/10 border border-primary/20 rounded-xl">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-gradient-to-r from-primary/20 to-purple-500/20 border border-primary/30">
+                  <Percent className="h-5 w-5 text-primary" />
+                </div>
+                <span className="text-lg font-semibold text-foreground">Total Unstaking Fee</span>
+              </div>
+              <span className="text-2xl font-mono font-bold text-gradient">
+                {formatFee(vaultFee + vaultCreatorFee + stableOrderFee)}%
+              </span>
             </div>
           </div>
         </CardContent>
