@@ -7,7 +7,7 @@ import { vaultsProps } from '@/utils/props'
 import { config } from '@/utils/config'
 import {  getPublicClient } from '@wagmi/core'
 import { useRouter } from 'next/navigation'
-import { ArrowRight, TrendingUp, ExternalLink} from 'lucide-react'
+import { ArrowRight, TrendingUp} from 'lucide-react'
 import { Button } from '../ui/button'
 
 export default function CardExplorer({ vault }: { vault: vaultsProps }) {
