@@ -7,6 +7,8 @@ const nextConfig = {
     unoptimized: true,
   },
   basePath: '/hodlCoin-Solidity-WebUI',
+  // Disable font optimization for better consistency
+  optimizeFonts: false,
 }
 
 export default nextConfig;
