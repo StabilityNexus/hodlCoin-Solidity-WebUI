@@ -41,22 +41,6 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
           rel="stylesheet"
         />
-        <style>{`
-          :root {
-            --font-poppins: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-          }
-          
-          * {
-            font-family: var(--font-poppins) !important;
-          }
-          
-          body {
-            font-size: 16px;
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-          }
-        `}</style>
       </head>
       <body className={poppins.className}>
         <ThemeProvider
