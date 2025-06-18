@@ -7,7 +7,6 @@ import { Toaster } from '@/components/ui/toaster'
 import { Header } from '@/components/Header'
 import Footer from '@/components/Footer'
 import { WalletProvider } from '@/providers/WalletProvider'
-import { WagmiProvider } from '@/providers/wagmi-provider'
 
 const poppins = Poppins({ 
   subsets: ['latin'],
@@ -66,18 +65,16 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <WagmiProvider>
-            <WalletProvider>
-              <div className="relative flex min-h-screen flex-col overflow-x-hidden">
-                <Header />
-                <main className="flex-1 w-full">
-                  {children}
-                </main>
-                <Footer />
-              </div>
-              <Toaster />
-            </WalletProvider>
-          </WagmiProvider>
+          <WalletProvider>
+            <div className="relative flex min-h-screen flex-col overflow-x-hidden">
+              <Header />
+              <main className="flex-1 w-full">
+                {children}
+              </main>
+              <Footer />
+            </div>
+            <Toaster />
+          </WalletProvider>
         </ThemeProvider>
       </body>
     </html>
