@@ -169,7 +169,7 @@ export default function CreateForm() {
       <div className="relative container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto">
           {!submitted ? (
-            <Card className="bg-background/50 backdrop-blur-sm border-primary/20 bg-gray-50 dark:bg-gray-700">
+            <Card className="bg-background/95 backdrop-blur-sm border-primary/30 shadow-xl dark:bg-card/95 dark:border-primary/40">
               <CardHeader className="space-y-2">
                 <CardTitle className="text-3xl font-extrabold tracking-tight text-center text-gradient">
                   Create New Vault
@@ -184,7 +184,7 @@ export default function CreateForm() {
                     <Input
                       type="text"
                       placeholder="Name of the hodlCoin that will be created"
-                      className={`w-full h-12 text-sm bg-background/50 border-primary/20 focus:border-primary/40 font-medium ${errors.coinName ? 'border-red-500' : ''}`}
+                      className={`w-full h-12 text-sm bg-background/80 border-border/60 focus:border-primary/60 font-medium placeholder:text-muted-foreground/70 dark:bg-background/60 dark:border-border/40 dark:focus:border-primary/70 ${errors.coinName ? 'border-red-500 dark:border-red-400' : ''}`}
                       value={coinName}
                       onChange={e => setCoinName(e.target.value)}
                     />
@@ -197,7 +197,7 @@ export default function CreateForm() {
                     <Input
                       type="text"
                       placeholder="Ticker Symbol of the hodlCoin that will be created"
-                      className={`w-full h-12 text-sm bg-background/50 border-primary/20 focus:border-primary/40 font-medium ${errors.symbol ? 'border-red-500' : ''}`}
+                      className={`w-full h-12 text-sm bg-background/80 border-border/60 focus:border-primary/60 font-medium placeholder:text-muted-foreground/70 dark:bg-background/60 dark:border-border/40 dark:focus:border-primary/70 ${errors.symbol ? 'border-red-500 dark:border-red-400' : ''}`}
                       value={symbol}
                       onChange={e => setSymbol(e.target.value)}
                     />
@@ -210,7 +210,7 @@ export default function CreateForm() {
                     <Input
                       type="text"
                       placeholder="Address of the ERC20 token that will be staked in the vault"
-                      className={`w-full h-12 text-sm bg-background/50 border-primary/20 focus:border-primary/40 font-medium ${errors.coin ? 'border-red-500' : ''}`}
+                      className={`w-full h-12 text-sm bg-background/80 border-border/60 focus:border-primary/60 font-medium placeholder:text-muted-foreground/70 dark:bg-background/60 dark:border-border/40 dark:focus:border-primary/70 ${errors.coin ? 'border-red-500 dark:border-red-400' : ''}`}
                       value={coin}
                       onChange={e => setCoin(e.target.value)}
                     />
@@ -223,7 +223,7 @@ export default function CreateForm() {
                     <Input
                       type="text"
                       placeholder="Address where you would like to receive the vault creator's portion of the unstaking fee"
-                      className={`w-full h-12 text-sm bg-background/50 border-primary/20 focus:border-primary/40 font-medium ${errors.vaultCreator ? 'border-red-500' : ''}`}
+                      className={`w-full h-12 text-sm bg-background/80 border-border/60 focus:border-primary/60 font-medium placeholder:text-muted-foreground/70 dark:bg-background/60 dark:border-border/40 dark:focus:border-primary/70 ${errors.vaultCreator ? 'border-red-500 dark:border-red-400' : ''}`}
                       value={vaultCreator}
                       onChange={e => setVaultCreator(e.target.value)}
                     />
@@ -239,7 +239,7 @@ export default function CreateForm() {
                         step="0.1"
                         min="0"
                         placeholder="Unstaking fee that remains in the vault"
-                        className={`w-full h-12 text-sm bg-background/50 border-primary/20 focus:border-primary/40 pr-10 font-medium ${errors.vaultFee ? 'border-red-500' : ''}`}
+                        className={`w-full h-12 text-sm bg-background/80 border-border/60 focus:border-primary/60 pr-10 font-medium placeholder:text-muted-foreground/70 dark:bg-background/60 dark:border-border/40 dark:focus:border-primary/70 ${errors.vaultFee ? 'border-red-500 dark:border-red-400' : ''}`}
                         value={vaultFee}
                         onChange={e => setVaultFee(e.target.value)}
                       />
@@ -259,7 +259,7 @@ export default function CreateForm() {
                         step="0.1"
                         min="0"
                         placeholder="Unstaking fee that is sent to this vault's creator"
-                        className={`w-full h-12 text-sm bg-background/50 border-primary/20 focus:border-primary/40 pr-10 font-medium ${errors.vaultCreatorFee ? 'border-red-500' : ''}`}
+                        className={`w-full h-12 text-sm bg-background/80 border-border/60 focus:border-primary/60 pr-10 font-medium placeholder:text-muted-foreground/70 dark:bg-background/60 dark:border-border/40 dark:focus:border-primary/70 ${errors.vaultCreatorFee ? 'border-red-500 dark:border-red-400' : ''}`}
                         value={vaultCreatorFee}
                         onChange={e => setVaultCreatorFee(e.target.value)}
                       />
@@ -274,7 +274,7 @@ export default function CreateForm() {
                 </div>
 
                 <Button
-                  className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground"
+                  className="w-full h-12 bg-gradient-to-r from-primary to-purple-500 hover:from-primary/90 hover:to-purple-500/90 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
                   onClick={createVault}
                   disabled={loadingCreation}
                 >
@@ -302,28 +302,28 @@ export default function CreateForm() {
                   style={{ height: '100%', width: '100%' }}
                 />
               </div>
-              <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-500">
+              <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-500 dark:from-purple-400 dark:to-fuchsia-500">
                 Vault Created Successfully!
               </h2>
-              <p className="text-muted-foreground">
-                Your vault has been created with ID: {uniqueId}
+              <p className="text-muted-foreground dark:text-muted-foreground/90">
+                Your vault has been created with ID: <span className="font-semibold text-foreground">{uniqueId}</span>
               </p>
               <div className="space-y-4">
-                <Link
-                  href={getBlockExplorerUrl(config.state.chainId, hashTx)}
-                  target="_blank"
-                  className="inline-flex items-center text-primary hover:text-primary/80 transition-colors"
-                >
-                  View Transaction
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-                <div>
-                  <Link href="/explorer">
-                    <Button variant="outline" className="mt-4">
-                      Back to Explorer
-                    </Button>
+                                  <Link
+                    href={getBlockExplorerUrl(config.state.chainId, hashTx)}
+                    target="_blank"
+                    className="inline-flex items-center text-primary hover:text-primary/80 dark:text-purple-400 dark:hover:text-purple-300 transition-colors font-medium"
+                  >
+                    View Transaction
+                    <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
-                </div>
+                                  <div>
+                    <Link href="/explorer">
+                      <Button variant="outline" className="mt-4 border-primary/30 hover:bg-primary/10 dark:border-primary/40 dark:hover:bg-primary/20">
+                        Back to Explorer
+                      </Button>
+                    </Link>
+                  </div>
               </div>
             </div>
           )}
