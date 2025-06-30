@@ -563,7 +563,7 @@ export default function ExplorerVaults() {
                   <h3 className='text-lg font-medium text-gradient'>No vaults found</h3>
                   <p className='text-muted-foreground max-w-md mx-auto'>
                     {searchQuery 
-                      ? `No vaults match your search "${searchQuery}". Try adjusting your search terms.`
+                      ? `No vaults match your search ${searchQuery}. Try adjusting your search terms.`
                       : 'No vaults are available for the selected network.'
                     }
                   </p>
