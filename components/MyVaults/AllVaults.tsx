@@ -1,49 +1,166 @@
 'use client'
 
-import { Plus, ArrowRight, Vault, TrendingUp } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Plus, Vault, TrendingUp, RefreshCw, Search, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { creatorToVaultProps } from '@/utils/props'
+import { vaultsProps } from '@/utils/props'
 import { useEffect, useState } from 'react'
-import { useAccount } from 'wagmi'
+import { useAccount, useChainId } from 'wagmi'
 import { getPublicClient } from '@wagmi/core'
 import { config } from '@/utils/config'
-import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
 import { HodlCoinFactoryAbi } from '@/utils/contracts/HodlCoinFactory'
 import { HodlCoinVaultFactories } from '@/utils/addresses'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Skeleton } from '@/components/ui/skeleton'
+import { Pagination } from '@/components/ui/pagination'
+import { Input } from '@/components/ui/input'
+import { Loading } from '@/components/ui/loading'
+import CardExplorer from '@/components/Explorer/CardExplorer'
+import { cn } from '@/lib/utils'
+import { indexedDBManager } from '@/utils/indexedDB'
+import { ChainDropdown } from '@/components/ChainDropdown'
+
+// Define supported chain IDs to match ChainDropdown
+type SupportedChainId = 1 | 137 | 534351 | 5115 | 61 | 2001 | 8453;
 
 const AllVaults = () => {
-  const [vaults, setVaults] = useState<creatorToVaultProps[]>([])
+  const [vaults, setVaults] = useState<vaultsProps[]>([])
+  const [filteredVaults, setFilteredVaults] = useState<vaultsProps[]>([])
+  const [paginatedVaults, setPaginatedVaults] = useState<vaultsProps[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isSyncing, setIsSyncing] = useState(false)
+  const [isLoadingFromCache, setIsLoadingFromCache] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedChain, setSelectedChain] = useState<SupportedChainId | 'all'>('all')
+  const [dataSource, setDataSource] = useState<'cache' | 'blockchain' | null>(null)
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pagination, setPagination] = useState({
+    page: 1,
+    totalPages: 1,
+    totalItems: 0,
+    itemsPerPage: 6
+  })
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false)
+  const pageSize = 6
   const account = useAccount()
+  const connectedChainId = useChainId()
   const router = useRouter()
 
-  const fetchVaultsFromAllChains = async () => {
+  // Helper functions for chain management
+  const getAvailableChains = (): SupportedChainId[] => {
+    return Object.keys(HodlCoinVaultFactories).map(Number) as SupportedChainId[]
+  }
+
+  const getChainName = (chainId: SupportedChainId | 'all') => {
+    if (chainId === 'all') return 'All Networks'
+    const chainNames: { [key: number]: string } = {
+      1: 'Ethereum',
+      137: 'Polygon',
+      534351: 'Scroll Sepolia',
+      5115: 'Citrea Testnet',
+      61: 'Ethereum Classic',
+      2001: 'Milkomeda',
+      8453: 'Base',
+    }
+    return chainNames[chainId] || `Chain ${chainId}`
+  }
+
+  const fetchVaultsFromAllChains = async (forceRefresh = false) => {
     try {
-      setIsLoading(true)
+      if (forceRefresh) {
+        setIsSyncing(true)
+      } else if (!initialLoadComplete) {
+        setIsLoading(true)
+      }
       setError(null)
-      let allVaults: creatorToVaultProps[] = []
+      let allVaults: vaultsProps[] = []
 
-      const chainPromises = Object.entries(HodlCoinVaultFactories).map(
-        ([chainId, factoryAddress]) =>
-          fetchVaultsForChain(chainId, factoryAddress),
-      )
+      if (!account.address) {
+        setVaults([])
+        setDataSource(null)
+        setLastUpdated(null)
+        setInitialLoadComplete(true)
+        return
+      }
 
-      const results = await Promise.all(chainPromises)
-      allVaults = results
-        .flat()
-        .filter((vault): vault is creatorToVaultProps => vault !== null)
+      // Try to get cached vaults first (only if not force refresh)
+      if (!forceRefresh) {
+        console.log('🔍 Checking cache for user vaults...')
+        setIsLoadingFromCache(true)
+        try {
+          const cachedVaults = await indexedDBManager.getUserVaults(account.address)
+          if (cachedVaults && cachedVaults.length > 0) {
+            console.log('✅ Found cached user vaults:', cachedVaults.length)
+            setVaults(cachedVaults as vaultsProps[])
+            setDataSource('cache')
+            setLastUpdated(new Date())
+            setInitialLoadComplete(true)
+            setIsLoading(false)
+            setIsSyncing(false)
+            setIsLoadingFromCache(false)
+            return
+          }
+          console.log('❌ No cached user vaults found or cache expired')
+        } catch (cacheError) {
+          console.error('💥 Error reading from cache:', cacheError)
+          // Continue with blockchain fetch if cache fails
+        }
+        setIsLoadingFromCache(false)
+      }
+
+      // Fetch from blockchain based on selected chain
+      console.log('⛓️ Fetching user vaults from blockchain...')
+      
+      if (selectedChain === 'all') {
+        // Fetch from all chains
+        const chainPromises = Object.entries(HodlCoinVaultFactories).map(
+          ([chainId, factoryAddress]) =>
+            fetchVaultsForChain(chainId, factoryAddress),
+        )
+        const results = await Promise.all(chainPromises)
+        allVaults = results
+          .flat()
+          .filter((vault: vaultsProps | null): vault is vaultsProps => vault !== null)
+      } else {
+        // Fetch from selected chain only
+        const factoryAddress = HodlCoinVaultFactories[selectedChain]
+        if (factoryAddress) {
+          const chainVaults = await fetchVaultsForChain(selectedChain.toString(), factoryAddress)
+          allVaults = chainVaults.filter((vault: vaultsProps | null): vault is vaultsProps => vault !== null)
+        }
+      }
+
+      // Sort vaults: connected network first, then others
+      if (connectedChainId) {
+        allVaults.sort((a, b) => {
+          if (a.chainId === connectedChainId && b.chainId !== connectedChainId) return -1
+          if (a.chainId !== connectedChainId && b.chainId === connectedChainId) return 1
+          return 0
+        })
+      }
 
       setVaults(allVaults)
+      setDataSource('blockchain')
+      setLastUpdated(new Date())
+      setInitialLoadComplete(true)
+
+      // Save to cache
+      try {
+        console.log('💾 Saving user vaults to cache:', allVaults.length)
+        await indexedDBManager.saveUserVaults(account.address, allVaults)
+        console.log('✅ User vaults saved to cache successfully')
+      } catch (cacheError) {
+        console.error('💥 Error saving to cache:', cacheError)
+        // Don't throw error, just log it - caching failure shouldn't break the app
+      }
+
     } catch (error) {
       console.error('Error fetching vaults:', error)
       setError('Failed to fetch vaults. Please try again later.')
     } finally {
       setIsLoading(false)
+      setIsSyncing(false)
     }
   }
 
@@ -61,75 +178,162 @@ const AllVaults = () => {
         return []
       }
 
-      // Get vault addresses for the connected account
-      const vaultAddresses = (await publicClient.readContract({
+      // Get total vault count for the creator
+      const totalCreatorVaults = await publicClient.readContract({
         address: factoryAddress as `0x${string}`,
         abi: HodlCoinFactoryAbi,
-        functionName: 'getVaultAddresses',
-        args: [account.address],
-      })) as `0x${string}`[]
+        functionName: 'creatorVaultCount',
+        args: [account.address as `0x${string}`],
+      }) as bigint
 
-      // Fetch details for each vault in parallel
-      const vaultPromises = vaultAddresses.map(async (vaultAddress, index) => {
-        try {
-          // Get vault ID by checking each vault in the factory until we find a match
-          let vaultId = 1
-          let found = false
+      if (Number(totalCreatorVaults) === 0) {
+        return []
+      }
 
-          while (!found) {
-            const vaultInfo = (await publicClient.readContract({
-              address: factoryAddress as `0x${string}`,
-              abi: HodlCoinFactoryAbi,
-              functionName: 'vaults',
-              args: [vaultId],
-            })) as [string, string, string, string] // [vaultAddress, coinName, coinAddress, coinSymbol]
+      // Get all vault addresses using the slice function
+      const vaultAddresses = await publicClient.readContract({
+        address: factoryAddress as `0x${string}`,
+        abi: HodlCoinFactoryAbi,
+        functionName: 'getCreatorVaultsSlice',
+        args: [account.address as `0x${string}`, BigInt(0), totalCreatorVaults - BigInt(1)],
+      }) as `0x${string}`[]
 
-            if (vaultInfo[0].toLowerCase() === vaultAddress.toLowerCase()) {
-              found = true
-            } else {
-              vaultId++
-            }
-          }
+      if (vaultAddresses.length === 0) {
+        return []
+      }
 
-          // Get price from vault contract
-          const priceHodl = (await publicClient.readContract({
-            abi: HodlCoinAbi,
-            address: vaultAddress,
-            functionName: 'priceHodl',
-          })) as bigint
+      // Get all vault details efficiently and match with creator vault addresses
+      try {
+        // Get total vault count
+        const totalVaults = await publicClient.readContract({
+          address: factoryAddress as `0x${string}`,
+          abi: HodlCoinFactoryAbi,
+          functionName: 'vaultId',
+        }) as bigint
 
-          // Get vault details from factory
-          const vaultInfo = (await publicClient.readContract({
-            address: factoryAddress as `0x${string}`,
-            abi: HodlCoinFactoryAbi,
-            functionName: 'vaults',
-            args: [vaultId],
-          })) as [string, string, string, string]
-
-          return {
-            chainId,
-            coinName: vaultInfo[1], // Name from factory
-            coinAddress: vaultInfo[2], // Coin address from factory
-            coinSymbol: vaultInfo[3], // Symbol from factory
-            vaultAddress: vaultAddress,
-            price: Number(Number(priceHodl).toFixed(5)) / 100000,
-          }
-        } catch (error) {
-          console.error(
-            `Error fetching vault ${vaultAddress} on chain ${chainId}:`,
-            error,
-          )
-          return null
+        if (Number(totalVaults) === 0) {
+          return []
         }
-      })
 
-      const results = await Promise.all(vaultPromises)
-      return results.filter(vault => vault !== null)
+        // Get all vault details at once
+        const allVaultDetails = await publicClient.readContract({
+          address: factoryAddress as `0x${string}`,
+          abi: HodlCoinFactoryAbi,
+          functionName: 'getVaultsSlice',
+          args: [BigInt(1), totalVaults],
+        }) as Array<{
+          vaultAddress: string
+          coinName: string
+          coinAddress: string
+          coinSymbol: string
+        }>
+
+        // Filter and match creator vault addresses with vault details
+        const creatorVaults = vaultAddresses
+          .map(creatorVaultAddress => {
+            const vaultDetail = allVaultDetails.find(
+              detail => detail.vaultAddress.toLowerCase() === creatorVaultAddress.toLowerCase()
+            )
+            
+            if (vaultDetail) {
+              return {
+                chainId: parseInt(chainId),
+                coinName: vaultDetail.coinName,
+                coinAddress: vaultDetail.coinAddress as `0x${string}`,
+                coinSymbol: vaultDetail.coinSymbol,
+                vaultAddress: creatorVaultAddress,
+                decimals: 18, // Standard ERC20 decimals
+              }
+            }
+            return null
+          })
+          .filter(vault => vault !== null)
+
+        return creatorVaults as vaultsProps[]
+      } catch (error) {
+        console.error(`Error fetching vault details for chain ${chainId}:`, error)
+        return []
+      }
     } catch (error) {
       console.error(`Error fetching vaults for chain ${chainId}:`, error)
       return []
     }
   }
+
+  // Handle chain selection
+  const handleChainSelect = (chainId: SupportedChainId | 'all') => {
+    setSelectedChain(chainId)
+    setCurrentPage(1)
+    // Trigger refresh with new chain selection
+    fetchVaultsFromAllChains()
+  }
+
+  // Handle sync
+  const handleSync = async () => {
+    await fetchVaultsFromAllChains(true)
+  }
+
+  // Handle clear cache
+  const handleClearCache = async () => {
+    if (!account.address) return
+    
+    try {
+      console.log('🗑️ Clearing user vault cache...')
+      await indexedDBManager.saveUserVaults(account.address, [])
+      setDataSource(null)
+      console.log('✅ User vault cache cleared')
+      
+      // Refresh data from blockchain
+      await fetchVaultsFromAllChains(true)
+    } catch (error) {
+      console.error('💥 Error clearing cache:', error)
+    }
+  }
+
+  // Handle search
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+    setCurrentPage(1)
+  }
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
+
+  // Filter and paginate vaults
+  useEffect(() => {
+    let filtered = vaults
+
+    // Apply search filter
+    if (searchQuery) {
+      filtered = filtered.filter(vault =>
+        vault.coinName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        vault.coinSymbol.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    }
+
+    // Apply chain filter
+    if (selectedChain !== 'all') {
+      filtered = filtered.filter(vault => vault.chainId === selectedChain)
+    }
+
+    setFilteredVaults(filtered)
+
+    // Calculate pagination
+    const totalPages = Math.ceil(filtered.length / pageSize)
+    const startIndex = (currentPage - 1) * pageSize
+    const endIndex = startIndex + pageSize
+    const paginated = filtered.slice(startIndex, endIndex)
+
+    setPaginatedVaults(paginated)
+    setPagination({
+      page: currentPage,
+      totalPages,
+      totalItems: filtered.length,
+      itemsPerPage: pageSize
+    })
+  }, [vaults, searchQuery, selectedChain, currentPage, pageSize])
 
   useEffect(() => {
     if (account.address) {
@@ -137,198 +341,236 @@ const AllVaults = () => {
     }
   }, [account.address])
 
-  const handleContinue = (chainId: string, vaultAddress: string) => {
-    router.push(`/v?chainId=${chainId}&vault=${vaultAddress}`)
-  }
-
-  const getChainName = (chainId: string) => {
-    const chainNames: { [key: string]: string } = {
-      '1': 'Ethereum',
-      '534351': 'Scroll Sepolia',
-      '5115': 'Citrea Testnet',
-      '61': 'Ethereum Classic',
-      '2001': 'Milkomeda',
-      '137': 'Polygon',
-      '8453': 'Base',
-    }
-    return chainNames[chainId] || `Chain ${chainId}`
-  }
-
-  const getChainColor = (chainId: string) => {
-    const chainColors: { [key: string]: string } = {
-      '1': 'bg-blue-400/10 text-blue-500 border-blue-400/20 dark:bg-blue-500/10 dark:text-blue-400/80 dark:border-blue-500/20',
-      '534351': 'bg-orange-400/10 text-orange-500 border-orange-400/20 dark:bg-orange-500/10 dark:text-orange-400/80 dark:border-orange-500/20',
-      '5115': 'bg-yellow-400/10 text-yellow-500 border-yellow-400/20 dark:bg-yellow-500/10 dark:text-yellow-400/80 dark:border-yellow-500/20',
-      '61': 'bg-green-400/10 text-green-500 border-green-400/20 dark:bg-green-500/10 dark:text-green-400/80 dark:border-green-500/20',
-      '2001': 'bg-purple-400/10 text-purple-500 border-purple-400/20 dark:bg-purple-500/10 dark:text-purple-400/80 dark:border-purple-500/20',
-      '137': 'bg-violet-400/10 text-violet-500 border-violet-400/20 dark:bg-violet-500/10 dark:text-violet-400/80 dark:border-violet-500/20',
-      '8453': 'bg-blue-400/10 text-blue-500 border-blue-400/20 dark:bg-blue-500/10 dark:text-blue-400/80 dark:border-blue-500/20',
-    }
-    return chainColors[chainId] || 'bg-gray-400/10 text-gray-500 border-gray-400/20 dark:bg-gray-500/10 dark:text-gray-400/80 dark:border-gray-500/20'
-  }
-
   return (
-    <div className='min-h-screen bg-background'>
-      {/* Modern Header */}
-      <div className='border-b border-border/40 bg-gradient-to-r from-background via-primary/[0.02] to-background'>
-        <div className='container mx-auto px-4 py-8'>
+    <div className='min-h-screen page-3d'>
+      {/* Streamlined Header */}
+      <div className='border-b border-border/40 header-3d mb-8'>
+        <div className='container mx-auto px-4 py-6'>
           <div className='flex items-center justify-between'>
-            <div className='space-y-2'>
-              <div className='flex items-center gap-3'>
-                <div className='p-2 rounded-xl bg-gradient-to-br from-primary/20 to-purple-500/20 border border-primary/20'>
-                  <Vault className='h-6 w-6 text-primary' />
-                </div>
-                <div>
-                  <h1 className='text-3xl font-bold text-foreground/90 dark:text-foreground/80'>My Vaults</h1>
-                  <p className='text-muted-foreground'>Manage and monitor your staking vaults</p>
-                </div>
+            <div className='flex items-center gap-3'>
+              <div className='p-2 rounded-xl bg-gradient-to-br from-primary/20 to-purple-500/20 border border-primary/20 floating-3d'>
+                <Vault className='h-6 w-6 text-primary' />
+              </div>
+              <div>
+                <h1 className='text-2xl font-bold text-gradient'>My Vaults</h1>
+                <p className='text-sm text-muted-foreground'>Manage and monitor your staking vaults</p>
               </div>
             </div>
             
-            {/* Stats Card */}
-            <div className='hidden md:flex gap-4'>
-              <Card className='p-4 bg-background/50 backdrop-blur-sm border-primary/10'>
-                <div className='flex items-center gap-2'>
-                  <TrendingUp className='h-4 w-4 text-green-400 dark:text-green-500/80' />
-                  <div>
-                    <div className='text-sm font-medium'>{vaults.length}</div>
-                    <div className='text-xs text-muted-foreground'>My Vaults</div>
-                  </div>
-                </div>
-              </Card>
+            {/* Header Actions */}
+            <div className='hidden md:flex items-center gap-3 text-sm'>
+              <Link href="/createVault">
+                <Button className='h-9 px-3 gap-2 bg-gradient-to-r from-primary/70 to-purple-500/70 hover:from-primary/80 hover:to-purple-500/80 button-3d'>
+                  <Plus className='h-4 w-4' />
+                  <span className='text-3d'>Create Vault</span>
+                </Button>
+              </Link>
+              <Button
+                onClick={handleSync}
+                disabled={isLoading || isSyncing || isLoadingFromCache}
+                variant="outline"
+                size="sm"
+                className={cn(
+                  'h-9 px-3 gap-2 border-primary/20 hover:bg-primary/5 button-3d',
+                  isSyncing && 'animate-pulse'
+                )}
+              >
+                <RefreshCw className={cn('h-4 w-4', isSyncing && 'animate-spin')} />
+                <span className='text-3d'>Sync</span>
+              </Button>
             </div>
           </div>
         </div>
       </div>
 
-      <div className='container mx-auto px-4 py-6'>
-        {/* Create Vault Button */}
-        <div className='flex justify-end mb-8'>
-          <Link href="/createVault">
-            <Button className='bg-gradient-to-r from-primary/70 to-purple-500/70 hover:from-primary/80 hover:to-purple-500/80 dark:from-primary/60 dark:to-purple-500/60 dark:hover:from-primary/70 dark:hover:to-purple-500/70 transition-all duration-300 font-medium'>
-              <Plus className="mr-2 h-4 w-4" />
-              Create New Vault
-            </Button>
-          </Link>
+      {/* Separate Controls */}
+      <div className='container mx-auto px-4 py-4 mb-8'>
+        <div className='flex items-center justify-between gap-4'>
+          {/* Left Side - Search Bar */}
+          <div className='flex-1 max-w-md'>
+            <div className='relative'>
+              <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+              <Input
+                placeholder='Search vaults by name or symbol...'
+                value={searchQuery}
+                onChange={e => handleSearch(e.target.value)}
+                className='pl-10 h-10 border-border/60 bg-background/80 backdrop-blur-sm input-3d'
+              />
+            </div>
+          </div>
+
+          {/* Right Side - Network Dropdown and Clear Filters */}
+          <div className='flex items-center gap-3'>
+            <ChainDropdown
+              selectedChainId={selectedChain}
+              onChainSelect={handleChainSelect}
+              currentChainId={connectedChainId}
+              availableChains={getAvailableChains()}
+            />
+            
+            {(searchQuery || selectedChain !== 'all') && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSearchQuery('')
+                  handleSearch('')
+                  setSelectedChain('all')
+                }}
+                className='h-10 px-3 gap-2 button-3d'
+              >
+                <X className='h-4 w-4' />
+                <span className='text-3d'>Clear</span>
+              </Button>
+            )}
+          </div>
         </div>
 
-        {/* Results Section */}
-        <div className='space-y-6'>
-          {/* Loading State */}
-          {isLoading && (
-            <div className='flex items-center justify-center py-16'>
-              <div className='text-center space-y-4'>
-                <div className='w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin mx-auto' />
-                <p className='text-muted-foreground'>Loading your vaults...</p>
+        {/* Active Filters and Data Source Display */}
+        {(searchQuery || selectedChain !== 'all' || (initialLoadComplete && vaults.length > 0)) && (
+          <div className='flex items-center justify-between text-xs mt-3'>
+            <div className='flex items-center gap-2'>
+              {(searchQuery || selectedChain !== 'all') && (
+                <>
+                  <span className='text-muted-foreground'>Active filters:</span>
+                  {searchQuery && (
+                    <div className='flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary'>
+                      <Search className='h-3 w-3' />
+                      "{searchQuery}"
+                    </div>
+                  )}
+                  {selectedChain !== 'all' && (
+                    <div className='flex items-center gap-1 px-2 py-1 rounded-md bg-blue-500/10 text-blue-600'>
+                      <Vault className='h-3 w-3' />
+                      {getChainName(selectedChain)}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+            
+            {/* Data Source Indicator */}
+            {initialLoadComplete && vaults.length > 0 && dataSource && lastUpdated && (
+              <div 
+                className='flex items-center gap-1 px-2 py-1 rounded-md bg-muted/30 text-muted-foreground text-xs cursor-help'
+                title={`Data ${dataSource === 'cache' ? 'loaded from cache' : 'fetched from blockchain'} at ${lastUpdated.toLocaleTimeString()}`}
+              >
+                <div className={cn(
+                  'w-2 h-2 rounded-full',
+                  dataSource === 'cache' ? 'bg-blue-500' : 'bg-green-500'
+                )} />
+                <span>
+                  {dataSource === 'cache' ? 'Cached' : 'Fresh'} • {lastUpdated.toLocaleTimeString()}
+                </span>
               </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Results Section */}
+      <div className='container mx-auto px-4 pb-6'>
+        <div className='space-y-6 mb-16'>
+          {/* Loading State - Only show on initial load */}
+          {isLoading && !initialLoadComplete && !isLoadingFromCache && (
+            <Loading variant="vault" message="Loading your vaults from blockchain..." />
+          )}
+
+          {/* Cache Loading State */}
+          {isLoadingFromCache && (
+            <div className='flex justify-center py-8'>
+              <Loading variant="vault" message="Loading cached vaults..." />
+            </div>
+          )}
+
+          {/* Syncing State */}
+          {isSyncing && (
+            <div className='flex justify-center py-8'>
+              <Loading variant="sync" message="Syncing with blockchain..." />
             </div>
           )}
 
           {/* Error State */}
-          {!isLoading && error && (
+          {error && (
             <div className='text-center py-16'>
-              <Card className='max-w-md mx-auto bg-destructive/10 border-destructive/20'>
-                <CardContent className='p-6 text-center'>
-                  <p className='text-destructive'>{error}</p>
-                  <Button 
-                    variant="outline" 
-                    onClick={fetchVaultsFromAllChains}
-                    className='mt-4'
-                  >
-                    Try Again
-                  </Button>
-                </CardContent>
-              </Card>
+              <div className='space-y-4'>
+                <div className='w-16 h-16 mx-auto rounded-full bg-destructive/10 flex items-center justify-center'>
+                  <Vault className='h-8 w-8 text-destructive' />
+                </div>
+                <div className='space-y-2'>
+                  <h3 className='text-lg font-medium text-gradient'>Error Loading Vaults</h3>
+                  <p className='text-muted-foreground max-w-md mx-auto'>{error}</p>
+                </div>
+                <Button 
+                  variant="outline" 
+                  onClick={() => fetchVaultsFromAllChains()}
+                  className='mt-4'
+                >
+                  Try Again
+                </Button>
+              </div>
             </div>
           )}
 
           {/* Vaults Grid */}
-          {!isLoading && !error && vaults.length > 0 && (
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-              {vaults.map(vault => (
-                <Card
-                  key={`${vault.chainId}-${vault.vaultAddress}`}
-                  className='group relative overflow-hidden bg-background border-border/60 hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 cursor-pointer'
-                  onClick={() => handleContinue(vault.chainId, vault.vaultAddress)}
-                >
-                  {/* Hover gradient overlay */}
-                  <div className='absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-purple-500/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-300' />
-                  
-                  <CardHeader className='pb-4'>
-                    <div className='flex items-start justify-between'>
-                      <div className='flex items-center gap-3'>
-                        <div className='min-w-0 flex-1'>
-                          <h3 className='font-bold text-xl text-foreground/90 dark:text-foreground/80 truncate' title={`${vault.coinName} Vault`}>
-                            {vault.coinName}
-                          </h3>
-                          <p className='text-sm text-muted-foreground font-medium mt-1'>
-                            {vault.coinSymbol} Vault
-                          </p>
-                        </div>
-                      </div>
-                      
-                      {/* Chain Badge */}
-                      <div className={`px-3 py-1.5 rounded-full text-xs font-medium border ${getChainColor(vault.chainId)}`}>
-                        {getChainName(vault.chainId)}
-                      </div>
-                    </div>
-                  </CardHeader>
-                  
-                  <CardContent className='space-y-5 pt-0'>
-                    {/* Price Display */}
-                    <div className='p-4 rounded-lg bg-muted/30 border border-border/40'>
-                      <div className='flex items-center justify-between'>
-                        <div className='flex items-center gap-2'>
-                          <TrendingUp className='h-4 w-4 text-green-400 dark:text-green-500/80' />
-                          <span className='text-sm font-medium text-muted-foreground'>
-                            Current Price
-                          </span>
-                        </div>
-                        <div className='text-right'>
-                          <span className='font-mono font-bold text-lg text-foreground/90 dark:text-foreground/80'>
-                            {vault.price.toFixed(5)} {vault.coinSymbol}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Action Button */}
-                    <Button 
-                      type='button' 
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleContinue(vault.chainId, vault.vaultAddress)
-                      }}
-                      className='relative z-10 w-full mt-6 h-11 bg-gradient-to-r from-primary/70 to-purple-500/70 hover:from-primary/80 hover:to-purple-500/80 dark:from-primary/60 dark:to-purple-500/60 dark:hover:from-primary/70 dark:hover:to-purple-500/70 transition-all duration-300 group-hover:shadow-md text-base font-medium'
-                    >
-                      <span>Manage Vault</span>
-                      <ArrowRight className='h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-300' />
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+          {initialLoadComplete && paginatedVaults.length > 0 && (
+            <>
+              <div className='grid max-w-6xl mx-auto grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                {paginatedVaults.map((vault, index) => (
+                  <CardExplorer
+                    key={`${vault.vaultAddress}-${index}`}
+                    vault={vault}
+                  />
+                ))}
+              </div>
+              
+              {/* Pagination */}
+              <div className='flex justify-center mt-8'>
+                <Pagination
+                  currentPage={pagination.page}
+                  totalPages={pagination.totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            </>
           )}
 
           {/* Empty State */}
-          {!isLoading && !error && vaults.length === 0 && (
+          {initialLoadComplete && filteredVaults.length === 0 && (
             <div className='text-center py-16'>
               <div className='space-y-4'>
                 <div className='w-16 h-16 mx-auto rounded-full bg-muted/50 flex items-center justify-center'>
                   <Vault className='h-8 w-8 text-muted-foreground' />
                 </div>
                 <div className='space-y-2'>
-                  <h3 className='text-lg font-medium'>No vaults found</h3>
+                  <h3 className='text-lg font-medium text-gradient'>No vaults found</h3>
                   <p className='text-muted-foreground max-w-md mx-auto'>
-                    You have not created any vaults yet. Start by creating your first vault to begin staking!
+                    {searchQuery || selectedChain !== 'all'
+                      ? `No vaults match your current filters. Try adjusting your search terms or network selection.`
+                      : 'You have not created any vaults yet. Start by creating your first vault to begin staking!'
+                    }
                   </p>
                 </div>
-                <Link href="/createVault">
-                  <Button className='mt-4 bg-gradient-to-r from-primary/70 to-purple-500/70 hover:from-primary/80 hover:to-purple-500/80 dark:from-primary/60 dark:to-purple-500/60 dark:hover:from-primary/70 dark:hover:to-purple-500/70 transition-all duration-300'>
-                    Create Your First Vault
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                {(searchQuery || selectedChain !== 'all') ? (
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setSearchQuery('')
+                      handleSearch('')
+                      setSelectedChain('all')
+                    }}
+                    className='mt-4'
+                  >
+                    Clear All Filters
                   </Button>
-                </Link>
+                ) : (
+                  <Link href="/createVault">
+                    <Button className='mt-4 bg-gradient-to-r from-primary/70 to-purple-500/70 hover:from-primary/80 hover:to-purple-500/80 button-3d'>
+                      Create Your First Vault
+                      <Plus className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
           )}

@@ -15,9 +15,9 @@ export function About() {
         <div ref={matrixRef} className="absolute inset-0 w-full h-full" />
         
         {/* Additional purple glow effects */}
-        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-violet-500/15 rounded-full blur-2xl animate-pulse animation-delay-2000" />
-        <div className="absolute top-1/2 right-1/3 w-20 h-20 bg-fuchsia-500/10 rounded-full blur-xl animate-pulse animation-delay-4000" />
+        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-gray-300/15 dark:bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
+                  <div className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-gray-400/10 dark:bg-violet-500/15 rounded-full blur-2xl animate-pulse animation-delay-2000" />
+          <div className="absolute top-1/2 right-1/3 w-20 h-20 bg-gray-500/5 dark:bg-fuchsia-500/10 rounded-full blur-xl animate-pulse animation-delay-4000" />
         
         {/* Subtle grid overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-900/5 to-transparent" />
@@ -49,28 +49,28 @@ export function About() {
                   <li className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
                     <div>
-                      <h4 className="font-semibold text-foreground">Efficient Distribution</h4>
+                      <h4 className="font-semibold text-gradient">Efficient Distribution</h4>
                       <p className="text-sm text-muted-foreground">Distribute rewards to thousands of holders with a single transaction</p>
                     </div>
                   </li>
                   <li className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
                     <div>
-                      <h4 className="font-semibold text-foreground">Build Community</h4>
+                      <h4 className="font-semibold text-gradient">Build Community</h4>
                       <p className="text-sm text-muted-foreground">Create dedicated vaults for specific tokens or communities</p>
                     </div>
                   </li>
                   <li className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
                     <div>
-                      <h4 className="font-semibold text-foreground">Earn Unstaking Fees</h4>
+                      <h4 className="font-semibold text-gradient">Earn Unstaking Fees</h4>
                       <p className="text-sm text-muted-foreground">Receive a portion of fees when users unstake early, creating passive income</p>
                     </div>
                   </li>
                   <li className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
                     <div>
-                      <h4 className="font-semibold text-foreground">Universal Use Cases</h4>
+                      <h4 className="font-semibold text-gradient">Universal Use Cases</h4>
                       <p className="text-sm text-muted-foreground">Perfect for DAOs, projects, or any token-based reward system</p>
                     </div>
                   </li>
@@ -90,28 +90,28 @@ export function About() {
                   <li className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
                     <div>
-                      <h4 className="font-semibold text-foreground">Earn from Others&apos; Impatience</h4>
+                      <h4 className="font-semibold text-gradient">Earn from Others&apos; Impatience</h4>
                       <p className="text-sm text-muted-foreground">Benefit from unstaking fees paid by users who exit early</p>
                     </div>
                   </li>
                   <li className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
                     <div>
-                      <h4 className="font-semibold text-foreground">Long-term Value Growth</h4>
+                      <h4 className="font-semibold text-gradient">Long-term Value Growth</h4>
                       <p className="text-sm text-muted-foreground">Hodling encourages price stability and long-term asset appreciation</p>
                     </div>
                   </li>
                   <li className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
                     <div>
-                      <h4 className="font-semibold text-foreground">Receive Rewards</h4>
+                      <h4 className="font-semibold text-gradient">Receive Rewards</h4>
                       <p className="text-sm text-muted-foreground">Get additional rewards distributed by vault creators and other participants</p>
                     </div>
                   </li>
                   <li className="flex items-start space-x-3">
                     <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
                     <div>
-                      <h4 className="font-semibold text-foreground">Flexible Participation</h4>
+                      <h4 className="font-semibold text-gradient">Flexible Participation</h4>
                       <p className="text-sm text-muted-foreground">Choose from various vaults with different risk profiles and reward structures</p>
                     </div>
                   </li>
@@ -136,17 +136,17 @@ export function About() {
           <div className="grid md:grid-cols-3 gap-6">
             <Card className="p-6 bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-colors text-center">
               <div className="text-3xl mb-4">🏢</div>
-              <h4 className="font-bold mb-2">Corporate Dividends</h4>
+              <h4 className="font-bold mb-2 text-gradient">Corporate Dividends</h4>
               <p className="text-sm text-muted-foreground">Just like companies distribute dividends to shareholders, Web3 projects need to reward token holders</p>
             </Card>
             <Card className="p-6 bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-colors text-center">
               <div className="text-3xl mb-4">🏛️</div>
-              <h4 className="font-bold mb-2">DAO Treasury</h4>
+              <h4 className="font-bold mb-2 text-gradient">DAO Treasury</h4>
               <p className="text-sm text-muted-foreground">DAOs can efficiently distribute treasury funds or governance rewards to their community members</p>
             </Card>
             <Card className="p-6 bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-colors text-center">
               <div className="text-3xl mb-4">🎯</div>
-              <h4 className="font-bold mb-2">Project Rewards</h4>
+              <h4 className="font-bold mb-2 text-gradient">Project Rewards</h4>
               <p className="text-sm text-muted-foreground">Any project with a token can reward loyal holders with additional tokens or other benefits</p>
             </Card>
           </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { Coins, ArrowLeft, Loader2, AlertCircle } from 'lucide-react'
+import { Coins, ArrowLeft, Loader2, AlertCircle, RefreshCw } from 'lucide-react'
 import ActionsVault from '@/components/Vault/Actions'
 import HeroVault from '@/components/Vault/HeroVault'
 import VaultInformation from '@/components/Vault/VaultInformation'
@@ -16,6 +16,8 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { useMatrixEffect } from '@/components/hooks/useMatrixEffect'
 import Link from 'next/link'
+import { indexedDBManager } from '@/utils/indexedDB'
+import { toast } from '@/components/ui/use-toast'
 
 export default function InteractionClient() {
   const searchParams = useSearchParams()
@@ -24,6 +26,7 @@ export default function InteractionClient() {
   const matrixRef = useMatrixEffect(0.15, 2)
 
   const [isLoading, setIsLoading] = useState(true)
+  const [isSyncing, setIsSyncing] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const [chainId, setChainId] = useState<number>(0)
@@ -66,7 +69,7 @@ export default function InteractionClient() {
     }
   }, [searchParams])
 
-  const getVaultsData = async () => {
+  const getVaultsData = async (forceRefresh: boolean = false) => {
     if (!vaultAddress || !chainId) {
       setError('Invalid vault address or chain ID')
       return
@@ -75,6 +78,36 @@ export default function InteractionClient() {
     try {
       setIsLoading(true)
       setError(null)
+
+      console.log('🚀 Loading individual vault details...', { vaultAddress, chainId, forceRefresh })
+
+      // Try to get cached data first only if not forcing refresh
+      if (!forceRefresh) {
+        const cachedData = await indexedDBManager.getIndividualVaultDetails(vaultAddress, chainId)
+        
+        if (cachedData) {
+          console.log('🎯 Using cached vault details:', cachedData)
+          
+          const vaultData = {
+            coinAddress: cachedData.coinAddress as `0x${string}`,
+            coinName: cachedData.coinName as string,
+            coinSymbol: cachedData.coinSymbol as string,
+            decimals: cachedData.decimals as number,
+            vaultAddress: vaultAddress,
+            chainId: chainId,
+          }
+
+          setVault(vaultData)
+          setVaultCreator(cachedData.vaultCreator as `0x${string}`)
+          setCoinAddress(cachedData.coinAddress as `0x${string}`)
+          setCoinName(cachedData.coinName as string)
+          setCoinSymbol(cachedData.coinSymbol as string)
+          setIsLoading(false)
+          return
+        }
+      }
+
+      console.log('📦 Fetching fresh data from blockchain...')
 
       // Get chain-specific public client
       const publicClient = getPublicClient(config as any, { chainId })
@@ -116,7 +149,19 @@ export default function InteractionClient() {
         }),
       ])
 
-      console.log(decimals);
+      console.log('📊 Fetched vault details from blockchain:', { name, symbol, decimals })
+
+      const vaultDetails = {
+        coinAddress: newCoinAddress,
+        coinName: name,
+        coinSymbol: symbol,
+        decimals: decimals,
+        vaultCreator: newVaultCreator,
+      }
+
+      // Save to cache
+      await indexedDBManager.saveIndividualVaultDetails(vaultAddress, chainId, vaultDetails)
+      console.log('💾 Saved vault details to cache')
 
       const vaultData = {
         coinAddress: newCoinAddress as `0x${string}`,
@@ -249,6 +294,56 @@ export default function InteractionClient() {
     }
   }
 
+  const handleSync = async () => {
+    if (isSyncing) return
+    
+    try {
+      setIsSyncing(true)
+      console.log('🔄 Manual sync triggered')
+      
+      toast({
+        title: 'Syncing Data',
+        description: 'Refreshing vault data from blockchain...',
+      })
+      
+      // Clear cached data first
+      try {
+        await indexedDBManager.clearIndividualVaultDetails(vaultAddress, chainId)
+        console.log('🗑️ Cleared cached vault data')
+      } catch (clearError) {
+        console.warn('⚠️ Failed to clear cache, continuing with sync:', clearError)
+      }
+      
+      // Force refresh vault data
+      await getVaultsData(true)
+      
+      // Also refresh balances and other data
+      if (vaultAddress && coinAddress && chainId) {
+        await Promise.all([
+          getReservesPrices(),
+          getFees(),
+          account.address ? getBalances() : Promise.resolve()
+        ])
+      }
+      
+      console.log('✅ Manual sync completed')
+      toast({
+        title: 'Sync Complete',
+        description: 'All vault data has been refreshed successfully.',
+      })
+    } catch (error) {
+      console.error('❌ Manual sync failed:', error)
+      toast({
+        title: 'Sync Failed',
+        description: 'Failed to sync data. Please try again.',
+        variant: 'destructive',
+      })
+      setError('Failed to sync data. Please try again.')
+    } finally {
+      setIsSyncing(false)
+    }
+  }
+
   useEffect(() => {
     if (vaultAddress && chainId) {
       getVaultsData()
@@ -271,8 +366,8 @@ export default function InteractionClient() {
         {/* Matrix background effect */}
         <div className="absolute inset-0 opacity-10">
           <div ref={matrixRef} className="absolute inset-0 w-full h-full" />
-          <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-violet-500/15 rounded-full blur-2xl animate-pulse animation-delay-2000" />
+          <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-gray-300/15 dark:bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-gray-400/10 dark:bg-violet-500/15 rounded-full blur-2xl animate-pulse animation-delay-2000" />
         </div>
         
         <Card className="bg-background/50 backdrop-blur-xl border-primary/20 p-8 shadow-2xl shadow-primary/5">
@@ -296,7 +391,7 @@ export default function InteractionClient() {
         <Card className="bg-background/50 backdrop-blur-xl border-red-500/20 p-8 shadow-2xl shadow-red-500/5 max-w-md mx-4">
           <div className="flex flex-col items-center space-y-4 text-center">
             <AlertCircle className="h-8 w-8 text-red-500" />
-            <h2 className="text-xl font-semibold text-foreground">Error Loading Vault</h2>
+                              <h2 className="text-xl font-semibold text-gradient">Error Loading Vault</h2>
             <p className="text-muted-foreground">{error}</p>
             <Link href="/">
               <Button variant="outline" className="border-primary/50 hover:bg-primary/10">
@@ -317,12 +412,12 @@ export default function InteractionClient() {
         <div ref={matrixRef} className="absolute inset-0 w-full h-full" />
         
         {/* Additional purple glow effects */}
-        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-violet-500/15 rounded-full blur-2xl animate-pulse animation-delay-2000" />
-        <div className="absolute top-1/2 right-1/3 w-20 h-20 bg-fuchsia-500/10 rounded-full blur-xl animate-pulse animation-delay-4000" />
+        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-gray-300/15 dark:bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/3 right-1/4 w-24 h-24 bg-gray-400/10 dark:bg-violet-500/15 rounded-full blur-2xl animate-pulse animation-delay-2000" />
+        <div className="absolute top-1/2 right-1/3 w-20 h-20 bg-gray-500/5 dark:bg-fuchsia-500/10 rounded-full blur-xl animate-pulse animation-delay-4000" />
         
         {/* Subtle grid overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-900/5 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-300/5 dark:via-purple-900/5 to-transparent" />
       </div>
 
       <div className="relative container mx-auto max-w-7xl px-4 py-8 space-y-4">
@@ -345,7 +440,45 @@ export default function InteractionClient() {
             <p className="text-muted-foreground mt-2">Chain ID: {chainId}</p>
           </div>
           
-          <div className="w-24" /> {/* Spacer for centering */}
+          {/* Balance Display and Sync Button - Top Right */}
+          <div className="flex gap-3 min-w-[380px] items-center">
+            {/* Sync Button */}
+            <Button
+              onClick={handleSync}
+              disabled={isSyncing || isLoading}
+              variant="outline"
+              size="sm"
+              title="Refresh vault data from blockchain and clear cache"
+              className="border-primary/50 hover:bg-primary/10 transition-all duration-300 transform hover:scale-105"
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
+              {isSyncing ? 'Syncing...' : 'Sync'}
+            </Button>
+            
+            {/* Available Token Balance */}
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/50 dark:to-emerald-950/50 
+                          backdrop-blur-xl border-2 border-purple-300/70 dark:border-purple-600/70 rounded-xl p-3 shadow-lg 
+                          hover:border-purple-400/90 dark:hover:border-purple-500/90 transition-all duration-300 flex-1">
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-xs text-green-600 dark:text-green-400 font-bold">{coinSymbol} balance</span>
+                <span className="font-mono text-sm font-bold text-green-700 dark:text-green-300">
+                  {parseFloat(balances.coinBalance.toFixed(4))}
+                </span>
+              </div>
+            </div>
+            
+            {/* Staked HodlCoin Balance */}
+            <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/50 dark:to-purple-950/50 
+                          backdrop-blur-xl border-2 border-purple-300/70 dark:border-purple-600/70 rounded-xl p-3 shadow-lg 
+                          hover:border-purple-400/90 dark:hover:border-purple-500/90 transition-all duration-300 flex-1">
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-xs text-blue-600 dark:text-blue-400 font-bold">h{coinSymbol} balance</span>
+                <span className="font-mono text-sm font-bold text-blue-700 dark:text-blue-300">
+                  {parseFloat(balances.hodlCoinBalance.toFixed(4))}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Hero Vault Section */}
