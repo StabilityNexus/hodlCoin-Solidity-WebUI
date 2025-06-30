@@ -436,7 +436,7 @@ const AllVaults = () => {
                   {searchQuery && (
                     <div className='flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary'>
                       <Search className='h-3 w-3' />
-                      "{searchQuery}"
+                      {searchQuery}
                     </div>
                   )}
                   {selectedChain !== 'all' && (
