@@ -20,9 +20,9 @@ export function Hero() {
         <div ref={matrixRef} className="absolute inset-0 w-full h-full" />
         
         {/* Additional purple glow effects */}
-        <div className="absolute top-1/4 right-1/4 w-40 h-40 bg-purple-500/8 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/3 left-1/4 w-32 h-32 bg-violet-500/12 rounded-full blur-2xl animate-pulse animation-delay-2000" />
-        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-fuchsia-500/8 rounded-full blur-xl animate-pulse animation-delay-4000" />
+        <div className="absolute top-1/4 right-1/4 w-40 h-40 bg-gray-300/10 dark:bg-purple-500/8 rounded-full blur-3xl animate-pulse" />
+                  <div className="absolute bottom-1/3 left-1/4 w-32 h-32 bg-gray-400/10 dark:bg-violet-500/12 rounded-full blur-2xl animate-pulse animation-delay-2000" />
+          <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-gray-500/5 dark:bg-fuchsia-500/8 rounded-full blur-xl animate-pulse animation-delay-4000" />
         
         {/* Subtle overlay for depth */}
         <div className="absolute inset-0 bg-gradient-to-t from-background/10 via-transparent to-background/5" />
@@ -65,7 +65,7 @@ export function Hero() {
               <div className="absolute -inset-1 bg-gradient-to-r from-primary to-purple-600 rounded-lg blur opacity-0 group-hover:opacity-30 transition-opacity duration-300" />
             </Button>
           </Link>
-          <Link href='/explorer'>
+          <Link href='/myVaults'>
             <Button 
               size="lg" 
               variant="outline" 

@@ -181,18 +181,7 @@ export default function HodlBox({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Balance Display */}
-        <div className="p-4 bg-background/30 backdrop-blur-sm border border-primary/20 rounded-xl">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Available Balance</span>
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-lg font-bold text-gradient">
-                {coinBalance.toFixed(6)}
-              </span>
-              <span className="text-sm text-muted-foreground">{vault?.coinSymbol}</span>
-            </div>
-          </div>
-        </div>
+
 
         {/* Input Section */}
         <div className="space-y-3">

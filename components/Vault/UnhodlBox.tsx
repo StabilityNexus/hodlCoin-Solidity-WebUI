@@ -181,18 +181,7 @@ export default function UnholdBox({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Balance Display */}
-        <div className="p-4 bg-background/30 backdrop-blur-sm border border-primary/20 rounded-xl">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Staked Balance</span>
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-lg font-bold text-gradient">
-                {hodlCoinBalance.toFixed(6)}
-              </span>
-              <span className="text-sm text-muted-foreground">h{vault?.coinSymbol}</span>
-            </div>
-          </div>
-        </div>
+
 
         {/* Input Section */}
         <div className="space-y-3">
@@ -262,7 +251,6 @@ export default function UnholdBox({
             <div className="p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <DollarSign className="h-4 w-4 text-green-500" />
                   <span className="text-sm text-foreground">You will receive</span>
                 </div>
                 <div className="flex items-center gap-2">

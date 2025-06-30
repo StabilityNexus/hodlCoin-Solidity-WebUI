@@ -28,6 +28,16 @@ const components: { title: string; href: string; description: string }[] = [
     description: 'Search for a vault by address',
   },
   {
+    title: 'My Vaults',
+    href: '/myVaults',
+    description: 'View vaults you have created',
+  },
+  {
+    title: 'Favorite Vaults',
+    href: '/favorites',
+    description: 'View vaults you have interacted with',
+  },
+  {
     title: 'Leaderboard',
     href: '/',
     description: 'Under construction',
@@ -67,7 +77,7 @@ export function NavBar() {
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem> */}
-        {/* <NavigationMenuItem>
+        <NavigationMenuItem>
           <NavigationMenuTrigger className='hover:text-foreground'>
             Application
           </NavigationMenuTrigger>
@@ -95,7 +105,7 @@ export function NavBar() {
               )}
             </ul>
           </NavigationMenuContent>
-        </NavigationMenuItem> */}
+        </NavigationMenuItem>
         {/* <NavigationMenuItem>
           <Link href='/' legacyBehavior passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>

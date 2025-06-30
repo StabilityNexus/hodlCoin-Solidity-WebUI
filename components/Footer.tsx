@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 const navigation = [
   {
-    name: 'X',
+    name: 'HodlCoin X',
     href: 'https://x.com/hodlCoinStaking',
     icon: (props: any) => (
       <svg fill='currentColor' viewBox='0 0 24 24' {...props}>
@@ -12,7 +12,7 @@ const navigation = [
     ),
   },
   {
-    name: 'X',
+    name: 'StabilityNexus X',
     href: 'https://x.com/StabilityNexus',
     icon: (props: any) => (
       <svg fill='currentColor' viewBox='0 0 24 24' {...props}>
