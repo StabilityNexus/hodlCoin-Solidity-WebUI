@@ -390,18 +390,6 @@ export default function CreateForm() {
               </div>
               <div className="flex flex-col sm:flex-row gap-3 justify-center items-center pt-4">
                 <Link
-                  href={getAddressExplorerUrl(config.state.chainId, vaultAddress)}
-                  target="_blank"
-                >
-                  <Button 
-                    variant="outline" 
-                    className="h-10 px-4 border-primary/30 hover:bg-primary/10 dark:border-primary/40 dark:hover:bg-primary/20 button-3d"
-                  >
-                    <span className="text-3d">View Vault</span>
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-                <Link
                   href={getBlockExplorerUrl(config.state.chainId, hashTx)}
                   target="_blank"
                 >
@@ -413,7 +401,7 @@ export default function CreateForm() {
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href={`/${vaultAddress}`}>
+                <Link href={`/v?chainId=${config.state.chainId}&vault=${vaultAddress}`}>
                   <Button className="h-10 px-6 bg-gradient-to-r from-primary to-purple-500 hover:from-primary/90 hover:to-purple-500/90 button-3d">
                     <span className="text-3d">Go to Vault</span>
                     <ArrowRight className="ml-2 h-4 w-4" />
