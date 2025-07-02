@@ -136,15 +136,15 @@ export default function CardExplorer({ vault }: { vault: vaultsProps }) {
 
   const getChainColor = (chainId: number) => {
     const chainColors: { [key: number]: string } = {
-      1: 'bg-blue-400/10 text-blue-500 border-blue-400/20 dark:bg-blue-500/10 dark:text-blue-400/80 dark:border-blue-500/20',
-      534351: 'bg-orange-400/10 text-orange-500 border-orange-400/20 dark:bg-orange-500/10 dark:text-orange-400/80 dark:border-orange-500/20',
-      5115: 'bg-yellow-400/10 text-yellow-500 border-yellow-400/20 dark:bg-yellow-500/10 dark:text-yellow-400/80 dark:border-yellow-500/20',
-      61: 'bg-green-400/10 text-green-500 border-green-400/20 dark:bg-green-500/10 dark:text-green-400/80 dark:border-green-500/20',
-      2001: 'bg-purple-400/10 text-purple-500 border-purple-400/20 dark:bg-purple-500/10 dark:text-purple-400/80 dark:border-purple-500/20',
-      137: 'bg-violet-400/10 text-violet-500 border-violet-400/20 dark:bg-violet-500/10 dark:text-violet-400/80 dark:border-violet-500/20',
-      8453: 'bg-blue-400/10 text-blue-500 border-blue-400/20 dark:bg-blue-500/10 dark:text-blue-400/80 dark:border-blue-500/20',
+      1: 'bg-purple-400/10 text-purple-500 border-purple-400/20 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20',
+      534351: 'bg-yellow-400/10 text-yellow-500 border-yellow-400/20 dark:bg-yellow-500/10 dark:text-yellow-400 dark:border-yellow-500/20',
+      5115: 'bg-yellow-400/10 text-yellow-500 border-yellow-400/20 dark:bg-yellow-500/10 dark:text-yellow-400 dark:border-yellow-500/20',
+      61: 'bg-purple-400/10 text-purple-500 border-purple-400/20 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20',
+      2001: 'bg-purple-400/10 text-purple-500 border-purple-400/20 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20',
+      137: 'bg-violet-400/10 text-violet-500 border-violet-400/20 dark:bg-violet-500/10 dark:text-violet-400 dark:border-violet-500/20',
+      8453: 'bg-purple-400/10 text-purple-500 border-purple-400/20 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20',
     }
-    return chainColors[chainId] || 'bg-gray-400/10 text-gray-500 border-gray-400/20 dark:bg-gray-500/10 dark:text-gray-400/80 dark:border-gray-500/20'
+    return chainColors[chainId] || 'bg-gray-400/10 text-gray-500 border-gray-400/20 dark:bg-gray-500/10 dark:text-gray-400 dark:border-gray-500/20'
   }
 
   return (
@@ -156,7 +156,7 @@ export default function CardExplorer({ vault }: { vault: vaultsProps }) {
         <div className='flex items-start justify-between'>
           <div className='flex items-center gap-3'>
             <div className='min-w-0 flex-1'>
-                                <h3 className='font-bold text-xl truncate transform transition-all duration-300 group-hover:scale-105 text-gradient' title={`${vault.coinName} Vault`}>
+              <h3 className='font-bold text-xl truncate transform transition-all duration-300 group-hover:scale-105 text-gradient' title={`${vault.coinName} Vault`}>
                 <span className='text-3d'>{vault.coinName}</span>
               </h3>
               <p className='text-sm text-muted-foreground font-medium mt-1 transition-colors duration-300 group-hover:text-muted-foreground/80'>
@@ -195,11 +195,11 @@ export default function CardExplorer({ vault }: { vault: vaultsProps }) {
       <CardContent className='space-y-5 pt-0 relative z-10'>
         {/* Enhanced Price Display with 3D effect */}
         <div className='p-4 rounded-xl bg-muted/30 border border-border/40 relative overflow-hidden group-hover:bg-muted/50 group-hover:border-border/60 transition-all duration-300 group-hover:shadow-md'>
-          <div className='absolute inset-0 bg-gradient-to-r from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl' />
+          <div className='absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl' />
           <div className='flex items-center justify-between relative z-10'>
             <div className='flex items-center gap-2'>
-              <TrendingUp className='h-4 w-4 text-green-400 dark:text-green-500/80 transition-transform duration-300 group-hover:scale-110' />
-              <span className='text-sm font-medium text-muted-foreground transition-colors duration-300 group-hover:text-green-600 dark:group-hover:text-green-400'>
+              <TrendingUp className='h-4 w-4 text-yellow-400 dark:text-yellow-400 transition-transform duration-300 group-hover:scale-110' />
+              <span className='text-sm font-medium text-muted-foreground transition-colors duration-300 group-hover:text-yellow-600 dark:group-hover:text-yellow-400'>
                 Hodl Price
               </span>
             </div>
@@ -207,7 +207,7 @@ export default function CardExplorer({ vault }: { vault: vaultsProps }) {
               {loading ? (
                 <div className='h-5 w-20 bg-muted animate-pulse rounded' />
               ) : (
-                <span className='font-mono font-bold text-lg text-foreground/90 dark:text-foreground/80 transition-colors duration-300 group-hover:text-green-600 dark:group-hover:text-green-400'>
+                <span className='font-mono font-bold text-lg text-foreground/90 dark:text-foreground/80 transition-colors duration-300 group-hover:text-yellow-600 dark:group-hover:text-yellow-400'>
                   {priceHodl !== null ? `${(Number(priceHodl) / 100000).toFixed(5)}` : 'N/A'} {vault.coinSymbol}
                 </span>
               )}
@@ -217,11 +217,11 @@ export default function CardExplorer({ vault }: { vault: vaultsProps }) {
 
         {/* Total Value Locked */}
         <div className='p-4 rounded-xl bg-muted/30 border border-border/40 relative overflow-hidden group-hover:bg-muted/50 group-hover:border-border/60 transition-all duration-300 group-hover:shadow-md'>
-          <div className='absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl' />
+          <div className='absolute inset-0 bg-gradient-to-r from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl' />
           <div className='flex items-center justify-between relative z-10'>
             <div className='flex items-center gap-2'>
-              <TrendingUp className='h-4 w-4 text-blue-400 dark:text-blue-500/80 transition-transform duration-300 group-hover:scale-110' />
-              <span className='text-sm font-medium text-muted-foreground transition-colors duration-300 group-hover:text-blue-600 dark:group-hover:text-blue-400'>
+              <TrendingUp className='h-4 w-4 text-purple-400 dark:text-purple-400 transition-transform duration-300 group-hover:scale-110' />
+              <span className='text-sm font-medium text-muted-foreground transition-colors duration-300 group-hover:text-purple-600 dark:group-hover:text-purple-400'>
                 TVL
               </span>
             </div>
@@ -229,7 +229,7 @@ export default function CardExplorer({ vault }: { vault: vaultsProps }) {
               {loading ? (
                 <div className='h-5 w-20 bg-muted animate-pulse rounded' />
               ) : (
-                <span className='font-mono font-bold text-lg text-foreground/90 dark:text-foreground/80 transition-colors duration-300 group-hover:text-blue-600 dark:group-hover:text-blue-400'>
+                <span className='font-mono font-bold text-lg text-foreground/90 dark:text-foreground/80 transition-colors duration-300 group-hover:text-purple-600 dark:group-hover:text-purple-400'>
                   {totalValueLocked !== null ? `${totalValueLocked.toFixed(2)}` : '0.00'} {vault.coinSymbol}
                 </span>
               )}

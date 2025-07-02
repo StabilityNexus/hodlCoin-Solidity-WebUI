@@ -1,5 +1,5 @@
 import { vaultsProps } from '@/utils/props'
-import { Coins, Info, ExternalLink, User, Percent } from 'lucide-react'
+import { Coins, Info, ExternalLink, User, Percent, Shield } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
@@ -80,7 +80,7 @@ export default function VaultInformation({
                 <div className="group">
                   <h4 className='text-sm font-semibold text-foreground mb-2 flex items-center gap-2'>
                     <div className="w-2 h-2 bg-primary rounded-full" />
-                    h{vault?.coinSymbol} Vault Contract
+                    {vault?.hodlCoinSymbol} Vault Contract
                   </h4>
                   <div className='bg-background/30 backdrop-blur-sm border border-primary/20 rounded-xl p-4 flex items-center justify-between transition-all duration-300 hover:border-primary/40 hover:bg-background/40'>
                     <code className='font-mono text-sm break-all mr-2 text-foreground'>
@@ -189,15 +189,15 @@ export default function VaultInformation({
           </div>
           
           {/* Total Fee Summary */}
-          <div className="mt-8 p-6 bg-gradient-to-r from-primary/10 to-purple-500/10 border border-primary/20 rounded-xl">
+          <div className="mt-8 p-6 bg-muted/30 border border-border/40 rounded-xl">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-gradient-to-r from-primary/20 to-purple-500/20 border border-primary/30">
+                <div className="p-2 rounded-lg border border-primary/30">
                   <Percent className="h-5 w-5 text-primary" />
                 </div>
                 <span className="text-lg font-semibold text-foreground">Total Unstaking Fee</span>
               </div>
-              <span className="text-2xl font-mono font-bold text-gradient">
+              <span className="text-2xl font-mono font-bold text-foreground">
                 {formatFee(vaultFee + vaultCreatorFee + stableOrderFee)}%
               </span>
             </div>

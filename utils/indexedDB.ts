@@ -679,6 +679,7 @@ class IndexedDBManager {
         coinName: 'Test Coin',
         coinAddress: '0xtest123',
         coinSymbol: 'TEST',
+        hodlCoinSymbol: 'hTEST',
         chainId: 999,
         decimals: 18
       }]

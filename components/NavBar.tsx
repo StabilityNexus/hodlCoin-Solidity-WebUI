@@ -11,7 +11,6 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu'
 // import Pic from '../assets/logo_white.png'
 // import Image from 'next/image'
@@ -37,72 +36,23 @@ const components: { title: string; href: string; description: string }[] = [
     href: '/favorites',
     description: 'View vaults you have interacted with',
   },
-  {
-    title: 'Leaderboard',
-    href: '/',
-    description: 'Under construction',
-  },
 ]
 
 export function NavBar() {
   return (
     <NavigationMenu>
       <NavigationMenuList>
-        {/* <NavigationMenuItem>
-          <NavigationMenuTrigger className='hover:text-primary'>
-            Getting started
-          </NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul className='grid gap-2 p-3 md:w-[300px] lg:w-[400px] lg:grid-cols-[.75fr_1fr]'>
-              <li className='row-span-3'>
-                <NavigationMenuLink asChild>
-                  <Link href='/'>
-                    <div className='flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-[#6c18d0] to-[#8028c3] p-6 no-underline outline-none focus:shadow-md'>
-                      <div className='mb-2 mt-4 text-lg font-bold text-white'>
-                        HodlCoin
-                      </div>
-                      <p className='text-sm leading-tight text-white font-light'>
-                        xxx
-                      </p>
-                    </div>
-                  </Link>
-                </NavigationMenuLink>
-              </li>
-              <ListItem href='/' title='X'>
-                xxx
-              </ListItem>
-              <ListItem href='/' title='X'>
-                xxx
-              </ListItem>
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem> */}
         <NavigationMenuItem>
           <NavigationMenuTrigger className='hover:text-foreground'>
             Application
           </NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className='grid gap-2 p-3 md:w-[250px] lg:w-[300px]'>
-              {components.map(component =>
-                component.title === 'Leaderboard' ? (
-                  <ListItem
-                    key={component.title}
-                    title={component.title}
-                    href={component.href}
-                    className='cursor-not-allowed text-muted-foreground hover:text-muted-foreground hover:bg-transparent'
-                  >
-                    {component.description}
-                  </ListItem>
-                ) : (
-                  <ListItem
-                    key={component.title}
-                    title={component.title}
-                    href={component.href}
-                  >
-                    {component.description}
-                  </ListItem>
-                ),
-              )}
+              {components.map(item => (
+                <ListItem key={item.title} title={item.title} href={item.href}>
+                  {item.description}
+                </ListItem>
+              ))}
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>

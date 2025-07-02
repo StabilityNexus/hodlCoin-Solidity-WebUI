@@ -13,6 +13,7 @@ import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
 import { readContract, writeContract, getPublicClient } from '@wagmi/core'
 import { config } from '@/utils/config'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
+import { parseUnits } from 'viem'
 
 export default function UnholdBox({
   priceHodl,
@@ -52,8 +53,8 @@ export default function UnholdBox({
 
       setFeesAmount({
         vaultFeeAmount: Number(amount[0]) / 10 ** 18,
-        vaultCreatorFeeAmount: Number(amount[1]) / 10 ** 18,
-        stableOrderFeeAmount: Number(amount[2]) / 10 ** 18,
+        vaultCreatorFeeAmount: Number(amount[2]) / 10 ** 18,
+        stableOrderFeeAmount: Number(amount[1]) / 10 ** 18,
       })
     } catch (err) {
       console.error('Error getting fees amount:', err)
@@ -96,9 +97,8 @@ export default function UnholdBox({
 
   const formatAmount = (amountStr: string) => {
     try {
-      const amount = parseFloat(amountStr)
-      const decimals = vault?.decimals ?? 18;
-      return BigInt(Math.floor(amount * 10 ** decimals))
+      const decimals = vault?.decimals ?? 18
+      return parseUnits(amountStr, decimals)
     } catch (error) {
       console.error('Error formatting amount:', error)
       toast({
@@ -174,8 +174,8 @@ export default function UnholdBox({
     <Card className='bg-background/50 backdrop-blur-xl border-primary/20 shadow-2xl shadow-primary/5 hover:border-primary/30 transition-all duration-300'>
       <CardHeader>
         <CardTitle className='font-extrabold tracking-tight text-gradient text-xl flex items-center gap-3'>
-          <div className="p-2 rounded-lg bg-gradient-to-r from-red-500/20 to-orange-500/20 border border-red-500/30">
-            <TrendingDown className="h-5 w-5 text-red-500" />
+          <div className="p-2 rounded-lg bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30">
+            <TrendingDown className="h-5 w-5 text-yellow-500" />
           </div>
           Unstake Tokens
         </CardTitle>
@@ -186,7 +186,7 @@ export default function UnholdBox({
         {/* Input Section */}
         <div className="space-y-3">
           <div className='text-sm font-semibold text-foreground flex items-center gap-2'>
-            <div className="w-2 h-2 bg-red-500 rounded-full" />
+            <div className="w-2 h-2 bg-yellow-500 rounded-full" />
             Amount to Unstake
           </div>
           <div className='relative'>
@@ -207,13 +207,13 @@ export default function UnholdBox({
               <Button
                 variant='ghost'
                 size="sm"
-                className='text-xs text-red-500 hover:text-red-600 hover:bg-red-500/10 px-2 py-1 h-auto'
+                className='text-xs text-yellow-500 hover:text-yellow-600 hover:bg-yellow-500/10 px-2 py-1 h-auto'
                 onClick={handleMaxClick}
               >
                 MAX
               </Button>
               <span className="text-sm text-muted-foreground font-mono">
-                h{vault?.coinSymbol}
+                {vault?.hodlCoinSymbol}
               </span>
             </div>
           </div>
@@ -222,7 +222,7 @@ export default function UnholdBox({
         {/* Fee Breakdown */}
         {unholdAmount && parseFloat(unholdAmount) > 0 && (
           <div className="space-y-3">
-            <div className="p-4 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-xl">
+            <div className="p-4 bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20 rounded-xl">
               <div className="flex items-center gap-2 mb-3">
                 <AlertTriangle className="h-4 w-4 text-yellow-500" />
                 <span className="text-sm font-semibold text-foreground">Unstaking Fees</span>
@@ -277,8 +277,8 @@ export default function UnholdBox({
           <Button
             onClick={unholdAction}
             disabled={!unholdAmount || parseFloat(unholdAmount) <= 0}
-            className='w-full bg-gradient-to-r from-red-500 to-orange-600 hover:from-orange-600 hover:to-red-500 
-              transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-red-500/25 
+            className='w-full bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-amber-600 hover:to-yellow-500 
+              transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-yellow-500/25 
               text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none'
           >
             <div className="flex items-center gap-2">

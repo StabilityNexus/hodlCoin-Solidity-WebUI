@@ -9,7 +9,8 @@ import Animation from '@/public/animations/congrats_animation.json'
 import { toast } from '../ui/use-toast'
 import Link from 'next/link'
 import { readContract } from '@wagmi/core'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useAccount } from 'wagmi'
 import {
   getTransactionReceipt,
   simulateContract,
@@ -18,6 +19,7 @@ import {
 
 import { HodlCoinVaultFactories } from '@/utils/addresses'
 import { HodlCoinFactoryAbi } from '@/utils/contracts/HodlCoinFactory'
+import { ERC20Abi } from '@/utils/contracts/ERC20'
 
 import { config } from '@/utils/config'
 
@@ -30,6 +32,7 @@ const BLOCK_EXPLORERS: { [key: number]: string } = {
 }
 
 export default function CreateForm() {
+  const account = useAccount()
   const [coinName, setCoinName] = useState<string>('')
   const [symbol, setSymbol] = useState<string>('')
   const [coin, setCoin] = useState<string>('')
@@ -38,6 +41,7 @@ export default function CreateForm() {
   const [vaultCreatorFee, setVaultCreatorFee] = useState<string>('')
   const [stableOrderFee, ] = useState<string>('')
   const [uniqueId, setUniqueId] = useState<number>(0)
+  const [vaultAddress, setVaultAddress] = useState<string>('')
 
   const [loadingCreation, setLoadingCreation] = useState<boolean>(false)
   const [submitted, setSubmitted] = useState<boolean>(false)
@@ -52,6 +56,38 @@ export default function CreateForm() {
     vaultFee?: string
     vaultCreatorFee?: string
   }>({})
+
+  // Pre-fill vault creator with connected wallet address
+  useEffect(() => {
+    if (account.address && !vaultCreator) {
+      setVaultCreator(account.address)
+    }
+  }, [account.address, vaultCreator])
+
+  // Fetch symbol from underlying asset and pre-fill vault symbol
+  useEffect(() => {
+    const fetchTokenSymbol = async () => {
+      if (!coin || coin.length !== 42 || !coin.startsWith('0x')) return
+      
+      try {
+        const chainId = config.state.chainId
+        const tokenSymbol = await readContract(config as any, {
+          abi: ERC20Abi,
+          address: coin as `0x${string}`,
+          functionName: 'symbol',
+          args: [],
+        }) as string
+
+        if (tokenSymbol && !symbol) {
+          setSymbol(`h${tokenSymbol}`)
+        }
+      } catch (error) {
+        console.log('Error fetching token symbol:', error)
+      }
+    }
+
+    fetchTokenSymbol()
+  }, [coin, symbol])
 
   const convertFeeToNumerator = (fee: string): bigint => {
     const feeNumber = parseFloat(fee)
@@ -79,6 +115,15 @@ export default function CreateForm() {
   const getBlockExplorerUrl = (chainId: number, txHash: string) => {
     const baseUrl = BLOCK_EXPLORERS[chainId] || 'https://etherscan.io'
     return `${baseUrl}/tx/${txHash}`
+  }
+
+  const getAddressExplorerUrl = (chainId: number, address: string) => {
+    const baseUrl = BLOCK_EXPLORERS[chainId] || 'https://etherscan.io'
+    return `${baseUrl}/address/${address}`
+  }
+
+  const formatAddress = (address: string) => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`
   }
 
   async function createVault() {
@@ -142,7 +187,16 @@ export default function CreateForm() {
         args: [],
       })) as unknown as number
 
+      // Get the vault address using the vault ID
+      const vaultData = (await readContract(config as any, {
+        abi: HodlCoinFactoryAbi,
+        address: HodlCoinVaultFactories[chainId],
+        functionName: 'vaults',
+        args: [BigInt(Number(uniqueIdOfVault) - 1)], // Subtract 1 because vaultId is incremented after creation
+      })) as [string, string, string, string]
+
       setUniqueId(Number(uniqueIdOfVault))
+      setVaultAddress(vaultData[0]) // vaultAddress is the first element in the tuple
       setSubmitted(true)
     } catch (err: any) {
       console.log(err)
@@ -172,82 +226,61 @@ export default function CreateForm() {
           <Card className="bg-background/95 backdrop-blur-sm border-primary/30 shadow-xl dark:bg-card/95 dark:border-primary/40">
             <CardHeader className="space-y-2">
               <CardTitle className="text-3xl font-extrabold tracking-tight text-center text-gradient">
-                Create New Vault
+                Create New Staking Vault
               </CardTitle>
-              <CardDescription className="text-center text-muted-foreground font-medium">
-                Fill in the details below to create your new staking vault
-              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 relative z-10">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-foreground/90 text-3d">Vault Name</label>
-                  <Input
-                    type="text"
-                    placeholder="Name of the hodlCoin Vault"
-                    className={`w-full h-10 text-sm bg-background/80 border-black focus:border-primary/60 font-medium placeholder:text-muted-foreground/70 dark:bg-background/60 dark:border-border/40 dark:focus:border-primary/70 input-3d ${errors.coinName ? 'border-red-500 dark:border-red-400' : ''}`}
-                    value={coinName}
-                    onChange={e => setCoinName(e.target.value)}
-                  />
-                  {errors.coinName && (
-                    <p className="text-red-500 text-xs font-medium text-3d">{errors.coinName}</p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-foreground/90 text-3d">Vault Symbol</label>
-                  <Input
-                    type="text"
-                    placeholder="Ticker Symbol (e.g., BTC, ETH)"
-                    className={`w-full h-10 text-sm bg-background/80 border-black focus:border-primary/60 font-medium placeholder:text-muted-foreground/70 dark:bg-background/60 dark:border-border/40 dark:focus:border-primary/70 input-3d ${errors.symbol ? 'border-red-500 dark:border-red-400' : ''}`}
-                    value={symbol}
-                    onChange={e => setSymbol(e.target.value)}
-                  />
-                  {errors.symbol && (
-                    <p className="text-red-500 text-xs font-medium text-3d">{errors.symbol}</p>
-                  )}
-                </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-foreground/90 text-3d">Vault Name</label>
+                <Input
+                  type="text"
+                  placeholder="Name of the hodlCoin Vault"
+                  className={`w-full h-10 text-sm bg-background/80 border-black focus:border-primary/60 font-medium placeholder:text-muted-foreground/70 dark:bg-background/60 dark:border-border/40 dark:focus:border-primary/70 input-3d ${errors.coinName ? 'border-red-500 dark:border-red-400' : ''}`}
+                  value={coinName}
+                  onChange={e => setCoinName(e.target.value)}
+                />
+                {errors.coinName && (
+                  <p className="text-red-500 text-xs font-medium text-3d">{errors.coinName}</p>
+                )}
               </div>
 
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-foreground/90 text-3d">Underlying Asset Address</label>
-                  <Input
-                    type="text"
-                    placeholder="0x... ERC20 token address that will be staked"
-                    className={`w-full h-10 text-sm bg-background/80 border-black focus:border-primary/60 font-medium placeholder:text-muted-foreground/70 dark:bg-background/60 dark:border-border/40 dark:focus:border-primary/70 input-3d font-mono ${errors.coin ? 'border-red-500 dark:border-red-400' : ''}`}
-                    value={coin}
-                    onChange={e => setCoin(e.target.value)}
-                  />
-                  {errors.coin && (
-                    <p className="text-red-500 text-xs font-medium text-3d">{errors.coin}</p>
-                  )}
-                </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-foreground/90 text-3d">Token to be Staked in this Vault</label>
+                <Input
+                  type="text"
+                  placeholder="0x... ERC20 contract address of the token that will be staked in this vault"
+                  className={`w-full h-10 text-sm bg-background/80 border-black focus:border-primary/60 font-medium placeholder:text-muted-foreground/70 dark:bg-background/60 dark:border-border/40 dark:focus:border-primary/70 input-3d font-mono ${errors.coin ? 'border-red-500 dark:border-red-400' : ''}`}
+                  value={coin}
+                  onChange={e => setCoin(e.target.value)}
+                />
+                {errors.coin && (
+                  <p className="text-red-500 text-xs font-medium text-3d">{errors.coin}</p>
+                )}
+              </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-foreground/90 text-3d">Vault Creator Address</label>
-                  <Input
-                    type="text"
-                    placeholder="0x... Address to receive creator fees"
-                    className={`w-full h-10 text-sm bg-background/80 border-black focus:border-primary/60 font-medium placeholder:text-muted-foreground/70 dark:bg-background/60 dark:border-border/40 dark:focus:border-primary/70 input-3d font-mono ${errors.vaultCreator ? 'border-red-500 dark:border-red-400' : ''}`}
-                    value={vaultCreator}
-                    onChange={e => setVaultCreator(e.target.value)}
-                  />
-                  {errors.vaultCreator && (
-                    <p className="text-red-500 text-xs font-medium text-3d">{errors.vaultCreator}</p>
-                  )}
-                </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-foreground/90 text-3d">Symbol for the Staking Token</label>
+                <Input
+                  type="text"
+                  placeholder="Ticker Symbol (e.g., hBTC, hETH)"
+                  className={`w-full h-10 text-sm bg-background/80 border-black focus:border-primary/60 font-medium placeholder:text-muted-foreground/70 dark:bg-background/60 dark:border-border/40 dark:focus:border-primary/70 input-3d ${errors.symbol ? 'border-red-500 dark:border-red-400' : ''}`}
+                  value={symbol}
+                  onChange={e => setSymbol(e.target.value)}
+                />
+                {errors.symbol && (
+                  <p className="text-red-500 text-xs font-medium text-3d">{errors.symbol}</p>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-foreground/90 text-3d">Vault Fee (%)</label>
+                  <label className="text-sm font-semibold text-foreground/90 text-3d">Unstaking Fee for the Vault (%)</label>
                   <div className="relative">
                     <Input
                       type="number"
                       step="0.1"
                       min="0"
-                      placeholder="Fee remaining in vault"
+                      placeholder="Fee percentage"
                       className={`w-full h-10 text-sm bg-background/80 border-black focus:border-primary/60 pr-10 font-medium placeholder:text-muted-foreground/70 dark:bg-background/60 dark:border-border/40 dark:focus:border-primary/70 input-3d ${errors.vaultFee ? 'border-red-500 dark:border-red-400' : ''}`}
                       value={vaultFee}
                       onChange={e => setVaultFee(e.target.value)}
@@ -262,7 +295,7 @@ export default function CreateForm() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-foreground/90 text-3d">Creator Fee (%)</label>
+                  <label className="text-sm font-semibold text-foreground/90 text-3d">Unstaking Fee for the Vault Creator (%)</label>
                   <div className="relative">
                     <Input
                       type="number"
@@ -283,6 +316,20 @@ export default function CreateForm() {
                 </div>
               </div>
 
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-foreground/90 text-3d">Vault Creator Address</label>
+                <Input
+                  type="text"
+                  placeholder="0x... Address to receive creator fee"
+                  className={`w-full h-10 text-sm bg-background/80 border-black focus:border-primary/60 font-medium placeholder:text-muted-foreground/70 dark:bg-background/60 dark:border-border/40 dark:focus:border-primary/70 input-3d font-mono ${errors.vaultCreator ? 'border-red-500 dark:border-red-400' : ''}`}
+                  value={vaultCreator}
+                  onChange={e => setVaultCreator(e.target.value)}
+                />
+                {errors.vaultCreator && (
+                  <p className="text-red-500 text-xs font-medium text-3d">{errors.vaultCreator}</p>
+                )}
+              </div>
+
               <div className="pt-4">
                 <Button
                   className="w-full h-12 bg-gradient-to-r from-primary to-purple-500 hover:from-primary/90 hover:to-purple-500/90 text-white font-bold text-base shadow-2xl hover:shadow-3xl transition-all duration-500 button-3d relative overflow-hidden"
@@ -297,7 +344,7 @@ export default function CreateForm() {
                     </>
                   ) : (
                     <>
-                      <span className="text-3d relative z-10">Deploy Vault</span>
+                      <span className="text-3d relative z-10">Create Vault</span>
                       <ArrowRight className="ml-2 h-5 w-5 relative z-10" />
                     </>
                   )}
@@ -321,10 +368,39 @@ export default function CreateForm() {
                   Vault Created Successfully!
                 </h2>
                 <p className="text-base text-muted-foreground text-3d">
-                  Your vault has been deployed with ID: <span className="font-bold text-primary text-xl">{uniqueId}</span>
+                  Your vault has been deployed at address:
                 </p>
+                <div className="bg-background/50 dark:bg-background/30 border border-primary/20 rounded-lg p-3 font-mono text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-primary font-bold">{formatAddress(vaultAddress)}</span>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(vaultAddress)
+                        toast({
+                          title: 'Copied!',
+                          description: 'Vault address copied to clipboard',
+                        })
+                      }}
+                      className="text-xs bg-primary/10 hover:bg-primary/20 px-2 py-1 rounded transition-colors"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                </div>
               </div>
               <div className="flex flex-col sm:flex-row gap-3 justify-center items-center pt-4">
+                <Link
+                  href={getAddressExplorerUrl(config.state.chainId, vaultAddress)}
+                  target="_blank"
+                >
+                  <Button 
+                    variant="outline" 
+                    className="h-10 px-4 border-primary/30 hover:bg-primary/10 dark:border-primary/40 dark:hover:bg-primary/20 button-3d"
+                  >
+                    <span className="text-3d">View Vault</span>
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
                 <Link
                   href={getBlockExplorerUrl(config.state.chainId, hashTx)}
                   target="_blank"
@@ -337,9 +413,9 @@ export default function CreateForm() {
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/explorer">
+                <Link href={`/${vaultAddress}`}>
                   <Button className="h-10 px-6 bg-gradient-to-r from-primary to-purple-500 hover:from-primary/90 hover:to-purple-500/90 button-3d">
-                    <span className="text-3d">Explore Vaults</span>
+                    <span className="text-3d">Go to Vault</span>
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>

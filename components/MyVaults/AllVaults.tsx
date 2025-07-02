@@ -383,199 +383,218 @@ const AllVaults = () => {
         </div>
       </div>
 
-      {/* Separate Controls */}
-      <div className='container mx-auto px-4 py-4 mb-8'>
-        <div className='flex items-center justify-between gap-4'>
-          {/* Left Side - Search Bar */}
-          <div className='flex-1 max-w-md'>
-            <div className='relative'>
-              <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
-              <Input
-                placeholder='Search vaults by name or symbol...'
-                value={searchQuery}
-                onChange={e => handleSearch(e.target.value)}
-                className='pl-10 h-10 border-border/60 bg-background/80 backdrop-blur-sm input-3d'
-              />
+      {/* Wallet Connection Required */}
+      {!account.address ? (
+        <div className='container mx-auto px-4 py-20'>
+          <div className="text-center space-y-4">
+            <div className='w-16 h-16 mx-auto rounded-full bg-muted/50 flex items-center justify-center'>
+              <Vault className="h-8 w-8 text-muted-foreground" />
             </div>
-          </div>
-
-          {/* Right Side - Network Dropdown and Clear Filters */}
-          <div className='flex items-center gap-3'>
-            <ChainDropdown
-              selectedChainId={selectedChain}
-              onChainSelect={handleChainSelect}
-              currentChainId={connectedChainId}
-              availableChains={getAvailableChains()}
-            />
-            
-            {(searchQuery || selectedChain !== 'all') && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setSearchQuery('')
-                  handleSearch('')
-                  setSelectedChain('all')
-                }}
-                className='h-10 px-3 gap-2 button-3d'
-              >
-                <X className='h-4 w-4' />
-                <span className='text-3d'>Clear</span>
-              </Button>
-            )}
+            <div className='space-y-2'>
+              <h3 className='text-lg font-medium text-gradient'>Connect Your Wallet</h3>
+              <p className='text-muted-foreground max-w-md mx-auto'>
+                Please connect your wallet to view and manage your vaults
+              </p>
+            </div>
           </div>
         </div>
-
-        {/* Active Filters and Data Source Display */}
-        {(searchQuery || selectedChain !== 'all' || (initialLoadComplete && vaults.length > 0)) && (
-          <div className='flex items-center justify-between text-xs mt-3'>
-            <div className='flex items-center gap-2'>
-              {(searchQuery || selectedChain !== 'all') && (
-                <>
-                  <span className='text-muted-foreground'>Active filters:</span>
-                  {searchQuery && (
-                    <div className='flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary'>
-                      <Search className='h-3 w-3' />
-                      {searchQuery}
-                    </div>
-                  )}
-                  {selectedChain !== 'all' && (
-                    <div className='flex items-center gap-1 px-2 py-1 rounded-md bg-blue-500/10 text-blue-600'>
-                      <Vault className='h-3 w-3' />
-                      {getChainName(selectedChain)}
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-            
-            {/* Data Source Indicator */}
-            {initialLoadComplete && vaults.length > 0 && dataSource && lastUpdated && (
-              <div 
-                className='flex items-center gap-1 px-2 py-1 rounded-md bg-muted/30 text-muted-foreground text-xs cursor-help'
-                title={`Data ${dataSource === 'cache' ? 'loaded from cache' : 'fetched from blockchain'} at ${lastUpdated.toLocaleTimeString()}`}
-              >
-                <div className={cn(
-                  'w-2 h-2 rounded-full',
-                  dataSource === 'cache' ? 'bg-blue-500' : 'bg-green-500'
-                )} />
-                <span>
-                  {dataSource === 'cache' ? 'Cached' : 'Fresh'} • {lastUpdated.toLocaleTimeString()}
-                </span>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Results Section */}
-      <div className='container mx-auto px-4 pb-6'>
-        <div className='space-y-6 mb-16'>
-          {/* Loading State - Only show on initial load */}
-          {isLoading && !initialLoadComplete && !isLoadingFromCache && (
-            <Loading variant="vault" message="Loading your vaults from blockchain..." />
-          )}
-
-          {/* Cache Loading State */}
-          {isLoadingFromCache && (
-            <div className='flex justify-center py-8'>
-              <Loading variant="vault" message="Loading cached vaults..." />
-            </div>
-          )}
-
-          {/* Syncing State */}
-          {isSyncing && (
-            <div className='flex justify-center py-8'>
-              <Loading variant="sync" message="Syncing with blockchain..." />
-            </div>
-          )}
-
-          {/* Error State */}
-          {error && (
-            <div className='text-center py-16'>
-              <div className='space-y-4'>
-                <div className='w-16 h-16 mx-auto rounded-full bg-destructive/10 flex items-center justify-center'>
-                  <Vault className='h-8 w-8 text-destructive' />
-                </div>
-                <div className='space-y-2'>
-                  <h3 className='text-lg font-medium text-gradient'>Error Loading Vaults</h3>
-                  <p className='text-muted-foreground max-w-md mx-auto'>{error}</p>
-                </div>
-                <Button 
-                  variant="outline" 
-                  onClick={() => fetchVaultsFromAllChains()}
-                  className='mt-4'
-                >
-                  Try Again
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* Vaults Grid */}
-          {initialLoadComplete && paginatedVaults.length > 0 && (
-            <>
-              <div className='grid max-w-6xl mx-auto grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-                {paginatedVaults.map((vault, index) => (
-                  <CardExplorer
-                    key={`${vault.vaultAddress}-${index}`}
-                    vault={vault}
+      ) : (
+        <>
+          {/* Separate Controls */}
+          <div className='container mx-auto px-4 py-4 mb-8'>
+            <div className='flex items-center justify-between gap-4'>
+              {/* Left Side - Search Bar */}
+              <div className='flex-1 max-w-md'>
+                <div className='relative'>
+                  <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+                  <Input
+                    placeholder='Search vaults by name or symbol...'
+                    value={searchQuery}
+                    onChange={e => handleSearch(e.target.value)}
+                    className='pl-10 h-10 border-border/60 bg-background/80 backdrop-blur-sm input-3d'
                   />
-                ))}
+                </div>
               </div>
-              
-              {/* Pagination */}
-              <div className='flex justify-center mt-8'>
-                <Pagination
-                  currentPage={pagination.page}
-                  totalPages={pagination.totalPages}
-                  onPageChange={handlePageChange}
-                />
-              </div>
-            </>
-          )}
 
-          {/* Empty State */}
-          {initialLoadComplete && filteredVaults.length === 0 && (
-            <div className='text-center py-16'>
-              <div className='space-y-4'>
-                <div className='w-16 h-16 mx-auto rounded-full bg-muted/50 flex items-center justify-center'>
-                  <Vault className='h-8 w-8 text-muted-foreground' />
-                </div>
-                <div className='space-y-2'>
-                  <h3 className='text-lg font-medium text-gradient'>No vaults found</h3>
-                  <p className='text-muted-foreground max-w-md mx-auto'>
-                    {searchQuery || selectedChain !== 'all'
-                      ? `No vaults match your current filters. Try adjusting your search terms or network selection.`
-                      : 'You have not created any vaults yet. Start by creating your first vault to begin staking!'
-                    }
-                  </p>
-                </div>
-                {(searchQuery || selectedChain !== 'all') ? (
-                  <Button 
-                    variant="outline" 
+              {/* Right Side - Network Dropdown and Clear Filters */}
+              <div className='flex items-center gap-3'>
+                <ChainDropdown
+                  selectedChainId={selectedChain}
+                  onChainSelect={handleChainSelect}
+                  currentChainId={connectedChainId}
+                  availableChains={getAvailableChains()}
+                />
+                
+                {(searchQuery || selectedChain !== 'all') && (
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => {
                       setSearchQuery('')
                       handleSearch('')
                       setSelectedChain('all')
                     }}
-                    className='mt-4'
+                    className='h-10 px-3 gap-2 button-3d'
                   >
-                    Clear All Filters
+                    <X className='h-4 w-4' />
+                    <span className='text-3d'>Clear</span>
                   </Button>
-                ) : (
-                  <Link href="/createVault">
-                    <Button className='mt-4 bg-gradient-to-r from-primary/70 to-purple-500/70 hover:from-primary/80 hover:to-purple-500/80 button-3d'>
-                      Create Your First Vault
-                      <Plus className="ml-2 h-4 w-4" />
-                    </Button>
-                  </Link>
                 )}
               </div>
             </div>
-          )}
-        </div>
-      </div>
+
+            {/* Active Filters and Data Source Display */}
+            {(searchQuery || selectedChain !== 'all' || (initialLoadComplete && vaults.length > 0)) && (
+              <div className='flex items-center justify-between text-xs mt-3'>
+                <div className='flex items-center gap-2'>
+                  {(searchQuery || selectedChain !== 'all') && (
+                    <>
+                      <span className='text-muted-foreground'>Active filters:</span>
+                      {searchQuery && (
+                        <div className='flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary'>
+                          <Search className='h-3 w-3' />
+                          {searchQuery}
+                        </div>
+                      )}
+                      {selectedChain !== 'all' && (
+                        <div className='flex items-center gap-1 px-2 py-1 rounded-md bg-blue-500/10 text-blue-600'>
+                          <Vault className='h-3 w-3' />
+                          {getChainName(selectedChain)}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+                
+                {/* Data Source Indicator */}
+                {initialLoadComplete && vaults.length > 0 && dataSource && lastUpdated && (
+                  <div 
+                    className='flex items-center gap-1 px-2 py-1 rounded-md bg-muted/30 text-muted-foreground text-xs cursor-help'
+                    title={`Data ${dataSource === 'cache' ? 'loaded from cache' : 'fetched from blockchain'} at ${lastUpdated.toLocaleTimeString()}`}
+                  >
+                    <div className={cn(
+                      'w-2 h-2 rounded-full',
+                      dataSource === 'cache' ? 'bg-blue-500' : 'bg-green-500'
+                    )} />
+                    <span>
+                      {dataSource === 'cache' ? 'Cached' : 'Fresh'} • {lastUpdated.toLocaleTimeString()}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Results Section */}
+          <div className='container mx-auto px-4 pb-6'>
+            <div className='space-y-6 mb-16'>
+              {/* Loading State - Only show on initial load */}
+              {isLoading && !initialLoadComplete && !isLoadingFromCache && (
+                <Loading variant="vault" message="Loading your vaults from blockchain..." />
+              )}
+
+              {/* Cache Loading State */}
+              {isLoadingFromCache && (
+                <div className='flex justify-center py-8'>
+                  <Loading variant="vault" message="Loading cached vaults..." />
+                </div>
+              )}
+
+              {/* Syncing State */}
+              {isSyncing && (
+                <div className='flex justify-center py-8'>
+                  <Loading variant="sync" message="Syncing with blockchain..." />
+                </div>
+              )}
+
+              {/* Error State */}
+              {error && (
+                <div className='text-center py-16'>
+                  <div className='space-y-4'>
+                    <div className='w-16 h-16 mx-auto rounded-full bg-destructive/10 flex items-center justify-center'>
+                      <Vault className='h-8 w-8 text-destructive' />
+                    </div>
+                    <div className='space-y-2'>
+                      <h3 className='text-lg font-medium text-gradient'>Error Loading Vaults</h3>
+                      <p className='text-muted-foreground max-w-md mx-auto'>{error}</p>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => fetchVaultsFromAllChains()}
+                      className='mt-4'
+                    >
+                      Try Again
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Vaults Grid */}
+              {initialLoadComplete && paginatedVaults.length > 0 && (
+                <>
+                  <div className='grid max-w-6xl mx-auto grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                    {paginatedVaults.map((vault) => (
+                      <CardExplorer
+                        key={`${vault.chainId}-${vault.vaultAddress}`}
+                        vault={vault}
+                      />
+                    ))}
+                  </div>
+                  
+                  {/* Pagination */}
+                  <div className='flex justify-center mt-8'>
+                    <Pagination
+                      currentPage={pagination.page}
+                      totalPages={pagination.totalPages}
+                      onPageChange={handlePageChange}
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* Empty State */}
+              {initialLoadComplete && filteredVaults.length === 0 && (
+                <div className='text-center py-16'>
+                  <div className='space-y-4'>
+                    <div className='w-16 h-16 mx-auto rounded-full bg-muted/50 flex items-center justify-center'>
+                      <Vault className='h-8 w-8 text-muted-foreground' />
+                    </div>
+                    <div className='space-y-2'>
+                      <h3 className='text-lg font-medium text-gradient'>No vaults found</h3>
+                      <p className='text-muted-foreground max-w-md mx-auto'>
+                        {searchQuery || selectedChain !== 'all'
+                          ? `No vaults match your current filters. Try adjusting your search terms or network selection.`
+                          : 'You have not created any vaults yet. Start by creating your first vault to begin staking!'
+                        }
+                      </p>
+                    </div>
+                    {(searchQuery || selectedChain !== 'all') ? (
+                      <Button 
+                        variant="outline" 
+                        onClick={() => {
+                          setSearchQuery('')
+                          handleSearch('')
+                          setSelectedChain('all')
+                        }}
+                        className='mt-4'
+                      >
+                        Clear All Filters
+                      </Button>
+                    ) : (
+                      <Link href="/createVault">
+                        <Button className='mt-4 bg-gradient-to-r from-primary/70 to-purple-500/70 hover:from-primary/80 hover:to-purple-500/80 button-3d'>
+                          Create Your First Vault
+                          <Plus className="ml-2 h-4 w-4" />
+                        </Button>
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }

@@ -453,4 +453,22 @@
   .btn-gradient {
     @apply bg-gradient-to-r from-primary to-purple-500;
   }
+  
+  /* RainbowKit ConnectButton light mode styling */
+  [data-rk] button[data-testid="rk-connect-button"] {
+    @apply bg-white/90 border-gray-200/80 hover:bg-white/95 backdrop-blur-sm;
+  }
+  
+  [data-rk] button[data-testid="rk-account-button"] {
+    @apply bg-white/90 border-gray-200/80 hover:bg-white/95 backdrop-blur-sm;
+  }
+  
+  /* Additional RainbowKit styling for light mode */
+  [data-rk] {
+    --rk-colors-connectButtonBackground: rgba(255, 255, 255, 0.9);
+    --rk-colors-connectButtonBackgroundError: rgba(255, 255, 255, 0.9);
+    --rk-colors-connectButtonInnerBackground: rgba(255, 255, 255, 0.95);
+    --rk-colors-connectButtonText: rgb(30, 30, 30);
+    --rk-colors-connectButtonTextError: rgb(30, 30, 30);
+  }
 }

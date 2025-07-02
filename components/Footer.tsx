@@ -105,13 +105,11 @@ const navigation = [
 
 export default function Footer() {
   return (
-    <footer 
-      className='w-full px-24 py-10 space-y-4 bg-cover bg-center bg-no-repeat relative'
-      style={{
-        backgroundImage: 'url(/footer.png)'
-      }}
-    >
-      <div className='flex items-center justify-between'>
+    <footer className='w-full px-6 md:px-24 py-8 bg-secondary/20 border-t border-border'>
+      <div className='max-w-6xl mx-auto'>
+        <div className='flex flex-col md:flex-row items-center justify-between gap-6'>
+          {/* Navigation Links */}
+          <div className='flex items-center justify-between'>
         <Link
           href='https://stability.nexus/'
           target='_blank'
@@ -128,49 +126,56 @@ export default function Footer() {
           />
         </Link>
       </div>
-      <div className='flex items-center justify-between'>
-        <div className='flex items-center space-x-4 md:order-2'>
-          {navigation.map(item => (
+          <div className='flex flex-wrap items-center gap-6 text-sm'>
             <Link
-              key={item.name}
-              href={item.href}
+              href='https://stability.nexus/protocols'
               target='_blank'
-              className=' rounded-full bg-secondary/30 p-2 hover:bg-secondary'
+              className='font-medium hover:text-primary transition-colors'
             >
-              <span className='sr-only'>{item.name}</span>
-              <item.icon className='size-6' aria-hidden='true' />
+              Other Protocols
             </Link>
-          ))}
+            <Link
+              href='https://stability.nexus/research'
+              target='_blank'
+              className='font-medium hover:text-primary transition-colors'
+            >
+              Research
+            </Link>
+            <Link
+              href='https://news.stability.nexus/'
+              target='_blank'
+              className='font-medium hover:text-primary transition-colors'
+            >
+              News
+            </Link>
+            <Link
+              href='https://docs.stability.nexus/'
+              target='_blank'
+              className='font-medium hover:text-primary transition-colors'
+            >
+              Docs
+            </Link>
+          </div>
+
+          {/* Social Media Links */}
+          <div className='flex items-center gap-3'>
+            {navigation.map(item => (
+              <Link
+                key={item.name}
+                href={item.href}
+                target='_blank'
+                className='rounded-full bg-secondary/50 p-2 hover:bg-primary/20 transition-colors'
+              >
+                <span className='sr-only'>{item.name}</span>
+                <item.icon className='size-5' aria-hidden='true' />
+              </Link>
+            ))}
+          </div>
         </div>
-        <div className='text-white flex items-center gap-3 md:order-1'>
-          <Link
-            href='https://stability.nexus/protocols'
-            target='_blank'
-            className='font-medium hover:underline hover:decoration-primary hover:decoration-2'
-          >
-            Other Protocols
-          </Link>
-          <Link
-            href='https://stability.nexus/research'
-            target='_blank'
-            className='font-medium hover:underline hover:decoration-primary hover:decoration-2'
-          >
-            Research
-          </Link>
-          <Link
-            href='https://news.stability.nexus/'
-            target='_blank'
-            className='font-medium hover:underline hover:decoration-primary hover:decoration-2'
-          >
-            News
-          </Link>
-          <Link
-            href='https://docs.stability.nexus/'
-            target='_blank'
-            className='font-medium hover:underline hover:decoration-primary hover:decoration-2'
-          >
-            Docs
-          </Link>
+
+        {/* Copyright */}
+        <div className='mt-6 pt-6 border-t border-border text-center text-sm text-muted-foreground'>
+          © 2024 Stability Nexus. All rights reserved.
         </div>
       </div>
     </footer>
