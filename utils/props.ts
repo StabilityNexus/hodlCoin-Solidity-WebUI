@@ -3,7 +3,7 @@ export interface vaultsProps {
   coinAddress: `0x${string}`
   coinName: string
   coinSymbol: string
-  hodlCoinSymbol: string
+  hodlCoinSymbol?: string
   decimals: number
   chainId: number
 }
@@ -13,7 +13,7 @@ export interface vaultDetails {
   coinAddress: `0x${string}`
   coinName: string
   coinSymbol: string
-  hodlCoinSymbol: string
+  hodlCoinSymbol?: string
   decimals: number
   vaultCreator: `0x${string}`
 }

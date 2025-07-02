@@ -83,6 +83,7 @@ export default function ExplorerVaults() {
         coinName: vault[1],
         coinAddress: vault[2],
         coinSymbol: vault[3],
+        hodlCoinSymbol: vault[4],
         chainId: chainId,
         decimals: 18
       }))
