@@ -533,9 +533,9 @@ export default function ExplorerVaults() {
           {initialLoadComplete && paginatedVaults.length > 0 && (
             <>
               <div className='grid max-w-6xl mx-auto grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-                {paginatedVaults.map((vault, index) => (
+                {paginatedVaults.map((vault) => (
                   <CardExplorer
-                    key={`${vault.vaultAddress}-${index}`}
+                    key={`${vault.chainId}-${vault.vaultAddress}`}
                     vault={vault}
                   />
                 ))}

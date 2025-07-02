@@ -35,11 +35,13 @@ export default function InteractionClient() {
   const [coinAddress, setCoinAddress] = useState<`0x${string}`>('0x0')
   const [coinName, setCoinName] = useState<string>('')
   const [coinSymbol, setCoinSymbol] = useState<string>('')
+  const [hodlCoinSymbol, setHodlCoinSymbol] = useState<string>('')
 
   const [vault, setVault] = useState<vaultsProps>({
     coinAddress: '0x0' as `0x${string}`,
     coinName: '',
     coinSymbol: '',
+    hodlCoinSymbol: '',
     decimals: 0,
     vaultAddress: '0x0' as `0x${string}`,
     chainId: 0,
@@ -69,6 +71,19 @@ export default function InteractionClient() {
     }
   }, [searchParams])
 
+  const getChainName = (chainId: number) => {
+    const chainNames: { [key: number]: string } = {
+      1: 'Ethereum',
+      534351: 'Scroll Sepolia',
+      5115: 'Citrea Testnet',
+      61: 'Ethereum Classic',
+      2001: 'Milkomeda',
+      137: 'Polygon',
+      8453: 'Base',
+    }
+    return chainNames[chainId] || `Chain ${chainId}`
+  }
+
   const getVaultsData = async (forceRefresh: boolean = false) => {
     if (!vaultAddress || !chainId) {
       setError('Invalid vault address or chain ID')
@@ -92,6 +107,7 @@ export default function InteractionClient() {
             coinAddress: cachedData.coinAddress as `0x${string}`,
             coinName: cachedData.coinName as string,
             coinSymbol: cachedData.coinSymbol as string,
+            hodlCoinSymbol: cachedData.hodlCoinSymbol as string,
             decimals: cachedData.decimals as number,
             vaultAddress: vaultAddress,
             chainId: chainId,
@@ -102,6 +118,7 @@ export default function InteractionClient() {
           setCoinAddress(cachedData.coinAddress as `0x${string}`)
           setCoinName(cachedData.coinName as string)
           setCoinSymbol(cachedData.coinSymbol as string)
+          setHodlCoinSymbol(cachedData.hodlCoinSymbol as string)
           setIsLoading(false)
           return
         }
@@ -131,7 +148,7 @@ export default function InteractionClient() {
       ])
 
       // Get token details
-      const [name, symbol, decimals] = await Promise.all([
+      const [name, symbol, decimals, hodlSymbol] = await Promise.all([
         publicClient.readContract({
           abi: ERC20Abi,
           address: newCoinAddress as `0x${string}`,
@@ -147,14 +164,20 @@ export default function InteractionClient() {
           address: newCoinAddress as `0x${string}`,
           functionName: 'decimals',
         }),
+        publicClient.readContract({
+          abi: HodlCoinAbi,
+          address: vaultAddress,
+          functionName: 'symbol',
+        }),
       ])
 
-      console.log('📊 Fetched vault details from blockchain:', { name, symbol, decimals })
+      console.log('📊 Fetched vault details from blockchain:', { name, symbol, decimals, hodlSymbol })
 
       const vaultDetails = {
         coinAddress: newCoinAddress,
         coinName: name,
         coinSymbol: symbol,
+        hodlCoinSymbol: hodlSymbol,
         decimals: decimals,
         vaultCreator: newVaultCreator,
       }
@@ -167,6 +190,7 @@ export default function InteractionClient() {
         coinAddress: newCoinAddress as `0x${string}`,
         coinName: name as string,
         coinSymbol: symbol as string,
+        hodlCoinSymbol: hodlSymbol as string,
         decimals: decimals as number,
         vaultAddress: vaultAddress,
         chainId: chainId,
@@ -177,6 +201,7 @@ export default function InteractionClient() {
       setCoinAddress(newCoinAddress as `0x${string}`)
       setCoinName(name as string)
       setCoinSymbol(symbol as string)
+      setHodlCoinSymbol(hodlSymbol as string)
     } catch (error) {
       console.error('Error fetching vault data:', error)
       setError('Failed to load vault data. Please check the vault address and chain ID.')
@@ -437,7 +462,7 @@ export default function InteractionClient() {
             <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-gradient">
               {coinName} Vault
             </h1>
-            <p className="text-muted-foreground mt-2">Chain ID: {chainId}</p>
+            <p className="text-muted-foreground mt-2">Chain: {getChainName(chainId)}</p>
           </div>
           
           {/* Balance Display and Sync Button - Top Right */}
@@ -456,8 +481,7 @@ export default function InteractionClient() {
             </Button>
             
             {/* Available Token Balance */}
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/50 dark:to-emerald-950/50 
-                          backdrop-blur-xl border-2 border-purple-300/70 dark:border-purple-600/70 rounded-xl p-3 shadow-lg 
+            <div className="backdrop-blur-xl rounded-xl p-3 shadow-lg 
                           hover:border-purple-400/90 dark:hover:border-purple-500/90 transition-all duration-300 flex-1">
               <div className="flex flex-col items-center gap-1">
                 <span className="text-xs text-green-600 dark:text-green-400 font-bold">{coinSymbol} balance</span>
@@ -468,11 +492,10 @@ export default function InteractionClient() {
             </div>
             
             {/* Staked HodlCoin Balance */}
-            <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/50 dark:to-purple-950/50 
-                          backdrop-blur-xl border-2 border-purple-300/70 dark:border-purple-600/70 rounded-xl p-3 shadow-lg 
+            <div className="backdrop-blur-xl rounded-xl p-3 shadow-lg 
                           hover:border-purple-400/90 dark:hover:border-purple-500/90 transition-all duration-300 flex-1">
               <div className="flex flex-col items-center gap-1">
-                <span className="text-xs text-blue-600 dark:text-blue-400 font-bold">h{coinSymbol} balance</span>
+                <span className="text-xs text-blue-600 dark:text-blue-400 font-bold">{hodlCoinSymbol} balance</span>
                 <span className="font-mono text-sm font-bold text-blue-700 dark:text-blue-300">
                   {parseFloat(balances.hodlCoinBalance.toFixed(4))}
                 </span>

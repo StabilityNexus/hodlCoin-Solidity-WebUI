@@ -15,6 +15,7 @@ import { ERC20Abi } from '@/utils/contracts/ERC20'
 import { useMatrixEffect } from '../hooks/useMatrixEffect'
 import { useFavorites } from '@/utils/favorites'
 import { Badge } from '../ui/badge'
+import { parseUnits } from 'viem'
 
 export default function HeroVault({
   vault,
@@ -86,10 +87,11 @@ export default function HeroVault({
     return true
   }
 
+  // Convert the human-readable amount into the on-chain integer representation
   const formatAmount = (amount: number) => {
     try {
-      const decimals = vault?.decimals ?? 18;
-      return BigInt(Math.floor(amount * 10 ** decimals))
+      const decimals = vault?.decimals ?? 18
+      return parseUnits(amount.toString(), decimals)
     } catch (error) {
       console.error('Error formatting amount:', error)
       toast({
@@ -116,9 +118,10 @@ export default function HeroVault({
         setIsLoading(false)
         return
       }
+      // Send underlying coin (not hodlCoin) to the vault so that TVL & price increase
       const tx = await writeContract(config as any, {
-        abi: HodlCoinAbi,
-        address: vault?.vaultAddress as `0x${string}`,
+        abi: ERC20Abi,
+        address: vault?.coinAddress as `0x${string}`,
         functionName: 'transfer',
         args: [
           vault?.vaultAddress as `0x${string}`,
@@ -343,7 +346,7 @@ export default function HeroVault({
                   Total Supply
                 </div>
                 <div className='text-2xl font-mono font-bold text-gradient'>
-                  {supply} h{vault?.coinSymbol}
+                  {supply} {vault?.hodlCoinSymbol}
                 </div>
               </div>
             </div>

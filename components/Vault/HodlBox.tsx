@@ -13,6 +13,7 @@ import { ERC20Abi } from '@/utils/contracts/ERC20'
 import { useAccount } from 'wagmi'
 import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
+import { parseUnits } from 'viem'
 
 export default function HodlBox({
   priceHodl,
@@ -71,9 +72,8 @@ export default function HodlBox({
 
   const formatAmount = (amountStr: string) => {
     try {
-      const amount = parseFloat(amountStr)
-      const decimals = vault?.decimals ?? 18;
-      return BigInt(Math.floor(amount * 10 ** decimals))
+      const decimals = vault?.decimals ?? 18
+      return parseUnits(amountStr, decimals)
     } catch (error) {
       console.error('Error formatting amount:', error)
       toast({
@@ -174,8 +174,8 @@ export default function HodlBox({
     <Card className='bg-background/50 backdrop-blur-xl border-primary/20 shadow-2xl shadow-primary/5 hover:border-primary/30 transition-all duration-300'>
       <CardHeader>
         <CardTitle className='font-extrabold tracking-tight text-gradient text-xl flex items-center gap-3'>
-          <div className="p-2 rounded-lg bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30">
-            <TrendingUp className="h-5 w-5 text-green-500" />
+          <div className="p-2 rounded-lg bg-gradient-to-r from-purple-500/20 to-violet-500/20 border border-purple-500/30">
+            <TrendingUp className="h-5 w-5 text-purple-500" />
           </div>
           Stake Tokens
         </CardTitle>
@@ -221,17 +221,17 @@ export default function HodlBox({
 
         {/* Expected Output */}
         {hodlAmount && parseFloat(hodlAmount) > 0 && (
-          <div className="p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl">
+          <div className="p-4 bg-gradient-to-r from-purple-500/10 to-violet-500/10 border border-purple-500/20 rounded-xl">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Coins className="h-4 w-4 text-green-500" />
+                <Coins className="h-4 w-4 text-purple-500" />
                 <span className="text-sm text-foreground">You will receive</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-mono text-lg font-bold text-green-500">
+                <span className="font-mono text-lg font-bold text-purple-500">
                   {expectedHodlCoins.toFixed(6)}
                 </span>
-                <span className="text-sm text-muted-foreground">h{vault?.coinSymbol}</span>
+                <span className="text-sm text-muted-foreground">{vault?.hodlCoinSymbol}</span>
               </div>
             </div>
           </div>
@@ -250,8 +250,8 @@ export default function HodlBox({
           <Button
             onClick={hodlAction}
             disabled={!hodlAmount || parseFloat(hodlAmount) <= 0}
-            className='w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-emerald-600 hover:to-green-500 
-              transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-green-500/25 
+            className='w-full bg-gradient-to-r from-purple-500 to-violet-600 hover:from-violet-600 hover:to-purple-500 
+              transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25 
               text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none'
           >
             {coinApproved ? (

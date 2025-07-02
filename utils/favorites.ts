@@ -10,6 +10,7 @@ export interface FavoriteVault {
   chainId: number
   coinName: string
   coinSymbol: string
+  hodlCoinSymbol?: string
   coinAddress: string
   decimals?: number
   addedAt?: number
@@ -228,6 +229,7 @@ export class FavoritesManager {
       chainId: favorite.chainId,
       coinName: favorite.coinName,
       coinSymbol: favorite.coinSymbol,
+      hodlCoinSymbol: favorite.hodlCoinSymbol || `h${favorite.coinSymbol}`,
       coinAddress: favorite.coinAddress as `0x${string}`,
       decimals: favorite.decimals || 18
     }

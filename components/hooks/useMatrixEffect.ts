@@ -7,7 +7,7 @@ export const useMatrixEffect = (opacity = 0.3, symbolCount = 3) => {
     const matrixContainer = matrixRef.current
     if (!matrixContainer) return
 
-    const symbols = ['BTC', 'ETH', 'ADA', 'ERG']
+    const symbols = ['$', '¢', '€', '£', '¥', '₿']
     const columns = Math.floor(window.innerWidth / 40) // Increased spacing for fewer symbols
     
     // Create matrix columns
