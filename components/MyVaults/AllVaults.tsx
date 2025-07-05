@@ -8,6 +8,7 @@ import { useAccount, useChainId } from 'wagmi'
 import { getPublicClient } from '@wagmi/core'
 import { config } from '@/utils/config'
 import { HodlCoinFactoryAbi } from '@/utils/contracts/HodlCoinFactory'
+import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
 import { HodlCoinVaultFactories } from '@/utils/addresses'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -22,10 +23,17 @@ import { ChainDropdown } from '@/components/ChainDropdown'
 // Define supported chain IDs to match ChainDropdown
 type SupportedChainId = 1 | 137 | 534351 | 5115 | 61 | 2001 | 8453;
 
+// Extended vault props with price and TVL data
+interface ExtendedVaultProps extends vaultsProps {
+  priceHodl?: number | null;
+  totalValueLocked?: number | null;
+  dataLoaded?: boolean;
+}
+
 const AllVaults = () => {
-  const [vaults, setVaults] = useState<vaultsProps[]>([])
-  const [filteredVaults, setFilteredVaults] = useState<vaultsProps[]>([])
-  const [paginatedVaults, setPaginatedVaults] = useState<vaultsProps[]>([])
+  const [vaults, setVaults] = useState<ExtendedVaultProps[]>([])
+  const [filteredVaults, setFilteredVaults] = useState<ExtendedVaultProps[]>([])
+  const [paginatedVaults, setPaginatedVaults] = useState<ExtendedVaultProps[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isSyncing, setIsSyncing] = useState(false)
   const [isLoadingFromCache, setIsLoadingFromCache] = useState(false)
@@ -46,6 +54,61 @@ const AllVaults = () => {
   const account = useAccount()
   const connectedChainId = useChainId()
   const router = useRouter()
+
+  const fetchVaultPriceAndTVL = async (vault: vaultsProps): Promise<{ priceHodl: number | null; totalValueLocked: number | null }> => {
+    try {
+      const publicClient = getPublicClient(config as any, { chainId: vault.chainId })
+      
+      // Get price
+      const price = await publicClient?.readContract({
+        address: vault.vaultAddress as `0x${string}`,
+        abi: HodlCoinAbi,
+        functionName: 'priceHodl',
+      })
+
+      // Get total supply for TVL calculation
+      const totalSupply = await publicClient?.readContract({
+        address: vault.vaultAddress as `0x${string}`,
+        abi: HodlCoinAbi,
+        functionName: 'totalSupply',
+      })
+      
+      // Calculate TVL: totalSupply * priceHodl
+      let tvl = null
+      if (totalSupply && price) {
+        tvl = (Number(totalSupply) / Math.pow(10, vault.decimals)) * (Number(price) / 100000)
+      }
+
+      return {
+        priceHodl: price ? Number(price) : null,
+        totalValueLocked: tvl
+      }
+    } catch (error) {
+      console.error(`Error getting price/TVL for vault ${vault.vaultAddress}:`, error)
+      return { priceHodl: null, totalValueLocked: null }
+    }
+  }
+
+  const fetchAllVaultData = async (basicVaults: vaultsProps[]): Promise<ExtendedVaultProps[]> => {
+    console.log('📊 Fetching price and TVL data for', basicVaults.length, 'user vaults...')
+    
+    // Create promises for all vault price/TVL fetches
+    const dataPromises = basicVaults.map(async (vault) => {
+      const { priceHodl, totalValueLocked } = await fetchVaultPriceAndTVL(vault)
+      return {
+        ...vault,
+        priceHodl,
+        totalValueLocked,
+        dataLoaded: true
+      }
+    })
+
+    // Wait for all data to be fetched
+    const extendedVaults = await Promise.all(dataPromises)
+    console.log('✅ All user vault data loaded successfully')
+    
+    return extendedVaults
+  }
 
   // Helper functions for chain management
   const getAvailableChains = (): SupportedChainId[] => {
@@ -74,7 +137,7 @@ const AllVaults = () => {
         setIsLoading(true)
       }
       setError(null)
-      let allVaults: vaultsProps[] = []
+      let allVaults: ExtendedVaultProps[] = []
 
       if (!account.address) {
         setVaults([])
@@ -92,13 +155,27 @@ const AllVaults = () => {
           const cachedVaults = await indexedDBManager.getUserVaults(account.address)
           if (cachedVaults && cachedVaults.length > 0) {
             console.log('✅ Found cached user vaults:', cachedVaults.length)
-            setVaults(cachedVaults as vaultsProps[])
+            // Convert to ExtendedVaultProps format
+            const basicVaults = cachedVaults.map(vault => ({
+              ...vault,
+              priceHodl: null,
+              totalValueLocked: null,
+              dataLoaded: false
+            }))
+            allVaults = basicVaults
             setDataSource('cache')
             setLastUpdated(new Date())
             setInitialLoadComplete(true)
             setIsLoading(false)
             setIsSyncing(false)
             setIsLoadingFromCache(false)
+            
+            // Fetch price and TVL data for cached vaults
+            if (allVaults.length > 0) {
+              const basicVaultData = allVaults.map(({ priceHodl, totalValueLocked, dataLoaded, ...vault }) => vault)
+              const extendedVaults = await fetchAllVaultData(basicVaultData)
+              setVaults(extendedVaults)
+            }
             return
           }
           console.log('❌ No cached user vaults found or cache expired')
@@ -112,6 +189,7 @@ const AllVaults = () => {
       // Fetch from blockchain based on selected chain
       console.log('⛓️ Fetching user vaults from blockchain...')
       
+      let basicVaults: vaultsProps[] = []
       if (selectedChain === 'all') {
         // Fetch from all chains
         const chainPromises = Object.entries(HodlCoinVaultFactories).map(
@@ -119,7 +197,7 @@ const AllVaults = () => {
             fetchVaultsForChain(chainId, factoryAddress),
         )
         const results = await Promise.all(chainPromises)
-        allVaults = results
+        basicVaults = results
           .flat()
           .filter((vault: vaultsProps | null): vault is vaultsProps => vault !== null)
       } else {
@@ -127,28 +205,35 @@ const AllVaults = () => {
         const factoryAddress = HodlCoinVaultFactories[selectedChain]
         if (factoryAddress) {
           const chainVaults = await fetchVaultsForChain(selectedChain.toString(), factoryAddress)
-          allVaults = chainVaults.filter((vault: vaultsProps | null): vault is vaultsProps => vault !== null)
+          basicVaults = chainVaults.filter((vault: vaultsProps | null): vault is vaultsProps => vault !== null)
         }
       }
 
       // Sort vaults: connected network first, then others
       if (connectedChainId) {
-        allVaults.sort((a, b) => {
+        basicVaults.sort((a, b) => {
           if (a.chainId === connectedChainId && b.chainId !== connectedChainId) return -1
           if (a.chainId !== connectedChainId && b.chainId === connectedChainId) return 1
           return 0
         })
       }
 
-      setVaults(allVaults)
+      // Now fetch price and TVL data for all vaults
+      if (basicVaults.length > 0) {
+        const extendedVaults = await fetchAllVaultData(basicVaults)
+        setVaults(extendedVaults)
+      } else {
+        setVaults([])
+      }
+
       setDataSource('blockchain')
       setLastUpdated(new Date())
       setInitialLoadComplete(true)
 
       // Save to cache
       try {
-        console.log('💾 Saving user vaults to cache:', allVaults.length)
-        await indexedDBManager.saveUserVaults(account.address, allVaults)
+        console.log('💾 Saving user vaults to cache:', basicVaults.length)
+        await indexedDBManager.saveUserVaults(account.address, basicVaults)
         console.log('✅ User vaults saved to cache successfully')
       } catch (cacheError) {
         console.error('💥 Error saving to cache:', cacheError)
@@ -281,6 +366,7 @@ const AllVaults = () => {
       console.log('🗑️ Clearing user vault cache...')
       await indexedDBManager.saveUserVaults(account.address, [])
       setDataSource(null)
+      setLastUpdated(null)
       console.log('✅ User vault cache cleared')
       
       // Refresh data from blockchain

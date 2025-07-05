@@ -1,12 +1,11 @@
 'use client'
 
 import { vaultsProps } from '@/utils/props'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
-import { Loader2, TrendingUp, Coins, CheckCircle } from 'lucide-react'
-import { StylishButton } from '../StylishButton'
+import { Loader2, TrendingUp, Coins } from 'lucide-react'
 import { writeContract, getPublicClient } from '@wagmi/core'
 import { config } from '@/utils/config'
 import { ERC20Abi } from '@/utils/contracts/ERC20'
@@ -29,7 +28,7 @@ export default function HodlBox({
   const { toast } = useToast()
   const [loadingHold, setLoadingHold] = useState<boolean>(false)
   const [hodlAmount, setHodlAmount] = useState<string>('')
-  const [coinApproved, setCoinApproved] = useState<boolean>(false)
+  const [currentStep, setCurrentStep] = useState<'approve' | 'stake' | null>(null)
   const account = useAccount()
 
   const validateInputs = () => {
@@ -87,68 +86,78 @@ export default function HodlBox({
   const hodlAction = async () => {
     try {
       setLoadingHold(true)
+      setCurrentStep('approve')
 
       if (!validateInputs()) {
         setLoadingHold(false)
+        setCurrentStep(null)
         return
       }
 
       const formattedAmount = formatAmount(hodlAmount)
       if (!formattedAmount) {
         setLoadingHold(false)
+        setCurrentStep(null)
         return
       }
 
-      if (!coinApproved) {
-        try {
-          const tx = await writeContract(config as any, {
-            abi: ERC20Abi,
-            address: vault!.coinAddress as `0x${string}`,
-            functionName: 'approve',
-            args: [vault!.vaultAddress, formattedAmount],
-            account: account.address as `0x${string}`,
-          })
+      // First approve the tokens
+      try {
+        const approveTx = await writeContract(config as any, {
+          abi: ERC20Abi,
+          address: vault!.coinAddress as `0x${string}`,
+          functionName: 'approve',
+          args: [vault!.vaultAddress, formattedAmount],
+          account: account.address as `0x${string}`,
+        })
 
-          setCoinApproved(true)
-          toast({
-            title: 'Approval Success',
-            description: 'You have successfully approved your tokens',
-          })
-        } catch (error) {
-          console.error('Approval error:', error)
-          toast({
-            title: 'Approval Failed',
-            description:
-              error instanceof Error ? error.message : 'Error approving tokens',
-          })
-          setLoadingHold(false)
-          return
-        }
-      } else {
-        try {
-          const tx = await writeContract(config as any, {
-            abi: HodlCoinAbi,
-            address: vault!.vaultAddress as `0x${string}`,
-            functionName: 'hodl',
-            args: [account.address as `0x${string}`, formattedAmount],
-            account: account.address as `0x${string}`,
-          })
+        toast({
+          title: 'Approval Success',
+          description: 'Tokens approved successfully, proceeding to stake...',
+        })
 
-          await getBalances()
-          toast({
-            title: 'Hodl Success',
-            description: 'Your hodl has been successfully completed',
-          })
-          setCoinApproved(false)
-          setHodlAmount('')
-        } catch (error) {
-          console.error('Hodl error:', error)
-          toast({
-            title: 'Hodl Failed',
-            description:
-              error instanceof Error ? error.message : 'Error completing hodl',
-          })
-        }
+        // Wait a bit for approval to process, then stake
+        setCurrentStep('stake')
+        
+        setTimeout(async () => {
+          try {
+            const stakeTx = await writeContract(config as any, {
+              abi: HodlCoinAbi,
+              address: vault!.vaultAddress as `0x${string}`,
+              functionName: 'hodl',
+              args: [account.address as `0x${string}`, formattedAmount],
+              account: account.address as `0x${string}`,
+            })
+
+            await getBalances()
+            toast({
+              title: 'Stake Success',
+              description: 'Your tokens have been successfully staked!',
+            })
+            setHodlAmount('')
+          } catch (error) {
+            console.error('Stake error:', error)
+            toast({
+              title: 'Stake Failed',
+              description:
+                error instanceof Error ? error.message : 'Error completing stake',
+            })
+          } finally {
+            setLoadingHold(false)
+            setCurrentStep(null)
+          }
+        }, 2000)
+
+      } catch (error) {
+        console.error('Approval error:', error)
+        toast({
+          title: 'Approval Failed',
+          description:
+            error instanceof Error ? error.message : 'Error approving tokens',
+        })
+        setLoadingHold(false)
+        setCurrentStep(null)
+        return
       }
     } catch (error) {
       console.error('Transaction error:', error)
@@ -159,8 +168,8 @@ export default function HodlBox({
             ? error.message
             : 'An unexpected error occurred',
       })
-    } finally {
       setLoadingHold(false)
+      setCurrentStep(null)
     }
   }
 
@@ -169,6 +178,12 @@ export default function HodlBox({
   }
 
   const expectedHodlCoins = hodlAmount ? parseFloat(hodlAmount) / priceHodl : 0
+
+  const getButtonText = () => {
+    if (currentStep === 'approve') return 'Approving...'
+    if (currentStep === 'stake') return 'Staking...'
+    return 'Approve & Stake'
+  }
 
   return (
     <Card className='bg-background/50 backdrop-blur-xl border-primary/20 shadow-2xl shadow-primary/5 hover:border-primary/30 transition-all duration-300'>
@@ -181,7 +196,6 @@ export default function HodlBox({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-
 
         {/* Input Section */}
         <div className="space-y-3">
@@ -244,7 +258,7 @@ export default function HodlBox({
             disabled
           >
             <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-            {coinApproved ? 'Staking...' : 'Approving...'}
+            {getButtonText()}
           </Button>
         ) : (
           <Button
@@ -254,17 +268,10 @@ export default function HodlBox({
               transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25 
               text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none'
           >
-            {coinApproved ? (
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4" />
-                Stake Tokens
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4" />
-                Approve & Stake
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Approve & Stake
+            </div>
           </Button>
         )}
 

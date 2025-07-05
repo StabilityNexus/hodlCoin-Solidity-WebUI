@@ -7,8 +7,9 @@ import { getPublicClient } from '@wagmi/core'
 import { config } from '@/utils/config'
 import { HodlCoinVaultFactories } from '@/utils/addresses'
 import { HodlCoinFactoryAbi } from '@/utils/contracts/HodlCoinFactory'
+import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
 import { Input } from '../ui/input'
-import { Search, Vault, TrendingUp, RefreshCw, Filter, X, ChevronDown } from 'lucide-react'
+import { Search, Vault, TrendingUp, RefreshCw, X } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Card } from '../ui/card'
 import { useAccount, useChainId } from 'wagmi'
@@ -21,13 +22,20 @@ import { cn } from '@/lib/utils'
 // Define supported chain IDs to match ChainDropdown
 type SupportedChainId = 1 | 137 | 534351 | 5115 | 61 | 2001 | 8453;
 
+// Extended vault props with price and TVL data
+interface ExtendedVaultProps extends vaultsProps {
+  priceHodl?: number | null;
+  totalValueLocked?: number | null;
+  dataLoaded?: boolean;
+}
+
 const ITEMS_PER_PAGE = 6
 
 export default function ExplorerVaults() {
   const [loading, setLoading] = useState(true) // Start with true to prevent flickering
-  const [vaults, setVaults] = useState<vaultsProps[]>([])
-  const [filteredVaults, setFilteredVaults] = useState<vaultsProps[]>([])
-  const [paginatedVaults, setPaginatedVaults] = useState<vaultsProps[]>([])
+  const [vaults, setVaults] = useState<ExtendedVaultProps[]>([])
+  const [filteredVaults, setFilteredVaults] = useState<ExtendedVaultProps[]>([])
+  const [paginatedVaults, setPaginatedVaults] = useState<ExtendedVaultProps[]>([])
   const [selectedChain, setSelectedChain] = useState<SupportedChainId | 'all'>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
@@ -85,7 +93,10 @@ export default function ExplorerVaults() {
         coinSymbol: vault[3],
         hodlCoinSymbol: vault[4],
         chainId: chainId,
-        decimals: 18
+        decimals: 18,
+        priceHodl: null,
+        totalValueLocked: null,
+        dataLoaded: false
       }))
     } catch (error) {
       console.error(`Error fetching vaults for chain ${chainId}:`, error)
@@ -93,13 +104,74 @@ export default function ExplorerVaults() {
     }
   }
 
-  const getVaultsFromCache = async (chainId: string | number): Promise<vaultsProps[] | null> => {
+  const fetchVaultPriceAndTVL = async (vault: vaultsProps): Promise<{ priceHodl: number | null; totalValueLocked: number | null }> => {
+    try {
+      const publicClient = getPublicClient(config as any, { chainId: vault.chainId })
+      
+      // Get price
+      const price = await publicClient?.readContract({
+        address: vault.vaultAddress as `0x${string}`,
+        abi: HodlCoinAbi,
+        functionName: 'priceHodl',
+      })
+
+      // Get total supply for TVL calculation
+      const totalSupply = await publicClient?.readContract({
+        address: vault.vaultAddress as `0x${string}`,
+        abi: HodlCoinAbi,
+        functionName: 'totalSupply',
+      })
+      
+      // Calculate TVL: totalSupply * priceHodl
+      let tvl = null
+      if (totalSupply && price) {
+        tvl = (Number(totalSupply) / Math.pow(10, vault.decimals)) * (Number(price) / 100000)
+      }
+
+      return {
+        priceHodl: price ? Number(price) : null,
+        totalValueLocked: tvl
+      }
+    } catch (error) {
+      console.error(`Error getting price/TVL for vault ${vault.vaultAddress}:`, error)
+      return { priceHodl: null, totalValueLocked: null }
+    }
+  }
+
+  const fetchAllVaultData = async (basicVaults: vaultsProps[]): Promise<ExtendedVaultProps[]> => {
+    console.log('📊 Fetching price and TVL data for', basicVaults.length, 'vaults...')
+    
+    // Create promises for all vault price/TVL fetches
+    const dataPromises = basicVaults.map(async (vault) => {
+      const { priceHodl, totalValueLocked } = await fetchVaultPriceAndTVL(vault)
+      return {
+        ...vault,
+        priceHodl,
+        totalValueLocked,
+        dataLoaded: true
+      }
+    })
+
+    // Wait for all data to be fetched
+    const extendedVaults = await Promise.all(dataPromises)
+    console.log('✅ All vault data loaded successfully')
+    
+    return extendedVaults
+  }
+
+  const getVaultsFromCache = async (chainId: string | number): Promise<ExtendedVaultProps[] | null> => {
     try {
       console.log('🔍 Checking cache for chain:', chainId)
       const cached = await indexedDBManager.getExplorerVaults(chainId)
       if (cached && cached.length > 0) {
         console.log('✅ Found cached vaults for chain', chainId, ':', cached.length)
-        return cached
+        // Convert to ExtendedVaultProps format
+        return cached.map(vault => ({
+          ...vault,
+          priceHodl: null,
+          totalValueLocked: null,
+          dataLoaded: false
+        }))
       }
       console.log('❌ No cached vaults found for chain:', chainId)
       return null
@@ -109,10 +181,12 @@ export default function ExplorerVaults() {
     }
   }
 
-  const saveVaultsToCache = async (chainId: string | number, vaults: vaultsProps[]) => {
+  const saveVaultsToCache = async (chainId: string | number, vaults: ExtendedVaultProps[]) => {
     try {
       console.log('💾 Saving vaults to cache for chain', chainId, ':', vaults.length)
-      await indexedDBManager.saveExplorerVaults(chainId, vaults)
+      // Convert back to basic vaultsProps format for caching
+      const basicVaults = vaults.map(({ priceHodl, totalValueLocked, dataLoaded, ...vault }) => vault)
+      await indexedDBManager.saveExplorerVaults(chainId, basicVaults)
       console.log('✅ Vaults saved to cache successfully for chain:', chainId)
     } catch (error) {
       console.error('💥 Error saving vaults to cache for chain', chainId, ':', error)
@@ -129,7 +203,7 @@ export default function ExplorerVaults() {
         setLoading(true)
       }
       
-      let allVaults: vaultsProps[] = []
+      let allVaults: ExtendedVaultProps[] = []
       let usedCache = false
 
       console.log('🚀 Starting explorer vault fetch process...', { forceRefresh, selectedChain })
@@ -150,7 +224,7 @@ export default function ExplorerVaults() {
           
           if (validCachedResults.length > 0) {
             console.log('🎯 Using cached vaults from', validCachedResults.length, 'chains')
-            allVaults = validCachedResults.flat() as vaultsProps[]
+            allVaults = validCachedResults.flat() as ExtendedVaultProps[]
             usedCache = true
             
             // If we have partial cache, still fetch missing chains
@@ -223,7 +297,8 @@ export default function ExplorerVaults() {
         // If no cache or force refresh, fetch from blockchain
         if (allVaults.length === 0 || forceRefresh) {
           console.log('⛓️ Fetching selected chain from blockchain:', selectedChain)
-          allVaults = await fetchVaultsForChain(selectedChain as number)
+          const basicVaults = await fetchVaultsForChain(selectedChain as number)
+          allVaults = basicVaults
           usedCache = false
           
           // Save to cache
@@ -233,8 +308,18 @@ export default function ExplorerVaults() {
         }
       }
 
-      console.log('📊 Final vault count:', allVaults.length)
-      setVaults(allVaults)
+      console.log('📊 Basic vault count:', allVaults.length)
+      
+      // Now fetch price and TVL data for all vaults
+      if (allVaults.length > 0) {
+        // Convert to basic vaults for price/TVL fetching if needed
+        const basicVaults = allVaults.map(({ priceHodl, totalValueLocked, dataLoaded, ...vault }) => vault)
+        const extendedVaults = await fetchAllVaultData(basicVaults)
+        setVaults(extendedVaults)
+      } else {
+        setVaults([])
+      }
+      
       setDataSource(usedCache ? 'cache' : 'blockchain')
       setLastUpdated(new Date())
       setInitialLoadComplete(true)
