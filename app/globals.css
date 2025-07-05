@@ -432,6 +432,48 @@
   @apply bg-gradient-to-r from-primary to-purple-500 text-white hover:opacity-90 transition-opacity dark:from-purple-400 dark:to-fuchsia-500;
 }
 
+/* RainbowKit styling - Light mode defaults */
+:root {
+  /* Light mode RainbowKit colors */
+  --rk-colors-connectButtonBackground: rgba(255, 255, 255, 0.9);
+  --rk-colors-connectButtonBackgroundError: rgba(255, 255, 255, 0.9);
+  --rk-colors-connectButtonInnerBackground: rgba(255, 255, 255, 0.95);
+  --rk-colors-connectButtonText: rgb(30, 30, 30);
+  --rk-colors-connectButtonTextError: rgb(30, 30, 30);
+}
+
+/* Light mode button styling - using :not(.dark) to target light mode */
+:root:not(.dark) [data-rk] button[data-testid="rk-connect-button"] {
+  @apply bg-white/90 border-gray-200/80 hover:bg-white/95 backdrop-blur-sm;
+  color: rgb(30, 30, 30) !important;
+}
+
+:root:not(.dark) [data-rk] button[data-testid="rk-account-button"] {
+  @apply bg-white/90 border-gray-200/80 hover:bg-white/95 backdrop-blur-sm;
+}
+
+:root:not(.dark) [data-rk] button[data-testid="rk-account-button"] > div {
+  color: rgb(30, 30, 30) !important;
+}
+
+/* Dark mode RainbowKit overrides */
+.dark {
+  --rk-colors-connectButtonBackground: rgba(30, 30, 30, 0.9);
+  --rk-colors-connectButtonBackgroundError: rgba(30, 30, 30, 0.9);
+  --rk-colors-connectButtonInnerBackground: rgba(40, 40, 40, 0.95);
+  --rk-colors-connectButtonText: rgb(255, 255, 255);
+  --rk-colors-connectButtonTextError: rgb(255, 255, 255);
+}
+
+.dark [data-rk] button[data-testid="rk-connect-button"] {
+  @apply bg-gray-800/90 border-gray-700/80 hover:bg-gray-800/95 backdrop-blur-sm;
+  color: rgb(255, 255, 255) !important;
+}
+
+.dark [data-rk] button[data-testid="rk-account-button"] {
+  @apply bg-gray-800/90 border-gray-700/80 hover:bg-gray-800/95 backdrop-blur-sm;
+}
+
 /* Light mode specific styles */
 .light {
   .glass {
@@ -452,23 +494,5 @@
   
   .btn-gradient {
     @apply bg-gradient-to-r from-primary to-purple-500;
-  }
-  
-  /* RainbowKit ConnectButton light mode styling */
-  [data-rk] button[data-testid="rk-connect-button"] {
-    @apply bg-white/90 border-gray-200/80 hover:bg-white/95 backdrop-blur-sm;
-  }
-  
-  [data-rk] button[data-testid="rk-account-button"] {
-    @apply bg-white/90 border-gray-200/80 hover:bg-white/95 backdrop-blur-sm;
-  }
-  
-  /* Additional RainbowKit styling for light mode */
-  [data-rk] {
-    --rk-colors-connectButtonBackground: rgba(255, 255, 255, 0.9);
-    --rk-colors-connectButtonBackgroundError: rgba(255, 255, 255, 0.9);
-    --rk-colors-connectButtonInnerBackground: rgba(255, 255, 255, 0.95);
-    --rk-colors-connectButtonText: rgb(30, 30, 30);
-    --rk-colors-connectButtonTextError: rgb(30, 30, 30);
   }
 }

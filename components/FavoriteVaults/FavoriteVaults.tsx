@@ -15,16 +15,26 @@ import CardExplorer from '@/components/Explorer/CardExplorer'
 import { useFavorites } from '@/utils/favorites'
 import { vaultsProps } from '@/utils/props'
 import { indexedDBManager } from '@/utils/indexedDB'
+import { getPublicClient } from '@wagmi/core'
+import { config } from '@/utils/config'
+import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
 
 const ITEMS_PER_PAGE = 6
 
 // Define supported chain IDs to match ChainDropdown
 type SupportedChainId = 1 | 137 | 534351 | 5115 | 61 | 2001 | 8453;
 
+// Extended vault props with price and TVL data
+interface ExtendedVaultProps extends vaultsProps {
+  priceHodl?: number | null;
+  totalValueLocked?: number | null;
+  dataLoaded?: boolean;
+}
+
 const FavoriteVaults = () => {
-  const [vaults, setVaults] = useState<vaultsProps[]>([])
-  const [filteredVaults, setFilteredVaults] = useState<vaultsProps[]>([])
-  const [paginatedVaults, setPaginatedVaults] = useState<vaultsProps[]>([])
+  const [vaults, setVaults] = useState<ExtendedVaultProps[]>([])
+  const [filteredVaults, setFilteredVaults] = useState<ExtendedVaultProps[]>([])
+  const [paginatedVaults, setPaginatedVaults] = useState<ExtendedVaultProps[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
@@ -41,6 +51,61 @@ const FavoriteVaults = () => {
   const router = useRouter()
   const connectedChainId = useChainId()
   const { getFavorites } = useFavorites()
+
+  const fetchVaultPriceAndTVL = async (vault: vaultsProps): Promise<{ priceHodl: number | null; totalValueLocked: number | null }> => {
+    try {
+      const publicClient = getPublicClient(config as any, { chainId: vault.chainId })
+      
+      // Get price
+      const price = await publicClient?.readContract({
+        address: vault.vaultAddress as `0x${string}`,
+        abi: HodlCoinAbi,
+        functionName: 'priceHodl',
+      })
+
+      // Get total supply for TVL calculation
+      const totalSupply = await publicClient?.readContract({
+        address: vault.vaultAddress as `0x${string}`,
+        abi: HodlCoinAbi,
+        functionName: 'totalSupply',
+      })
+      
+      // Calculate TVL: totalSupply * priceHodl
+      let tvl = null
+      if (totalSupply && price) {
+        tvl = (Number(totalSupply) / Math.pow(10, vault.decimals)) * (Number(price) / 100000)
+      }
+
+      return {
+        priceHodl: price ? Number(price) : null,
+        totalValueLocked: tvl
+      }
+    } catch (error) {
+      console.error(`Error getting price/TVL for vault ${vault.vaultAddress}:`, error)
+      return { priceHodl: null, totalValueLocked: null }
+    }
+  }
+
+  const fetchAllVaultData = async (basicVaults: vaultsProps[]): Promise<ExtendedVaultProps[]> => {
+    console.log('📊 Fetching price and TVL data for', basicVaults.length, 'favorite vaults...')
+    
+    // Create promises for all vault price/TVL fetches
+    const dataPromises = basicVaults.map(async (vault) => {
+      const { priceHodl, totalValueLocked } = await fetchVaultPriceAndTVL(vault)
+      return {
+        ...vault,
+        priceHodl,
+        totalValueLocked,
+        dataLoaded: true
+      }
+    })
+
+    // Wait for all data to be fetched
+    const extendedVaults = await Promise.all(dataPromises)
+    console.log('✅ All favorite vault data loaded successfully')
+    
+    return extendedVaults
+  }
 
   const fetchFavoriteVaultsFromBlockchain = async (forceRefresh = false) => {
     if (!account.address) {
@@ -61,7 +126,7 @@ const FavoriteVaults = () => {
         setIsLoading(true)
       }
       setError(null)
-      let favoriteVaults: vaultsProps[] = []
+      let favoriteVaults: ExtendedVaultProps[] = []
       let usedCache = false
 
       console.log('🚀 Loading favorite vaults...', { forceRefresh, userAddress: account.address })
@@ -72,53 +137,72 @@ const FavoriteVaults = () => {
         const cached = await indexedDBManager.getFavoriteVaults(account.address)
         if (cached && cached.length > 0) {
           console.log('✅ Using cached favorite vaults:', cached.length)
-          favoriteVaults = cached
+          // Convert to ExtendedVaultProps format
+          const basicVaults = cached.map(vault => ({
+            ...vault,
+            priceHodl: null,
+            totalValueLocked: null,
+            dataLoaded: false
+          }))
+          favoriteVaults = basicVaults
           usedCache = true
-          setVaults(favoriteVaults)
-          setDataSource('cache')
-          setLastUpdated(new Date())
-          setInitialLoadComplete(true)
-          applyFilters(favoriteVaults, searchQuery, selectedChain)
-          if (!paginationStateLoaded) {
-            setCurrentPage(1) // Reset to first page when data changes only if no saved state
-          }
-          setIsLoading(false)
-          setIsSyncing(false)
-          return // Exit early if we have cached data
+        } else {
+          console.log('❌ No cached favorite vaults found')
         }
-        console.log('❌ No cached favorite vaults found')
       }
 
-      console.log('⛓️ Loading favorite vaults from blockchain...')
+      // If no cache or force refresh, fetch from blockchain
+      if (favoriteVaults.length === 0 || forceRefresh) {
+        console.log('⛓️ Loading favorite vaults from blockchain...')
 
-      // Get favorites from blockchain
-      const favorites = await getFavorites(account.address)
-      favoriteVaults = favorites.map(fav => ({
-        vaultAddress: fav.vaultAddress as `0x${string}`,
-        chainId: fav.chainId,
-        coinName: fav.coinName,
-        coinSymbol: fav.coinSymbol,
-        coinAddress: fav.coinAddress as `0x${string}`,
-        decimals: fav.decimals || 18
-      }))
+        // Get favorites from blockchain
+        const favorites = await getFavorites(account.address)
+        const basicVaults = favorites.map(fav => ({
+          vaultAddress: fav.vaultAddress as `0x${string}`,
+          chainId: fav.chainId,
+          coinName: fav.coinName,
+          coinSymbol: fav.coinSymbol,
+          coinAddress: fav.coinAddress as `0x${string}`,
+          decimals: fav.decimals || 18
+        }))
 
-      console.log('📊 Total favorite vaults loaded:', favoriteVaults.length)
+        favoriteVaults = basicVaults.map(vault => ({
+          ...vault,
+          priceHodl: null,
+          totalValueLocked: null,
+          dataLoaded: false
+        }))
 
-      // Save to cache after successful blockchain fetch
-      try {
-        console.log('💾 Saving favorite vaults to cache:', favoriteVaults.length)
-        await indexedDBManager.saveFavoriteVaults(account.address, favoriteVaults)
-        console.log('✅ Favorite vaults saved to cache successfully')
-      } catch (cacheError) {
-        console.error('💥 Error saving to cache:', cacheError)
-        // Don't throw error, just log it - caching failure shouldn't break the app
+        console.log('📊 Total favorite vaults loaded:', favoriteVaults.length)
+        usedCache = false
+
+        // Save to cache after successful blockchain fetch
+        try {
+          console.log('💾 Saving favorite vaults to cache:', favoriteVaults.length)
+          await indexedDBManager.saveFavoriteVaults(account.address, basicVaults)
+          console.log('✅ Favorite vaults saved to cache successfully')
+        } catch (cacheError) {
+          console.error('💥 Error saving to cache:', cacheError)
+          // Don't throw error, just log it - caching failure shouldn't break the app
+        }
       }
 
-      setVaults(favoriteVaults)
-      setDataSource('blockchain')
+      // Now fetch price and TVL data for all vaults
+      let finalVaults: ExtendedVaultProps[] = []
+      if (favoriteVaults.length > 0) {
+        // Convert to basic vaults for price/TVL fetching
+        const basicVaults = favoriteVaults.map(({ priceHodl, totalValueLocked, dataLoaded, ...vault }) => vault)
+        const extendedVaults = await fetchAllVaultData(basicVaults)
+        finalVaults = extendedVaults
+        setVaults(extendedVaults)
+      } else {
+        setVaults([])
+      }
+
+      setDataSource(usedCache ? 'cache' : 'blockchain')
       setLastUpdated(new Date())
       setInitialLoadComplete(true)
-      applyFilters(favoriteVaults, searchQuery, selectedChain)
+      applyFilters(finalVaults, searchQuery, selectedChain)
       if (!paginationStateLoaded) {
         setCurrentPage(1) // Reset to first page when data changes only if no saved state
       }
@@ -161,9 +245,16 @@ const FavoriteVaults = () => {
       const savedState = await indexedDBManager.getPaginationState('favorites')
       if (savedState) {
         console.log('🔄 Loading saved pagination state for favorites:', savedState)
-        setCurrentPage(savedState.page)
-        setSearchQuery(savedState.searchQuery)
-        setSelectedChain(savedState.selectedChain as SupportedChainId | 'all')
+        setCurrentPage(savedState.page || 1)
+        setSearchQuery(savedState.searchQuery || '')
+        
+        // Parse selectedChain safely
+        const chainValue = savedState.selectedChain
+        if (chainValue === 'all' || getAvailableChains().includes(Number(chainValue) as SupportedChainId)) {
+          setSelectedChain(chainValue === 'all' ? 'all' : Number(chainValue) as SupportedChainId)
+        } else {
+          setSelectedChain('all')
+        }
       }
       setPaginationStateLoaded(true)
     } catch (error) {
@@ -186,7 +277,7 @@ const FavoriteVaults = () => {
     }
   }
 
-  const applyFilters = (vaultList: any[], search: string, chain: SupportedChainId | 'all') => {
+  const applyFilters = (vaultList: ExtendedVaultProps[], search: string, chain: SupportedChainId | 'all') => {
     let filtered = vaultList
 
     // Apply search filter

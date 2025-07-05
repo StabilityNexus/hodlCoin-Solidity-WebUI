@@ -2,10 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader } from '../ui/card'
-import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
 import { vaultsProps } from '@/utils/props'
-import { config } from '@/utils/config'
-import {  getPublicClient } from '@wagmi/core'
 import { useRouter } from 'next/navigation'
 import { ArrowRight, TrendingUp, Star, StarOff} from 'lucide-react'
 import { Button } from '../ui/button'
@@ -13,52 +10,20 @@ import { useFavorites } from '@/utils/favorites'
 import { useAccount } from 'wagmi'
 import { toast } from '../ui/use-toast'
 
-export default function CardExplorer({ vault }: { vault: vaultsProps }) {
-  const [priceHodl, setPriceHodl] = useState<number | null>(null)
-  const [totalValueLocked, setTotalValueLocked] = useState<number | null>(null)
-  const [loading, setLoading] = useState(true)
+// Extended vault props with price and TVL data
+interface ExtendedVaultProps extends vaultsProps {
+  priceHodl?: number | null;
+  totalValueLocked?: number | null;
+  dataLoaded?: boolean;
+}
+
+export default function CardExplorer({ vault }: { vault: ExtendedVaultProps }) {
   const [isFavorited, setIsFavorited] = useState(false)
   const [favoriteLoading, setFavoriteLoading] = useState(false)
   const chainId = vault.chainId
   const router = useRouter()
   const { isFavorite, toggleFavorite } = useFavorites()
   const { address: userAddress } = useAccount()
-
-  const getReservesPrices = useCallback(async () => {
-    if (!vault.vaultAddress) return
-
-    try {
-      setLoading(true)
-      const publicClient = getPublicClient(config as any, { chainId })
-      
-      // Get price
-      const price = await publicClient?.readContract({
-        address: vault.vaultAddress as `0x${string}`,
-        abi: HodlCoinAbi,
-        functionName: 'priceHodl',
-      })
-      setPriceHodl(Number(price))
-
-      // Get total supply for TVL calculation
-      const totalSupply = await publicClient?.readContract({
-        address: vault.vaultAddress as `0x${string}`,
-        abi: HodlCoinAbi,
-        functionName: 'totalSupply',
-      })
-      
-      // Calculate TVL: totalSupply * priceHodl
-      if (totalSupply && price) {
-        const tvl = (Number(totalSupply) / Math.pow(10, vault.decimals)) * (Number(price) / 100000)
-        setTotalValueLocked(tvl)
-      }
-    } catch (err) {
-      console.error(`Error getting price for vault ${vault.vaultAddress}:`, err)
-      setPriceHodl(null)
-      setTotalValueLocked(null)
-    } finally {
-      setLoading(false)
-    }
-  }, [vault.vaultAddress, chainId, vault.decimals])
 
   const checkFavoriteStatus = useCallback(async () => {
     if (!userAddress) {
@@ -76,9 +41,8 @@ export default function CardExplorer({ vault }: { vault: vaultsProps }) {
   }, [vault.vaultAddress, vault.chainId, userAddress, isFavorite])
 
   useEffect(() => {
-    getReservesPrices()
     checkFavoriteStatus()
-  }, [getReservesPrices, checkFavoriteStatus])
+  }, [checkFavoriteStatus])
 
   const handleContinue = () => {
     if (vault.vaultAddress) {
@@ -204,13 +168,12 @@ export default function CardExplorer({ vault }: { vault: vaultsProps }) {
               </span>
             </div>
             <div className='text-right'>
-              {loading ? (
-                <div className='h-5 w-20 bg-muted animate-pulse rounded' />
-              ) : (
-                <span className='font-mono font-bold text-lg text-foreground/90 dark:text-foreground/80 transition-colors duration-300 group-hover:text-yellow-600 dark:group-hover:text-yellow-400'>
-                  {priceHodl !== null ? `${(Number(priceHodl) / 100000).toFixed(5)}` : 'N/A'} {vault.coinSymbol}
-                </span>
-              )}
+              <span className='font-mono font-bold text-lg text-foreground/90 dark:text-foreground/80 transition-colors duration-300 group-hover:text-yellow-600 dark:group-hover:text-yellow-400'>
+                {vault.priceHodl !== null && vault.priceHodl !== undefined 
+                  ? `${(Number(vault.priceHodl) / 100000).toFixed(5)}`
+                  : 'N/A'
+                } {vault.coinSymbol}
+              </span>
             </div>
           </div>
         </div>
@@ -226,13 +189,12 @@ export default function CardExplorer({ vault }: { vault: vaultsProps }) {
               </span>
             </div>
             <div className='text-right'>
-              {loading ? (
-                <div className='h-5 w-20 bg-muted animate-pulse rounded' />
-              ) : (
-                <span className='font-mono font-bold text-lg text-foreground/90 dark:text-foreground/80 transition-colors duration-300 group-hover:text-purple-600 dark:group-hover:text-purple-400'>
-                  {totalValueLocked !== null ? `${totalValueLocked.toFixed(2)}` : '0.00'} {vault.coinSymbol}
-                </span>
-              )}
+              <span className='font-mono font-bold text-lg text-foreground/90 dark:text-foreground/80 transition-colors duration-300 group-hover:text-purple-600 dark:group-hover:text-purple-400'>
+                {vault.totalValueLocked !== null && vault.totalValueLocked !== undefined 
+                  ? `${vault.totalValueLocked.toFixed(2)}`
+                  : '0.00'
+                } {vault.coinSymbol}
+              </span>
             </div>
           </div>
         </div>
