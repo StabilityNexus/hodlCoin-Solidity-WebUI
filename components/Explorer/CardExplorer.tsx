@@ -101,8 +101,8 @@ export default function CardExplorer({ vault }: { vault: ExtendedVaultProps }) {
   const getChainColor = (chainId: number) => {
     const chainColors: { [key: number]: string } = {
       1: 'bg-purple-400/10 text-purple-500 border-purple-400/20 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20',
-      534351: 'bg-yellow-400/10 text-yellow-500 border-yellow-400/20 dark:bg-yellow-500/10 dark:text-yellow-400 dark:border-yellow-500/20',
-      5115: 'bg-yellow-400/10 text-yellow-500 border-yellow-400/20 dark:bg-yellow-500/10 dark:text-yellow-400 dark:border-yellow-500/20',
+      534351: 'bg-amber-400/10 text-amber-500 border-amber-400/20 dark:bg-yellow-300/10 dark:text-yellow-300 dark:border-yellow-300/20',
+      5115: 'bg-amber-400/10 text-amber-500 border-amber-400/20 dark:bg-yellow-300/10 dark:text-yellow-300 dark:border-yellow-300/20',
       61: 'bg-purple-400/10 text-purple-500 border-purple-400/20 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20',
       2001: 'bg-purple-400/10 text-purple-500 border-purple-400/20 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20',
       137: 'bg-violet-400/10 text-violet-500 border-violet-400/20 dark:bg-violet-500/10 dark:text-violet-400 dark:border-violet-500/20',
@@ -142,9 +142,11 @@ export default function CardExplorer({ vault }: { vault: ExtendedVaultProps }) {
               {favoriteLoading ? (
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
               ) : isFavorited ? (
-                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                <Star className="h-4 w-4" style={{ color: 'hsl(50 100% 45%)', fill: 'hsl(50 100% 45%)' }} />
               ) : (
-                <StarOff className="h-4 w-4 text-muted-foreground hover:text-yellow-500" />
+                <StarOff className="h-4 w-4 text-muted-foreground" 
+                         onMouseEnter={(e) => e.currentTarget.style.color = 'hsl(50 100% 45%)'}
+                         onMouseLeave={(e) => e.currentTarget.style.color = ''} />
               )}
             </Button>
             
@@ -159,16 +161,22 @@ export default function CardExplorer({ vault }: { vault: ExtendedVaultProps }) {
       <CardContent className='space-y-5 pt-0 relative z-10'>
         {/* Enhanced Price Display with 3D effect */}
         <div className='p-4 rounded-xl bg-muted/30 border border-border/40 relative overflow-hidden group-hover:bg-muted/50 group-hover:border-border/60 transition-all duration-300 group-hover:shadow-md'>
-          <div className='absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl' />
+          <div className='absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl' 
+               style={{ background: 'linear-gradient(to right, hsl(50 100% 50% / 0.1), transparent)' }} />
           <div className='flex items-center justify-between relative z-10'>
             <div className='flex items-center gap-2'>
-              <TrendingUp className='h-4 w-4 text-yellow-400 dark:text-yellow-400 transition-transform duration-300 group-hover:scale-110' />
-              <span className='text-sm font-medium text-muted-foreground transition-colors duration-300 group-hover:text-yellow-600 dark:group-hover:text-yellow-400'>
+              <TrendingUp className='h-4 w-4 transition-transform duration-300 group-hover:scale-110' 
+                         style={{ color: 'hsl(50 100% 45%)' }} />
+              <span className='text-sm font-medium text-muted-foreground transition-colors duration-300'
+                    onMouseEnter={(e) => e.currentTarget.style.color = 'hsl(50 100% 45%)'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = ''}>
                 Hodl Price
               </span>
             </div>
             <div className='text-right'>
-              <span className='font-mono font-bold text-lg text-foreground/90 dark:text-foreground/80 transition-colors duration-300 group-hover:text-yellow-600 dark:group-hover:text-yellow-400'>
+              <span className='font-mono font-bold text-lg text-foreground/90 dark:text-foreground/80 transition-colors duration-300'
+                    onMouseEnter={(e) => e.currentTarget.style.color = 'hsl(50 100% 45%)'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = ''}>
                 {vault.priceHodl !== null && vault.priceHodl !== undefined 
                   ? `${(Number(vault.priceHodl) / 100000).toFixed(5)}`
                   : 'N/A'
