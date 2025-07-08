@@ -189,8 +189,11 @@ export default function HodlBox({
     <Card className='bg-background/50 backdrop-blur-xl border-primary/20 shadow-2xl shadow-primary/5 hover:border-primary/30 transition-all duration-300'>
       <CardHeader>
         <CardTitle className='font-extrabold tracking-tight text-gradient text-xl flex items-center gap-3'>
-          <div className="p-2 rounded-lg bg-gradient-to-r from-purple-500/20 to-violet-500/20 border border-purple-500/30">
-            <TrendingUp className="h-5 w-5 text-purple-500" />
+          <div className="p-2 rounded-lg border" style={{ 
+            background: 'linear-gradient(to right, hsl(50 100% 50% / 0.2), hsl(50 100% 55% / 0.2))',
+            borderColor: 'hsl(50 100% 50% / 0.3)'
+          }}>
+            <TrendingUp className="h-5 w-5" style={{ color: 'hsl(50 100% 45%)' }} />
           </div>
           Stake Tokens
         </CardTitle>
@@ -235,14 +238,17 @@ export default function HodlBox({
 
         {/* Expected Output */}
         {hodlAmount && parseFloat(hodlAmount) > 0 && (
-          <div className="p-4 bg-gradient-to-r from-purple-500/10 to-violet-500/10 border border-purple-500/20 rounded-xl">
+          <div className="p-4 border rounded-xl" style={{ 
+            background: 'linear-gradient(to right, hsl(50 100% 50% / 0.1), hsl(50 100% 55% / 0.15))',
+            borderColor: 'hsl(50 100% 50% / 0.2)'
+          }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Coins className="h-4 w-4 text-purple-500" />
+                <Coins className="h-4 w-4" style={{ color: 'hsl(50 100% 45%)' }} />
                 <span className="text-sm text-foreground">You will receive</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-mono text-lg font-bold text-purple-500">
+                <span className="font-mono text-lg font-bold" style={{ color: 'hsl(50 100% 45%)' }}>
                   {expectedHodlCoins.toFixed(6)}
                 </span>
                 <span className="text-sm text-muted-foreground">{vault?.hodlCoinSymbol}</span>
@@ -264,9 +270,17 @@ export default function HodlBox({
           <Button
             onClick={hodlAction}
             disabled={!hodlAmount || parseFloat(hodlAmount) <= 0}
-            className='w-full bg-gradient-to-r from-purple-500 to-violet-600 hover:from-violet-600 hover:to-purple-500 
-              transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25 
-              text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none'
+            className='w-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none'
+            style={{ 
+              background: 'linear-gradient(to right, hsl(50 100% 50%), hsl(50 100% 55%))',
+              color: 'hsl(240 10% 3.9%)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'linear-gradient(to right, hsl(50 100% 55%), hsl(50 100% 50%))'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'linear-gradient(to right, hsl(50 100% 50%), hsl(50 100% 55%))'
+            }}
           >
             <div className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />

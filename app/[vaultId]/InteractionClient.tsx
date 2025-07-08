@@ -484,8 +484,8 @@ export default function InteractionClient() {
             <div className="backdrop-blur-xl rounded-xl p-3 shadow-lg 
                           hover:border-purple-400/90 dark:hover:border-purple-500/90 transition-all duration-300 flex-1">
               <div className="flex flex-col items-center gap-1">
-                <span className="text-xs text-green-600 dark:text-green-400 font-bold">{coinSymbol} balance</span>
-                <span className="font-mono text-sm font-bold text-green-700 dark:text-green-300">
+                <span className="text-xs text-purple-600 dark:text-purple-400 font-bold">{coinSymbol} balance</span>
+                <span className="font-mono text-sm font-bold text-purple-700 dark:text-purple-300">
                   {parseFloat(balances.coinBalance.toFixed(4))}
                 </span>
               </div>
@@ -495,8 +495,8 @@ export default function InteractionClient() {
             <div className="backdrop-blur-xl rounded-xl p-3 shadow-lg 
                           hover:border-purple-400/90 dark:hover:border-purple-500/90 transition-all duration-300 flex-1">
               <div className="flex flex-col items-center gap-1">
-                <span className="text-xs text-blue-600 dark:text-blue-400 font-bold">{hodlCoinSymbol} balance</span>
-                <span className="font-mono text-sm font-bold text-blue-700 dark:text-blue-300">
+                <span className="text-xs text-amber-500 dark:text-amber-400 font-bold">{hodlCoinSymbol} balance</span>
+                <span className="font-mono text-sm font-bold text-amber-500 dark:text-amber-300">
                   {parseFloat(balances.hodlCoinBalance.toFixed(4))}
                 </span>
               </div>

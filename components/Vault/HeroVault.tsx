@@ -37,6 +37,14 @@ export default function HeroVault({
   const [copied, setCopied] = useState(false)
   const matrixRef = useMatrixEffect(0.15, 2)
 
+  // === Reward Projection Calculations ===
+  // Current price before reward distribution
+  const priceBeforeReward = typeof priceHodl === 'number' ? priceHodl : 0
+  // Reward distributed per hodlCoin (hUSDC) based on user input
+  const rewardPerToken = supply && supply > 0 ? rewardAmount / supply : 0
+  // Projected price after reward distribution
+  const priceAfterReward = priceBeforeReward + rewardPerToken
+
   const account = useAccount()
   const { isFavorite, toggleFavorite } = useFavorites()
 
@@ -227,8 +235,8 @@ export default function HeroVault({
   const getChainColor = (chainId: number) => {
     const chainColors: { [key: number]: string } = {
       1: 'bg-blue-400/10 text-blue-500 border-blue-400/20',
-      534351: 'bg-orange-400/10 text-orange-500 border-orange-400/20',
-      5115: 'bg-yellow-400/10 text-yellow-500 border-yellow-400/20',
+          534351: 'bg-orange-400/10 text-orange-500 border-orange-400/20',
+    5115: 'bg-yellow-300/10 text-yellow-300 border-yellow-300/20',
       61: 'bg-green-400/10 text-green-500 border-green-400/20',
       2001: 'bg-purple-400/10 text-purple-500 border-purple-400/20',
       137: 'bg-violet-400/10 text-violet-500 border-violet-400/20',
@@ -285,7 +293,7 @@ export default function HeroVault({
                       <div className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
                     ) : isFavorited ? (
                       <>
-                        <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                        <Star className="h-4 w-4" style={{ color: 'hsl(50 100% 45%)', fill: 'hsl(50 100% 45%)' }} />
                         <span className="text-sm">Favorited</span>
                       </>
                     ) : (
@@ -295,12 +303,22 @@ export default function HeroVault({
                       </>
                     )}
                   </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" 
+                     style={{ background: 'linear-gradient(to right, hsl(50 100% 50% / 0.2), transparent)' }} />
                 </Button>
                 
                 <Button
-                  className='relative overflow-hidden group bg-gradient-to-r from-primary to-purple-600 hover:from-purple-600 hover:to-primary 
-                    transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-primary/25 font-semibold text-sm px-4 py-2'
+                  className='relative overflow-hidden group transition-all duration-300 transform hover:scale-105 hover:shadow-lg font-semibold text-sm px-4 py-2'
+                  style={{ 
+                    background: 'linear-gradient(to right, hsl(50 100% 50%), hsl(50 100% 55%))',
+                    color: 'hsl(240 10% 3.9%)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'linear-gradient(to right, hsl(50 100% 55%), hsl(50 100% 50%))'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'linear-gradient(to right, hsl(50 100% 50%), hsl(50 100% 55%))'
+                  }}
                   onClick={() => setIsRewardPopupVisible(true)}
                 >
                   <span className="relative z-10 flex items-center gap-2">
@@ -361,8 +379,11 @@ export default function HeroVault({
             >
               <div className='flex justify-between items-center mb-6'>
                 <h3 className='text-2xl font-extrabold tracking-tight text-gradient flex items-center gap-3'>
-                  <div className="p-2 rounded-lg bg-gradient-to-r from-primary/20 to-purple-500/20 border border-primary/30">
-                    <Gift className="h-5 w-5 text-primary" />
+                  <div className="p-2 rounded-lg border" style={{ 
+                    background: 'linear-gradient(to right, hsl(50 100% 50% / 0.2), hsl(50 100% 55% / 0.2))',
+                    borderColor: 'hsl(50 100% 50% / 0.3)'
+                  }}>
+                    <Gift className="h-5 w-5" style={{ color: 'hsl(50 100% 45%)' }} />
                   </div>
                   Reward Stakers
                 </h3>
@@ -382,7 +403,7 @@ export default function HeroVault({
                 <div className='space-y-3'>
                   <div className='text-sm font-semibold text-foreground flex items-center gap-2'>
                     <div className="w-2 h-2 bg-primary rounded-full" />
-                    Reward Amount
+                    Total Reward Amount
                   </div>
                   <div className='relative'>
                     <Input
@@ -406,6 +427,33 @@ export default function HeroVault({
                   </div>
                 </div>
 
+                {/* Informational Projection Section */}
+                <div className='space-y-4 text-sm'>
+                  <p className='text-muted-foreground'>
+                    The amount input above will be deposited in the vault and will instantaneously increase the {vault?.hodlCoinSymbol} price, benefitting all {vault?.hodlCoinSymbol} holders fairly in proportion to their balances.
+                  </p>
+                  <div className='grid grid-cols-1 gap-2'>
+                    <div className='flex items-center justify-between'>
+                      <span className='text-foreground'>Reward per {vault?.hodlCoinSymbol}:</span>
+                      <span className='font-mono font-semibold'>
+                        {rewardPerToken.toFixed(6)} {vault?.coinSymbol}
+                      </span>
+                    </div>
+                    <div className='flex items-center justify-between'>
+                      <span className='text-foreground'>{vault?.hodlCoinSymbol} price before reward distribution:</span>
+                      <span className='font-mono font-semibold'>
+                        {priceBeforeReward.toFixed(6)} {vault?.coinSymbol}
+                      </span>
+                    </div>
+                    <div className='flex items-center justify-between'>
+                      <span className='text-foreground'>{vault?.hodlCoinSymbol} price after reward distribution:</span>
+                      <span className='font-mono font-semibold'>
+                        {priceAfterReward.toFixed(6)} {vault?.coinSymbol}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
                 {isLoading ? (
                   <Button
                     className='w-full bg-muted hover:bg-muted text-muted-foreground cursor-not-allowed'
@@ -416,12 +464,20 @@ export default function HeroVault({
                   </Button>
                 ) : (
                   <Button
-                    className='w-full bg-gradient-to-r from-primary to-purple-600 hover:from-purple-600 hover:to-primary 
-                      transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-primary/25 
-                      text-primary-foreground font-semibold'
+                    className='w-full transition-all duration-300 transform hover:scale-105 hover:shadow-lg font-semibold'
+                    style={{ 
+                      background: 'linear-gradient(to right, hsl(50 100% 50%), hsl(50 100% 55%))',
+                      color: 'hsl(240 10% 3.9%)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'linear-gradient(to right, hsl(50 100% 55%), hsl(50 100% 50%))'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'linear-gradient(to right, hsl(50 100% 50%), hsl(50 100% 55%))'
+                    }}
                     onClick={handleRewardSubmit}
                   >
-                    Send Reward
+                    Deposit Reward
                   </Button>
                 )}
               </div>

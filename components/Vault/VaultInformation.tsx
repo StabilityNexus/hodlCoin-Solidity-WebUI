@@ -108,7 +108,7 @@ export default function VaultInformation({
                         <User className="h-4 w-4 text-primary" />
                       </div>
                       <code className='font-mono text-sm break-all text-foreground'>
-                        {formatAddress(vaultCreator)}
+                        {vaultCreator}
                       </code>
                     </div>
                     <Button
@@ -136,13 +136,13 @@ export default function VaultInformation({
               <div className='space-y-4'>
                 <div className="group">
                   <h4 className='text-sm font-semibold text-foreground mb-2 flex items-center gap-2'>
-                    <div className="w-2 h-2 bg-green-500 rounded-full" />
+                    <div className="w-2 h-2 bg-purple-500 rounded-full" />
                     Fee that stays in the Vault
                   </h4>
-                  <div className='bg-background/30 backdrop-blur-sm border border-green-500/20 rounded-xl p-4 transition-all duration-300 hover:border-green-500/40 hover:bg-background/40'>
+                  <div className='bg-background/30 backdrop-blur-sm border border-purple-500/20 rounded-xl p-4 transition-all duration-300 hover:border-purple-500/40 hover:bg-background/40'>
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20">
-                        <Percent className="h-4 w-4 text-green-500" />
+                      <div className="p-2 rounded-lg bg-gradient-to-r from-purple-500/10 to-fuchsia-500/10 border border-purple-500/20">
+                        <Percent className="h-4 w-4 text-purple-500" />
                       </div>
                       <span className='font-mono text-2xl font-bold text-gradient'>
                         {formatFee(vaultFee)}%
@@ -153,13 +153,13 @@ export default function VaultInformation({
                 
                 <div className="group">
                   <h4 className='text-sm font-semibold text-foreground mb-2 flex items-center gap-2'>
-                    <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                    <div className="w-2 h-2 bg-purple-500 rounded-full" />
                     Fee paid to the Vault Creator
                   </h4>
-                  <div className='bg-background/30 backdrop-blur-sm border border-blue-500/20 rounded-xl p-4 transition-all duration-300 hover:border-blue-500/40 hover:bg-background/40'>
+                  <div className='bg-background/30 backdrop-blur-sm border border-purple-500/20 rounded-xl p-4 transition-all duration-300 hover:border-purple-500/40 hover:bg-background/40'>
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20">
-                        <User className="h-4 w-4 text-blue-500" />
+                      <div className="p-2 rounded-lg bg-gradient-to-r from-purple-500/10 to-fuchsia-500/10 border border-purple-500/20">
+                        <User className="h-4 w-4 text-purple-500" />
                       </div>
                       <span className='font-mono text-2xl font-bold text-gradient'>
                         {formatFee(vaultCreatorFee)}%

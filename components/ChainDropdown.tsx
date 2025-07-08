@@ -23,7 +23,7 @@ const CHAIN_COLORS: Record<SupportedChainId, string> = {
   1: "bg-blue-500",
   137: "bg-violet-500",
   534351: "bg-orange-500",
-  5115: "bg-yellow-500", 
+  5115: "bg-yellow-300", 
   61: "bg-green-500",
   2001: "bg-purple-500",
   8453: "bg-blue-500",

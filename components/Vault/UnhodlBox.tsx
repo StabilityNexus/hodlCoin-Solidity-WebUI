@@ -173,8 +173,8 @@ export default function UnholdBox({
     <Card className='bg-background/50 backdrop-blur-xl border-primary/20 shadow-2xl shadow-primary/5 hover:border-primary/30 transition-all duration-300'>
       <CardHeader>
         <CardTitle className='font-extrabold tracking-tight text-gradient text-xl flex items-center gap-3'>
-          <div className="p-2 rounded-lg bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30">
-            <TrendingDown className="h-5 w-5 text-yellow-500" />
+          <div className="p-2 rounded-lg bg-gradient-to-r from-purple-500/20 to-violet-500/20 border border-purple-500/30">
+            <TrendingDown className="h-5 w-5 text-purple-500" />
           </div>
           Unstake Tokens
         </CardTitle>
@@ -185,7 +185,7 @@ export default function UnholdBox({
         {/* Input Section */}
         <div className="space-y-3">
           <div className='text-sm font-semibold text-foreground flex items-center gap-2'>
-            <div className="w-2 h-2 bg-yellow-500 rounded-full" />
+            <div className="w-2 h-2 bg-purple-500 rounded-full" />
             Amount to Unstake
           </div>
           <div className='relative'>
@@ -206,7 +206,7 @@ export default function UnholdBox({
               <Button
                 variant='ghost'
                 size="sm"
-                className='text-xs text-yellow-500 hover:text-yellow-600 hover:bg-yellow-500/10 px-2 py-1 h-auto'
+                className='text-xs text-purple-500 hover:text-purple-600 hover:bg-purple-500/10 px-2 py-1 h-auto'
                 onClick={handleMaxClick}
               >
                 MAX
@@ -221,15 +221,15 @@ export default function UnholdBox({
         {/* Fee Breakdown */}
         {unholdAmount && parseFloat(unholdAmount) > 0 && (
           <div className="space-y-3">
-            <div className="p-4 bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20 rounded-xl">
+            <div className="p-4 bg-gradient-to-r from-purple-500/10 to-violet-500/10 border border-purple-500/20 rounded-xl">
               <div className="flex items-center gap-2 mb-3">
-                <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                <AlertTriangle className="h-4 w-4 text-purple-500" />
                 <span className="text-sm font-semibold text-foreground">Unstaking Fees</span>
               </div>
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Vault Fee:</span>
-                  <span className="font-mono text-yellow-600">{feesAmount.vaultFeeAmount.toFixed(6)} {vault?.coinSymbol}</span>
+                  <span className="font-mono text-purple-600">{feesAmount.vaultFeeAmount.toFixed(6)} {vault?.coinSymbol}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Creator Fee:</span>
@@ -276,8 +276,8 @@ export default function UnholdBox({
           <Button
             onClick={unholdAction}
             disabled={!unholdAmount || parseFloat(unholdAmount) <= 0}
-            className='w-full bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-amber-600 hover:to-yellow-500 
-              transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-yellow-500/25 
+            className='w-full bg-gradient-to-r from-purple-500 to-violet-600 hover:from-violet-600 hover:to-purple-500 
+              transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25 
               text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none'
           >
             <div className="flex items-center gap-2">
@@ -288,9 +288,9 @@ export default function UnholdBox({
         )}
 
         {/* Warning Text */}
-        <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+        <div className="p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg">
           <div className="flex items-start gap-2">
-            <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5 flex-shrink-0" />
+            <AlertTriangle className="h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" />
             <p className="text-xs text-muted-foreground">
               Unstaking incurs fees that benefit remaining stakers and the vault creator. 
               Consider the timing of your unstaking to minimize fees.
