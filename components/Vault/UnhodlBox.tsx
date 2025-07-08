@@ -233,7 +233,7 @@ export default function UnholdBox({
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Creator Fee:</span>
-                  <span className="font-mono text-blue-600">{feesAmount.vaultCreatorFeeAmount.toFixed(6)} {vault?.coinSymbol}</span>
+                  <span className="font-mono text-purple-600">{feesAmount.vaultCreatorFeeAmount.toFixed(6)} {vault?.coinSymbol}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Protocol Fee:</span>
@@ -247,13 +247,16 @@ export default function UnholdBox({
             </div>
 
             {/* Expected Output */}
-            <div className="p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl">
+            <div className="p-4 border rounded-xl" style={{ 
+              background: 'linear-gradient(to right, hsl(50 100% 50% / 0.1), hsl(50 100% 55% / 0.15))',
+              borderColor: 'hsl(50 100% 50% / 0.2)'
+            }}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-foreground">You will receive</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-lg font-bold text-green-500">
+                  <span className="font-mono text-lg font-bold" style={{ color: 'hsl(50 100% 45%)' }}>
                     {expectedReceive.toFixed(6)}
                   </span>
                   <span className="text-sm text-muted-foreground">{vault?.coinSymbol}</span>
