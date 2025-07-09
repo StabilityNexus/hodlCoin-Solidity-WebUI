@@ -18,7 +18,7 @@ export function Header() {
   // ) as any
 
   return (
-    <div className='fixed w-full h-16 bottom-0 lg:top-0 z-20 flex flex-col shadow-xl border-b-[1px] border-secondary justify-center backdrop-blur-md bg-background/15'>
+    <div className='fixed w-full h-16 top-0 z-20 flex flex-col shadow-xl border-b-[1px] border-secondary justify-center backdrop-blur-md bg-background/15'>
       <div className='w-full bg-transparent flex flex-row justify-center items-center lg:px-24 h-14'>
         <Link href='/' className='h-16 flex items-center'>
           {/* {useTheme().theme === 'dark' ? (
