@@ -19,22 +19,22 @@ const components: { title: string; href: string; description: string }[] = [
   {
     title: 'Create Vault',
     href: '/createVault',
-    description: 'Fill in the form to create a vault',
+    description: 'Your own new vault',
   },
   {
     title: 'Explorer',
     href: '/explorer',
-    description: 'Search for a vault by address',
+    description: 'All vaults',
   },
   {
     title: 'My Vaults',
     href: '/myVaults',
-    description: 'View vaults you have created',
+    description: 'Vaults you have created',
   },
   {
     title: 'Favorite Vaults',
     href: '/favorites',
-    description: 'View vaults you have interacted with',
+    description: 'Vaults you have interacted with',
   },
 ]
 
@@ -44,7 +44,7 @@ export function NavBar() {
       <NavigationMenuList>
         <NavigationMenuItem>
           <NavigationMenuTrigger className='hover:text-foreground'>
-            Application
+            Staking Vaults
           </NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className='grid gap-2 p-3 md:w-[250px] lg:w-[300px]'>
