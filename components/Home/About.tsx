@@ -23,137 +23,11 @@ export function About() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-900/5 to-transparent" />
       </div>
 
+      
+
       <div className="relative container mx-auto px-4 space-y-24">
-        {/* How it Works Section */}
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center space-y-4 mb-16">
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-gradient">
-              How it Works
-            </h2>
-            <div className="h-1 w-20 bg-gradient-to-r from-primary to-purple-500 dark:from-purple-400 dark:to-fuchsia-500 rounded-full mx-auto" />
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              HodlCoin creates a win-win ecosystem for both vault creators and stakers through innovative incentive mechanisms.
-            </p>
-          </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* For Vault Creators */}
-            <Card className="p-8 bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-colors">
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <h3 className="text-2xl font-bold text-gradient">For Vault Creators</h3>
-                  <div className="h-0.5 w-12 bg-gradient-to-r from-primary to-purple-500 rounded-full" />
-                </div>
-                
-                <ul className="space-y-4">
-                  <li className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-semibold text-gradient">Efficient Distribution</h4>
-                      <p className="text-sm text-muted-foreground">Distribute rewards to thousands of holders with a single transaction</p>
-                    </div>
-                  </li>
-                  <li className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-semibold text-gradient">Build Community</h4>
-                      <p className="text-sm text-muted-foreground">Create dedicated vaults for specific tokens or communities</p>
-                    </div>
-                  </li>
-                  <li className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-semibold text-gradient">Earn Unstaking Fees</h4>
-                      <p className="text-sm text-muted-foreground">Receive a portion of fees when users unstake early, creating passive income</p>
-                    </div>
-                  </li>
-                  <li className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-semibold text-gradient">Universal Use Cases</h4>
-                      <p className="text-sm text-muted-foreground">Perfect for DAOs, projects, or any token-based reward system</p>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-            </Card>
-
-            {/* For Stakers */}
-            <Card className="p-8 bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-colors">
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <h3 className="text-2xl font-bold text-gradient">For Stakers</h3>
-                  <div className="h-0.5 w-12 bg-gradient-to-r from-primary to-purple-500 rounded-full" />
-                </div>
-                
-                <ul className="space-y-4">
-                  <li className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-semibold text-gradient">Earn from Others&apos; Impatience</h4>
-                      <p className="text-sm text-muted-foreground">Benefit from unstaking fees paid by users who exit early</p>
-                    </div>
-                  </li>
-                  <li className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-semibold text-gradient">Long-term Value Growth</h4>
-                      <p className="text-sm text-muted-foreground">Hodling encourages price stability and long-term asset appreciation</p>
-                    </div>
-                  </li>
-                  <li className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-semibold text-gradient">Receive Rewards</h4>
-                      <p className="text-sm text-muted-foreground">Get additional rewards distributed by vault creators and other participants</p>
-                    </div>
-                  </li>
-                  <li className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-semibold text-gradient">Flexible Participation</h4>
-                      <p className="text-sm text-muted-foreground">Choose from various vaults with different risk profiles and reward structures</p>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-            </Card>
-          </div>
-        </div>
-
-        {/* Use Cases Section */}
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center space-y-4 mb-16">
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-gradient">
-              Universal Use Cases
-            </h2>
-            <div className="h-1 w-20 bg-gradient-to-r from-primary to-purple-500 dark:from-purple-400 dark:to-fuchsia-500 rounded-full mx-auto" />
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              Every Web3 project and DAO needs efficient token distribution - just like companies distribute dividends to shareholders.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <Card className="p-6 bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-colors text-center">
-              <div className="text-3xl mb-4">🏢</div>
-              <h4 className="font-bold mb-2 text-gradient">Corporate Dividends</h4>
-              <p className="text-sm text-muted-foreground">Just like companies distribute dividends to shareholders, Web3 projects need to reward token holders</p>
-            </Card>
-            <Card className="p-6 bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-colors text-center">
-              <div className="text-3xl mb-4">🏛️</div>
-              <h4 className="font-bold mb-2 text-gradient">DAO Treasury</h4>
-              <p className="text-sm text-muted-foreground">DAOs can efficiently distribute treasury funds or governance rewards to their community members</p>
-            </Card>
-            <Card className="p-6 bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-colors text-center">
-              <div className="text-3xl mb-4">🎯</div>
-              <h4 className="font-bold mb-2 text-gradient">Project Rewards</h4>
-              <p className="text-sm text-muted-foreground">Any project with a token can reward loyal holders with additional tokens or other benefits</p>
-            </Card>
-          </div>
-        </div>
-
-
-        {/* About HodlCoin Section */}
+        {/* How HodlCoin Works Section */}
         <div className="flex flex-col lg:flex-row items-center gap-12 max-w-6xl mx-auto">
           {/* Paper Image */}
           <div className="w-full lg:w-1/2">
@@ -183,7 +57,7 @@ export function About() {
           <div className="w-full lg:w-1/2 space-y-6">
             <div className="space-y-4">
               <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-gradient">
-                About HodlCoin
+                How hodlCoin Works
               </h2>
               <div className="h-1 w-20 bg-gradient-to-r from-primary to-purple-500 dark:from-purple-400 dark:to-fuchsia-500 rounded-full" />
             </div>
@@ -225,6 +99,103 @@ export function About() {
             </div>
           </div>
         </div>
+
+        
+        {/* Why HodlCoin Section */}
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center space-y-4 mb-16">
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-gradient">
+              Why hodlCoin
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* For Vault Creators */}
+            <Card className="p-8 bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-colors">
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-bold text-gradient">For Vault Creators</h3>
+                  <div className="h-0.5 w-12 bg-gradient-to-r from-primary to-purple-500 rounded-full" />
+                </div>
+                
+                <ul className="space-y-4">
+                  <li className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-semibold text-gradient">Reward your Loyal Tokenholders</h4>
+                      <p className="text-sm text-muted-foreground">Efficiently distribute rewards to all your tokenholders with a single transaction.</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-semibold text-gradient">Signal your Long-Term Commitment</h4>
+                      <p className="text-sm text-muted-foreground">Stake your own tokens in a vault with a high unstaking fee, to show your community that you are holding for the long run.</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-semibold text-gradient">Earn Unstaking Fees</h4>
+                      <p className="text-sm text-muted-foreground">Receive a portion of fees when users unstake early.</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-semibold text-gradient">Protect your Token from Sell Pressure</h4>
+                      <p className="text-sm text-muted-foreground">The unstaking fee disincentivizes sellers and incentivizes holders without inflation.</p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </Card>
+
+            {/* For Stakers */}
+            <Card className="p-8 bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-colors">
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-bold text-gradient">For Stakers</h3>
+                  <div className="h-0.5 w-12 bg-gradient-to-r from-primary to-purple-500 rounded-full" />
+                </div>
+                
+                <ul className="space-y-4">
+                  <li className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-semibold text-gradient">Earn from Others&apos; Impatience</h4>
+                      <p className="text-sm text-muted-foreground">Benefit from unstaking fees paid by users who exit early.</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-semibold text-gradient">Long-Term Value Growth</h4>
+                      <p className="text-sm text-muted-foreground">The price of the hodlCoin is mathematically guaranteed to grow w.r.t. the price of the underlying coin, if you hodl longer than others.</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-semibold text-gradient">Receive Rewards</h4>
+                      <p className="text-sm text-muted-foreground">Get additional rewards distributed by vault creators who want to incentivize staking.</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-semibold text-gradient">Flexible Participation</h4>
+                      <p className="text-sm text-muted-foreground">Stake and unstake at any time, choosing from a wide variety of vaults for various tokens.</p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </Card>
+          </div>
+        </div>
+
+
+        
       </div>
     </section>
   )
