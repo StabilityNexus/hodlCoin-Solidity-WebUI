@@ -126,35 +126,8 @@ export default function Footer() {
           />
         </Link>
       </div>
-          <div className='flex flex-wrap items-center gap-6 text-sm'>
-            <Link
-              href='https://stability.nexus/protocols'
-              target='_blank'
-              className='font-medium hover:text-primary transition-colors'
-            >
-              Other Protocols
-            </Link>
-            <Link
-              href='https://stability.nexus/research'
-              target='_blank'
-              className='font-medium hover:text-primary transition-colors'
-            >
-              Research
-            </Link>
-            <Link
-              href='https://news.stability.nexus/'
-              target='_blank'
-              className='font-medium hover:text-primary transition-colors'
-            >
-              News
-            </Link>
-            <Link
-              href='https://docs.stability.nexus/'
-              target='_blank'
-              className='font-medium hover:text-primary transition-colors'
-            >
-              Docs
-            </Link>
+          <div className='flex flex-wrap items-center gap-6 text-sm text-muted-foreground text-center'>
+             © 2023-2025 The Stable Order. All rights reserved.
           </div>
 
           {/* Social Media Links */}
@@ -171,11 +144,6 @@ export default function Footer() {
               </Link>
             ))}
           </div>
-        </div>
-
-        {/* Copyright */}
-        <div className='mt-6 pt-6 border-t border-border text-center text-sm text-muted-foreground'>
-          © 2024 Stability Nexus. All rights reserved.
         </div>
       </div>
     </footer>
