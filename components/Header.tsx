@@ -1,7 +1,6 @@
 'use client'
 
-// import Pic from '../assets/logo_black.png'
-// import Pic2 from '../assets/logo_white.png'
+import Pic from '/images/hodlcoin.svg'
 import Image from 'next/image'
 import React from 'react'
 import { useTheme } from 'next-themes'
@@ -21,10 +20,10 @@ export function Header() {
     <div className='fixed w-full h-16 top-0 z-20 flex flex-col shadow-xl border-b-[1px] border-secondary justify-center backdrop-blur-md bg-background/15'>
       <div className='w-full bg-transparent flex flex-row justify-center items-center lg:px-24 h-14'>
         <Link href='/' className='h-16 flex items-center'>
-          {/* {useTheme().theme === 'dark' ? (
+          {useTheme().theme === 'dark' ? (
             <Image
               className='cursor-pointer h-[100%] w-auto py-2 hidden lg:inline-block'
-              src={Pic2}
+              src={Pic}
               width={100}
               height={100}
               alt=''
@@ -37,7 +36,7 @@ export function Header() {
               height={100}
               alt=''
             />
-          )} */}
+          )}
           <p
             className="cursor-pointer font-extrabold text-2xl tracking-tight mx-1 hidden lg:inline-block 
               bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent
