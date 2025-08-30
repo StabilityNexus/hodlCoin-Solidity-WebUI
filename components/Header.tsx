@@ -1,6 +1,5 @@
 'use client'
 
-import Pic from '/hodlcoin.svg'
 import Image from 'next/image'
 import React from 'react'
 import { useTheme } from 'next-themes'
@@ -23,7 +22,7 @@ export function Header() {
           {useTheme().theme === 'dark' ? (
             <Image
               className='cursor-pointer h-[100%] w-auto py-2 hidden lg:inline-block'
-              src={Pic}
+              src="/hodlcoin.svg"
               width={100}
               height={100}
               alt=''
@@ -31,7 +30,7 @@ export function Header() {
           ) : (
             <Image
               className='cursor-pointer h-[100%] w-auto py-2 hidden lg:inline-block'
-              src={Pic}
+              src="/hodlcoin.svg"
               width={100}
               height={100}
               alt=''
