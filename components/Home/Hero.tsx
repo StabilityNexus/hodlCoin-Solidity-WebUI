@@ -41,8 +41,8 @@ export function Hero() {
 
         {/* Main Content */}
         <div className="text-center space-y-6">
-          <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-gradient animate-fade-in">
-            HodlCoin Staking Platform
+          <h1 className="pb-2 text-5xl md:text-6xl font-extrabold tracking-tight text-gradient animate-fade-in">
+            hodlCoin Staking Platform
           </h1>
           <p className="text-lg md:text-lg text-muted-foreground font-medium leading-relaxed animate-slide-in">
             Self-Stabilizing Staking vaults where the price is mathematically proven to always increase! <br />
@@ -94,23 +94,6 @@ export function Hero() {
             </Button>
           </FindVault>
         </div>
-      </div>
-
-      {/* Footer */}
-      <div className="absolute bottom-8 flex items-center space-x-2 text-sm text-muted-foreground">
-        <span>A project by</span>
-        <Link href='https://news.stability.nexus/' target='_blank' className="hover:opacity-80 transition-opacity">
-          <Image
-            unoptimized
-            fetchPriority='high'
-            loading='lazy'
-            src='/logo-animated.gif'
-            alt='Stability Nexus'
-            width={32}
-            height={32}
-            className="rounded-full"
-          />
-        </Link>
       </div>
     </div>
   )

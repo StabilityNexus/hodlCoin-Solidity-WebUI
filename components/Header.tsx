@@ -42,7 +42,7 @@ export function Header() {
               dark:from-purple-400 dark:to-fuchsia-500 dark:bg-gradient-to-r dark:bg-clip-text dark:text-transparent"
             style={{ letterSpacing: '0.01em' }}
           >
-            HodlCoin
+            hodlCoin
           </p>
         </Link>
         <div className='flex-1 flex flex-row h-[100%] px-8 justify-end items-center hidden lg:flex'>
