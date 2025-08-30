@@ -119,7 +119,7 @@ export default function Footer() {
             unoptimized
             fetchPriority='high'
             loading='lazy'
-            src='./logo.png'
+            src='./logo-animated.gif'
             alt='Stability Nexus Logo'
             height={50}
             width={50}
