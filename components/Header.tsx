@@ -1,6 +1,6 @@
 'use client'
 
-import Pic from '/images/hodlcoin.svg'
+import Pic from '/hodlcoin.svg'
 import Image from 'next/image'
 import React from 'react'
 import { useTheme } from 'next-themes'
