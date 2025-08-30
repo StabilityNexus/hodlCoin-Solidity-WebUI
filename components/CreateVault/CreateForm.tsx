@@ -225,7 +225,7 @@ export default function CreateForm() {
         {!submitted ? (
           <Card className="bg-background/95 backdrop-blur-sm border-primary/30 shadow-xl dark:bg-card/95 dark:border-primary/40">
             <CardHeader className="space-y-2">
-              <CardTitle className="text-3xl font-extrabold tracking-tight text-center text-gradient">
+              <CardTitle className="pb-2 text-3xl font-extrabold tracking-tight text-center text-gradient">
                 Create New Staking Vault
               </CardTitle>
             </CardHeader>
