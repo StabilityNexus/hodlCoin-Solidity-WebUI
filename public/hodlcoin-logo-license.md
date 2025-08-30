@@ -1,0 +1,1 @@
+The hodlcoin logo is a modification of the [Penrose meets Sierpinski Triangle](https://commons.wikimedia.org/wiki/File:Penrose_meets_sierpinski-level2.svg) image by [Tomruen](https://commons.wikimedia.org/wiki/User:Tomruen). It is licensed under a [Creative Commons Attribution Share-Alike 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/deed.en).
