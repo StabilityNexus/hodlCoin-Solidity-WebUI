@@ -17,7 +17,7 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://hodlcoin.vercel.app'),
+  metadataBase: new URL('https://evm.hodlcoin.co.in'),
   title: 'hodlCoin - Self-Stabilizing Staking Platform',
   description: 'Create and stake in self-stabilizing vaults where the price is mathematically proven to always increase. Unstaking fees benefit vault creators and long-term stakers.',
   keywords: 'staking, cryptocurrency, blockchain, hodl, vault, defi, ethereum, rewards',
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://hodlcoin.vercel.app',
+    url: 'https://evm.hodlcoin.co.in',
     title: 'hodlCoin - Self-Stabilizing Staking Platform',
     description: 'Create and stake in self-stabilizing vaults where the price is mathematically proven to always increase. Unstaking fees benefit vault creators and long-term stakers.',
     siteName: 'hodlCoin',
