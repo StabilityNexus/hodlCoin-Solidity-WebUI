@@ -5,7 +5,7 @@ export const useMatrixEffect = (opacity = 0.3, symbolCount = 3) => {
 
   useEffect(() => {
     const matrixContainer = matrixRef.current
-    if (!matrixContainer) return
+    if (!matrixContainer || typeof window === 'undefined') return
 
     const symbols = ['$', '¢', '€', '£', '¥', '₿']
     const columns = Math.floor(window.innerWidth / 40) // Increased spacing for fewer symbols
@@ -50,7 +50,7 @@ export const useMatrixEffect = (opacity = 0.3, symbolCount = 3) => {
     }
 
     // Add CSS animation if not already added
-    if (!document.getElementById('matrix-styles')) {
+    if (typeof document !== 'undefined' && !document.getElementById('matrix-styles')) {
       const style = document.createElement('style')
       style.id = 'matrix-styles'
       style.textContent = `
