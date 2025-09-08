@@ -15,10 +15,10 @@ export const config = getDefaultConfig({
   projectId: process.env.NEXT_PUBLIC_PROJECT_ID ?? '',
   chains: [
     ethereumClassic,
-    scrollSepolia,
+    citreaTestnet,
     polygon,
     base,
-    citreaTestnet,
+    scrollSepolia,
   ],
   ssr: true,
 })
