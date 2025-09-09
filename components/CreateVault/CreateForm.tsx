@@ -1,6 +1,6 @@
 'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Loader2, ArrowRight } from 'lucide-react'
@@ -8,11 +8,10 @@ import { Player } from '@lottiefiles/react-lottie-player'
 import Animation from '@/public/animations/congrats_animation.json'
 import { toast } from '../ui/use-toast'
 import Link from 'next/link'
-import { readContract } from '@wagmi/core'
+import {  readContract } from '@wagmi/core'
 import { useState, useEffect } from 'react'
-import { useAccount } from 'wagmi'
+import { useAccount, useChainId } from 'wagmi'
 import {
-  getTransactionReceipt,
   simulateContract,
   writeContract,
 } from '@wagmi/core'
@@ -22,10 +21,15 @@ import { HodlCoinFactoryAbi } from '@/utils/contracts/HodlCoinFactory'
 import { ERC20Abi } from '@/utils/contracts/ERC20'
 
 import { config } from '@/utils/config'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
+import { TokenSchema } from '../hooks/useTokenList'
+import TokenPicker from './TokenPicker'
 
 const BLOCK_EXPLORERS: { [key: number]: string } = {
   1: 'https://etherscan.io',
   61: 'https://blockscout.com/etc/mainnet',
+  137: 'https://polygonscan.com',
+  8453: 'https://basescan.org',
   2001: 'https://explorer-mainnet-cardano-evm.c1.milkomeda.com',
   534351: 'https://sepolia.scrollscan.com',
   5115: 'https://explorer.testnet.citrea.xyz',
@@ -33,6 +37,8 @@ const BLOCK_EXPLORERS: { [key: number]: string } = {
 
 export default function CreateForm() {
   const account = useAccount()
+  const activeChainId = useChainId();
+  const[token,setToken] = useState<TokenSchema | null > (null) 
   const [coinName, setCoinName] = useState<string>('')
   const [symbol, setSymbol] = useState<string>('')
   const [coin, setCoin] = useState<string>('')
@@ -59,10 +65,16 @@ export default function CreateForm() {
 
   // Pre-fill vault creator with connected wallet address
   useEffect(() => {
-    if (account.address && !vaultCreator) {
+    if (account.address && !vaultCreator) {   
       setVaultCreator(account.address)
     }
   }, [account.address, vaultCreator])
+
+  useEffect(()=>{
+    setToken(null);
+    setCoin('');
+    setSymbol('')
+  },[activeChainId])
 
   // Fetch symbol from underlying asset and pre-fill vault symbol
   useEffect(() => {
@@ -70,15 +82,13 @@ export default function CreateForm() {
       if (!coin || coin.length !== 42 || !coin.startsWith('0x')) return
       
       try {
-        const chainId = config.state.chainId
         const tokenSymbol = await readContract(config as any, {
           abi: ERC20Abi,
           address: coin as `0x${string}`,
           functionName: 'symbol',
           args: [],
         }) as string
-
-        if (tokenSymbol && !symbol) {
+        if (tokenSymbol) {
           setSymbol(`h${tokenSymbol}`)
         }
       } catch (error) {
@@ -87,7 +97,9 @@ export default function CreateForm() {
     }
 
     fetchTokenSymbol()
-  }, [coin, symbol])
+  }, [coin])
+
+  
 
   const convertFeeToNumerator = (fee: string): bigint => {
     const feeNumber = parseFloat(fee)
@@ -211,7 +223,7 @@ export default function CreateForm() {
       setLoadingCreation(false)
     }
   }
-
+  
   return (
     <div className="relative min-h-screen mt-16 page-3d flex items-center justify-center bg-background">
       {/* Enhanced Background Elements with 3D effect */}
@@ -244,8 +256,48 @@ export default function CreateForm() {
                 )}
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-foreground/90 text-3d">Token to be Staked in this Vault</label>
+              <Tabs defaultValue="picker" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 border-2 rounded-md border-gray-400 h-full mb-2">
+                  <TabsTrigger
+                    value="picker"
+                    className="hover:bg-muted data-[state=active]:bg-black dark:data-[state=active]:bg-white data-[state=active]:text-white dark:data-[state=active]:text-black"
+                  >
+                    Select Token
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="manual"
+                    className="hover:bg-muted data-[state=active]:bg-black dark:data-[state=active]:bg-white data-[state=active]:text-white dark:data-[state=active]:text-black"
+                  >
+                    Enter Token Contract Address
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="picker" className="mt-0">
+                <TokenPicker
+                  selected={
+                    coin
+                      ? {
+                          id: token?.id ?? coin,
+                          contract_address: token?.contract_address ?? coin,
+                          symbol: token?.symbol ?? '',
+                          name: token?.name ?? '',
+                          image: token?.image ?? '',
+                        }
+                      : null
+                      
+                  }
+
+                  onSelect={(token) => {
+                    setCoin(token.contract_address)
+                    setToken(token)
+                    setSymbol(`h${token.symbol}`)
+                   
+                  }}
+                  chainId={activeChainId}
+                  placeholder="Select a token to stake"
+                />
+                </TabsContent>
+                <TabsContent value="manual" className="mt-0">
+                   
                 <Input
                   type="text"
                   placeholder="0x... ERC20 contract address of the token that will be staked in this vault"
@@ -256,7 +308,10 @@ export default function CreateForm() {
                 {errors.coin && (
                   <p className="text-red-500 text-xs font-medium text-3d">{errors.coin}</p>
                 )}
-              </div>
+
+
+                  </TabsContent>
+              </Tabs>
 
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-foreground/90 text-3d">Symbol for the Staking Token</label>
