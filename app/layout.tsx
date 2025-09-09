@@ -17,8 +17,8 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
-  title: 'HodlCoin',
-  description: 'Stake your tokens and earn rewards',
+  title: 'hodlCoin Staking Platform',
+  description: 'Self-Stabilizing Staking vaults where the price is mathematically proven to always increase! Unstaking fees benefit vault creators and those who keep staking longer.',
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon.ico',
