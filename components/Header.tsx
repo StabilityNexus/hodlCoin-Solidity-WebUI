@@ -21,23 +21,23 @@ export function Header() {
         <Link href='/' className='h-16 flex items-center'>
           {useTheme().theme === 'dark' ? (
             <Image
-              className='cursor-pointer h-[100%] w-auto py-2 hidden lg:inline-block'
+              className='cursor-pointer h-[100%] w-fit ml-2 py-2 lg:inline-block'
               src="/hodlcoin.svg"
               width={100}
               height={100}
-              alt=''
+              alt='logo'
             />
           ) : (
             <Image
-              className='cursor-pointer h-[100%] w-auto py-2 hidden lg:inline-block'
+              className='cursor-pointer h-[100%] w-fit py-2 ml-2 lg:inline-block'
               src="/hodlcoin.svg"
               width={100}
               height={100}
-              alt=''
+              alt='logo'
             />
           )}
           <p
-            className="cursor-pointer font-extrabold text-2xl tracking-tight mx-1 hidden lg:inline-block 
+            className="cursor-pointer font-extrabold text-2xl tracking-tight mr-8 lg:inline-block 
               bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent
               dark:from-purple-400 dark:to-fuchsia-500 dark:bg-gradient-to-r dark:bg-clip-text dark:text-transparent"
             style={{ letterSpacing: '0.01em' }}
@@ -45,7 +45,7 @@ export function Header() {
             hodlCoin
           </p>
         </Link>
-        <div className='flex-1 flex flex-row h-[100%] px-8 justify-end items-center hidden lg:flex'>
+        <div className='flex-1 flex-row h-[100%] px-8 justify-end items-center hidden lg:flex'>
           <NavBar />
         </div>
 
