@@ -11,6 +11,7 @@ const BLOCK_EXPLORERS: { [key: number]: string } = {
   2001: 'https://explorer-mainnet-cardano-evm.c1.milkomeda.com',
   534351: 'https://sepolia.scrollscan.com',
   5115: 'https://explorer.testnet.citrea.xyz',
+  56: 'https://bscscan.com',
 }
 
 export default function VaultInformation({

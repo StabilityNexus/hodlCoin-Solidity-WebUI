@@ -1,5 +1,6 @@
 import {
   base,
+  bsc,
   mainnet,
   polygon,
   scrollSepolia
@@ -19,6 +20,7 @@ export const config = getDefaultConfig({
     polygon,
     base,
     scrollSepolia,
+    bsc,
   ],
   ssr: true,
 })

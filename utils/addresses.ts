@@ -6,6 +6,7 @@ export const HodlCoinVaultFactories = {
   137: '0x89572326c048053fb0efa14bcc2dd4dfffdcc4a9',
   8453: '0xa482c35b3fd47f93ae381ee3f8ca1d4d3a565194',
   61: '0x9aA272a104d413e3702D6a28901f3998c16C802F',
+  56: '0x9aa272a104d413e3702d6a28901f3998c16c802f',
 } as {
   [key: number]: `0x${string}`
 }

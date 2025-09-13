@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Check, Network, Wifi } from "lucide-react";
 
 // Define supported chain IDs
-type SupportedChainId = 1 | 137 | 534351 | 5115 | 61 | 2001 | 8453;
+type SupportedChainId = 1 | 137 | 534351 | 5115 | 61 | 2001 | 8453 | 56;
 
 // Chain ID to name mapping
 const CHAIN_NAMES: Record<SupportedChainId, string> = {
@@ -16,6 +16,7 @@ const CHAIN_NAMES: Record<SupportedChainId, string> = {
   61: "Ethereum Classic",
   2001: "Milkomeda",
   8453: "Base",
+  56: "Binance Smart Chain",
 };
 
 // Chain colors for visual distinction
@@ -27,6 +28,7 @@ const CHAIN_COLORS: Record<SupportedChainId, string> = {
   61: "bg-green-500",
   2001: "bg-purple-500",
   8453: "bg-blue-500",
+  56: "bg-yellow-500",
 };
 
 // Chain icons
@@ -38,6 +40,7 @@ const CHAIN_ICONS: Record<SupportedChainId, string> = {
   61: "🟢",
   2001: "🟤",
   8453: "🔵",
+  56: "🟨",
 };
 
 interface ChainDropdownProps {
