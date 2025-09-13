@@ -94,6 +94,7 @@ export default function CardExplorer({ vault }: { vault: ExtendedVaultProps }) {
       2001: 'Milkomeda',
       137: 'Polygon',
       8453: 'Base',
+      56: 'Binance Smart Chain',
     }
     return chainNames[chainId] || `Chain ${chainId}`
   }
@@ -107,6 +108,7 @@ export default function CardExplorer({ vault }: { vault: ExtendedVaultProps }) {
       2001: 'bg-purple-400/10 text-purple-500 border-purple-400/20 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20',
       137: 'bg-violet-400/10 text-violet-500 border-violet-400/20 dark:bg-violet-500/10 dark:text-violet-400 dark:border-violet-500/20',
       8453: 'bg-purple-400/10 text-purple-500 border-purple-400/20 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20',
+      56: 'bg-purple-400/10 text-purple-500 border-purple-400/20 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20',
     }
     return chainColors[chainId] || 'bg-gray-400/10 text-gray-500 border-gray-400/20 dark:bg-gray-500/10 dark:text-gray-400 dark:border-gray-500/20'
   }

@@ -228,6 +228,7 @@ export default function HeroVault({
       2001: 'Milkomeda',
       137: 'Polygon',
       8453: 'Base',
+      56: 'Binance Smart Chain',
     }
     return chainNames[chainId] || `Chain ${chainId}`
   }
@@ -241,6 +242,7 @@ export default function HeroVault({
       2001: 'bg-purple-400/10 text-purple-500 border-purple-400/20',
       137: 'bg-violet-400/10 text-violet-500 border-violet-400/20',
       8453: 'bg-blue-400/10 text-blue-500 border-blue-400/20',
+      56: 'bg-yellow-400/10 text-yellow-500 border-yellow-400/20',
     }
     return chainColors[chainId] || 'bg-gray-400/10 text-gray-500 border-gray-400/20'
   }
@@ -254,6 +256,7 @@ export default function HeroVault({
       2001: 'https://explorer-mainnet-cardano-evm.c1.milkomeda.com',
       137: 'https://polygonscan.com',
       8453: 'https://basescan.org',
+      56: 'https://bscscan.com',
     }
     const baseUrl = explorers[chainId] || 'https://etherscan.io'
     return `${baseUrl}/address/${address}`

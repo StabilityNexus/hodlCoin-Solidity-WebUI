@@ -21,7 +21,7 @@ import { indexedDBManager } from '@/utils/indexedDB'
 import { ChainDropdown } from '@/components/ChainDropdown'
 
 // Define supported chain IDs to match ChainDropdown
-type SupportedChainId = 1 | 137 | 534351 | 5115 | 61 | 2001 | 8453;
+type SupportedChainId = 1 | 137 | 534351 | 5115 | 61 | 2001 | 8453 | 56;
 
 // Extended vault props with price and TVL data
 interface ExtendedVaultProps extends vaultsProps {
@@ -125,6 +125,7 @@ const AllVaults = () => {
       61: 'Ethereum Classic',
       2001: 'Milkomeda',
       8453: 'Base',
+      56: 'Binance Smart Chain',
     }
     return chainNames[chainId] || `Chain ${chainId}`
   }

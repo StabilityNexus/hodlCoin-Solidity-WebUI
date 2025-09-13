@@ -30,6 +30,7 @@ const BLOCK_EXPLORERS: { [key: number]: string } = {
   61: 'https://blockscout.com/etc/mainnet',
   137: 'https://polygonscan.com',
   8453: 'https://basescan.org',
+  56: 'https://bscscan.com',
   2001: 'https://explorer-mainnet-cardano-evm.c1.milkomeda.com',
   534351: 'https://sepolia.scrollscan.com',
   5115: 'https://explorer.testnet.citrea.xyz',

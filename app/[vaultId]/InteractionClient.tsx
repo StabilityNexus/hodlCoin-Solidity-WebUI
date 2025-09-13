@@ -80,6 +80,7 @@ export default function InteractionClient() {
       2001: 'Milkomeda',
       137: 'Polygon',
       8453: 'Base',
+      56: 'Binance Smart Chain',
     }
     return chainNames[chainId] || `Chain ${chainId}`
   }
