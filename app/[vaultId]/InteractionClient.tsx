@@ -18,6 +18,7 @@ import { useMatrixEffect } from '@/components/hooks/useMatrixEffect'
 import Link from 'next/link'
 import { indexedDBManager } from '@/utils/indexedDB'
 import { toast } from '@/components/ui/use-toast'
+import { getChainName } from '@/utils/chains'
 
 export default function InteractionClient() {
   const searchParams = useSearchParams()
@@ -71,19 +72,6 @@ export default function InteractionClient() {
     }
   }, [searchParams])
 
-  const getChainName = (chainId: number) => {
-    const chainNames: { [key: number]: string } = {
-      1: 'Ethereum',
-      534351: 'Scroll Sepolia',
-      5115: 'Citrea Testnet',
-      61: 'Ethereum Classic',
-      2001: 'Milkomeda',
-      137: 'Polygon',
-      8453: 'Base',
-      56: 'Binance Smart Chain',
-    }
-    return chainNames[chainId] || `Chain ${chainId}`
-  }
 
   const getVaultsData = async (forceRefresh: boolean = false) => {
     if (!vaultAddress || !chainId) {
