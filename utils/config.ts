@@ -15,6 +15,7 @@ export const config = getDefaultConfig({
   appName: 'hodlcoin',
   projectId: process.env.NEXT_PUBLIC_PROJECT_ID ?? '',
   chains: [
+    mainnet,
     ethereumClassic,
     citreaTestnet,
     polygon,

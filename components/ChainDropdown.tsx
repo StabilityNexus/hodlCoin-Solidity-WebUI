@@ -3,21 +3,10 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Check, Network, Wifi } from "lucide-react";
+import { getChainName, getSupportedChainIds } from "@/utils/chains";
 
 // Define supported chain IDs
 type SupportedChainId = 1 | 137 | 534351 | 5115 | 61 | 2001 | 8453 | 56;
-
-// Chain ID to name mapping
-const CHAIN_NAMES: Record<SupportedChainId, string> = {
-  1: "Ethereum",
-  137: "Polygon",
-  534351: "Scroll Sepolia", 
-  5115: "Citrea Testnet",
-  61: "Ethereum Classic",
-  2001: "Milkomeda",
-  8453: "Base",
-  56: "Binance Smart Chain",
-};
 
 // Chain colors for visual distinction
 const CHAIN_COLORS: Record<SupportedChainId, string> = {
@@ -79,7 +68,7 @@ export function ChainDropdown({
     if (selectedChainId === "all") {
       return "All Networks";
     }
-    return CHAIN_NAMES[selectedChainId as SupportedChainId];
+    return getChainName(selectedChainId as SupportedChainId);
   };
 
   const getDisplayIcon = () => {
@@ -180,7 +169,7 @@ export function ChainDropdown({
                       </div>
                     </div>
                     <span className="font-medium text-foreground">
-                      {CHAIN_NAMES[currentChainId as SupportedChainId]}
+                      {getChainName(currentChainId as SupportedChainId)}
                     </span>
                   </div>
                   {selectedChainId === currentChainId && (
@@ -210,7 +199,7 @@ export function ChainDropdown({
                   <div className="flex items-center gap-3">
                     <span className='text-lg'>{CHAIN_ICONS[chainId]}</span>
                     <span className="font-medium text-foreground">
-                      {CHAIN_NAMES[chainId]}
+                      {getChainName(chainId)}
                       </span>
                     </div>
                   {selectedChainId === chainId && (

@@ -9,6 +9,7 @@ import { Button } from '../ui/button'
 import { useFavorites } from '@/utils/favorites'
 import { useAccount } from 'wagmi'
 import { toast } from '../ui/use-toast'
+import { getChainName } from '@/utils/chains'
 
 // Extended vault props with price and TVL data
 interface ExtendedVaultProps extends vaultsProps {
@@ -85,19 +86,6 @@ export default function CardExplorer({ vault }: { vault: ExtendedVaultProps }) {
     }
   }
 
-  const getChainName = (chainId: number) => {
-    const chainNames: { [key: number]: string } = {
-      1: 'Ethereum',
-      534351: 'Scroll Sepolia',
-      5115: 'Citrea Testnet',
-      61: 'Ethereum Classic',
-      2001: 'Milkomeda',
-      137: 'Polygon',
-      8453: 'Base',
-      56: 'Binance Smart Chain',
-    }
-    return chainNames[chainId] || `Chain ${chainId}`
-  }
 
   const getChainColor = (chainId: number) => {
     const chainColors: { [key: number]: string } = {

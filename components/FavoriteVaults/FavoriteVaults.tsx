@@ -18,6 +18,7 @@ import { indexedDBManager } from '@/utils/indexedDB'
 import { getPublicClient } from '@wagmi/core'
 import { config } from '@/utils/config'
 import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
+import { getChainName } from '@/utils/chains'
 
 const ITEMS_PER_PAGE = 6
 
@@ -343,19 +344,9 @@ const FavoriteVaults = () => {
     return Array.from(chainSet).sort()
   }
 
-  const getChainName = (chainId: SupportedChainId | 'all') => {
+  const getChainDisplayName = (chainId: SupportedChainId | 'all') => {
     if (chainId === 'all') return 'All Networks'
-    const chainNames: { [key in SupportedChainId]: string } = {
-      1: 'Ethereum',
-      137: 'Polygon',
-      534351: 'Scroll Sepolia',
-      5115: 'Citrea Testnet',
-      61: 'Ethereum Classic',
-      2001: 'Milkomeda',
-      8453: 'Base',
-      56: 'Binance Smart Chain',
-    }
-    return chainNames[chainId] || `Chain ${chainId}`
+    return getChainName(chainId)
   }
 
   useEffect(() => {
@@ -506,7 +497,7 @@ const FavoriteVaults = () => {
                       {selectedChain !== 'all' && (
                         <div className='flex items-center gap-1 px-2 py-1 rounded-md bg-blue-500/10 text-blue-600'>
                           <Vault className='h-3 w-3' />
-                          {getChainName(selectedChain)}
+                          {getChainDisplayName(selectedChain)}
                         </div>
                       )}
                     </>

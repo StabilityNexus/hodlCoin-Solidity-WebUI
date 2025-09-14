@@ -24,17 +24,8 @@ import { config } from '@/utils/config'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { TokenSchema } from '../hooks/useTokenList'
 import TokenPicker from './TokenPicker'
+import { getChainExplorer, getTransactionUrl } from '@/utils/chains'
 
-const BLOCK_EXPLORERS: { [key: number]: string } = {
-  1: 'https://etherscan.io',
-  61: 'https://blockscout.com/etc/mainnet',
-  137: 'https://polygonscan.com',
-  8453: 'https://basescan.org',
-  56: 'https://bscscan.com',
-  2001: 'https://explorer-mainnet-cardano-evm.c1.milkomeda.com',
-  534351: 'https://sepolia.scrollscan.com',
-  5115: 'https://explorer.testnet.citrea.xyz',
-}
 
 export default function CreateForm() {
   const account = useAccount()
@@ -126,13 +117,12 @@ export default function CreateForm() {
   }
 
   const getBlockExplorerUrl = (chainId: number, txHash: string) => {
-    const baseUrl = BLOCK_EXPLORERS[chainId] || 'https://etherscan.io'
-    return `${baseUrl}/tx/${txHash}`
+    return getTransactionUrl(chainId, txHash)
   }
 
   const getAddressExplorerUrl = (chainId: number, address: string) => {
-    const baseUrl = BLOCK_EXPLORERS[chainId] || 'https://etherscan.io'
-    return `${baseUrl}/address/${address}`
+    const baseUrl = getChainExplorer(chainId)
+    return baseUrl ? `${baseUrl}/address/${address}` : ''
   }
 
   const formatAddress = (address: string) => {
