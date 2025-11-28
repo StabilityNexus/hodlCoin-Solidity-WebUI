@@ -17,13 +17,74 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
-  title: 'hodlCoin Staking Platform',
-  description: 'Self-Stabilizing Staking vaults where the price is mathematically proven to always increase! Unstaking fees benefit vault creators and those who keep staking longer.',
+  metadataBase: new URL('https://evm.hodlcoin.co.in'),
+  title: 'hodlCoin - Self-Stabilizing Staking Platform',
+  description: 'Create and stake in self-stabilizing vaults where the price is mathematically proven to always increase. Unstaking fees benefit vault creators and long-term stakers.',
+  keywords: 'staking, cryptocurrency, blockchain, hodl, vault, defi, ethereum, rewards',
+  authors: [{ name: 'hodlCoin Team' }],
+  creator: 'hodlCoin',
+  publisher: 'hodlCoin',
+  
+  // Open Graph
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://evm.hodlcoin.co.in',
+    title: 'hodlCoin - Self-Stabilizing Staking Platform',
+    description: 'Create and stake in self-stabilizing vaults where the price is mathematically proven to always increase. Unstaking fees benefit vault creators and long-term stakers.',
+    siteName: 'hodlCoin',
+    images: [
+      {
+        url: '/hodlcoin.png',
+        width: 1200,
+        height: 630,
+        alt: 'hodlCoin - Self-Stabilizing Staking Platform',
+        type: 'image/png',
+      },
+      {
+        url: '/logo.png',
+        width: 512,
+        height: 512,
+        alt: 'hodlCoin Logo',
+        type: 'image/png',
+      }
+    ],
+  },
+
+  // Twitter Card
+  twitter: {
+    card: 'summary_large_image',
+    site: '@hodlcoin',
+    creator: '@hodlcoin',
+    title: 'hodlCoin - Self-Stabilizing Staking Platform',
+    description: 'Create and stake in self-stabilizing vaults where the price is mathematically proven to always increase.',
+    images: ['/hodlcoin.png'],
+  },
+
+  // Additional metadata
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  
+  // Manifest and icons
+  manifest: '/manifest.json',
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon.ico',
-    apple: '/favicon.ico',
+    apple: '/logo.png',
   },
+  
+  // App specific
+  applicationName: 'hodlCoin',
+  category: 'finance',
 }
 
 export const viewport: Viewport = {
