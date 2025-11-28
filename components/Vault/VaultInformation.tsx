@@ -2,14 +2,8 @@ import { vaultsProps } from '@/utils/props'
 import { Coins, Info, ExternalLink, User, Percent, Shield } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { getAddressUrl } from '@/utils/chains'
 
-const BLOCK_EXPLORERS: { [key: number]: string } = {
-  1: 'https://etherscan.io',
-  61: 'https://blockscout.com/etc/mainnet',
-  2001: 'https://explorer-mainnet-cardano-evm.c1.milkomeda.com',
-  534351: 'https://sepolia.scrollscan.com',
-  5115: 'https://explorer.testnet.citrea.xyz',
-}
 
 export default function VaultInformation({
   vault,
@@ -26,8 +20,7 @@ export default function VaultInformation({
 }) {
   const getBlockExplorerUrl = (address: string) => {
     const chainId = vault?.chainId ?? 534351; 
-    const baseUrl = BLOCK_EXPLORERS[chainId] || 'https://etherscan.io'
-    return `${baseUrl}/address/${address}`
+    return getAddressUrl(chainId, address)
   }
 
   const openExplorer = (address: string) => {

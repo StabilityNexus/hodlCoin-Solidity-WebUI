@@ -219,45 +219,7 @@ export default function HeroVault({
     }
   }
 
-  const getChainName = (chainId: number) => {
-    const chainNames: { [key: number]: string } = {
-      1: 'Ethereum',
-      534351: 'Scroll Sepolia',
-      5115: 'Citrea Testnet',
-      61: 'Ethereum Classic',
-      2001: 'Milkomeda',
-      137: 'Polygon',
-      8453: 'Base',
-    }
-    return chainNames[chainId] || `Chain ${chainId}`
-  }
 
-  const getChainColor = (chainId: number) => {
-    const chainColors: { [key: number]: string } = {
-      1: 'bg-blue-400/10 text-blue-500 border-blue-400/20',
-          534351: 'bg-orange-400/10 text-orange-500 border-orange-400/20',
-    5115: 'bg-yellow-300/10 text-yellow-300 border-yellow-300/20',
-      61: 'bg-green-400/10 text-green-500 border-green-400/20',
-      2001: 'bg-purple-400/10 text-purple-500 border-purple-400/20',
-      137: 'bg-violet-400/10 text-violet-500 border-violet-400/20',
-      8453: 'bg-blue-400/10 text-blue-500 border-blue-400/20',
-    }
-    return chainColors[chainId] || 'bg-gray-400/10 text-gray-500 border-gray-400/20'
-  }
-
-  const getBlockExplorerUrl = (chainId: number, address: string) => {
-    const explorers: { [key: number]: string } = {
-      1: 'https://etherscan.io',
-      534351: 'https://sepolia.scrollscan.com',
-      5115: 'https://explorer.testnet.citrea.xyz',
-      61: 'https://blockscout.com/etc/mainnet',
-      2001: 'https://explorer-mainnet-cardano-evm.c1.milkomeda.com',
-      137: 'https://polygonscan.com',
-      8453: 'https://basescan.org',
-    }
-    const baseUrl = explorers[chainId] || 'https://etherscan.io'
-    return `${baseUrl}/address/${address}`
-  }
 
   return (
     <main className='relative container mx-auto p-4 overflow-hidden'>
