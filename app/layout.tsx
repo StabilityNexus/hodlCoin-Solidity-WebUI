@@ -1,20 +1,11 @@
 import '@rainbow-me/rainbowkit/styles.css'
 import './globals.css'
 import type { Metadata, Viewport } from 'next'
-import { Poppins } from 'next/font/google'
 import { ThemeProvider } from '@/providers/theme-provider'
 import { Toaster } from '@/components/ui/toaster'
 import { Header } from '@/components/Header'
 import Footer from '@/components/Footer'
 import { WalletProvider } from '@/providers/WalletProvider'
-
-const poppins = Poppins({ 
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700', '800', '900'],
-  variable: '--font-poppins',
-  display: 'swap',
-  fallback: ['system-ui', 'arial', 'sans-serif']
-})
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://evm.hodlcoin.co.in'),
@@ -99,9 +90,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className={poppins.variable}>
-      {/* Fonts are now loaded exclusively through `next/font` */}
-      <body className={poppins.className}>
+    <html lang="en" suppressHydrationWarning>
+      {/* Using system fonts to avoid network requests */}
+      <body className="font-sans">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

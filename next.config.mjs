@@ -1,12 +1,12 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
-  output: 'export',
-  distDir: 'out',
+  // output: 'export',  // Uncomment for static export (GitHub Pages)
+  // distDir: 'out',
   images: {
     unoptimized: true,
   },
-  basePath: '/hodlCoin-Solidity-WebUI',
+  // basePath: '/hodlCoin-Solidity-WebUI',  // Uncomment for GitHub Pages
   // Disable font optimization for better consistency
   optimizeFonts: false,
   // Prevent build hanging issues

@@ -1,0 +1,11 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://evm.hodlcoin.co.in/sitemap.xml
+
+# Disallow crawling of dynamic vault pages with invalid IDs
+Disallow: /api/
+Disallow: /_next/
+Disallow: /static/
