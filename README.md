@@ -1,49 +1,72 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# HODL Coin: Decentralized Crypto Vault
+
+Welcome to HODL Coin, a decentralized application that allows you to create and manage your own crypto vaults. Lock your tokens for a specified period and watch your assets grow. Our platform is built with security and transparency in mind, leveraging the power of blockchain technology.
+
+## Live Demo
+
+Check out the live demo [here](https://hodl-coin.reown.com/).
+
+## Features
+
+- **Create Custom Vaults**: Easily create a vault for any token.
+- **Flexible Locking Periods**: Lock your tokens for a duration of your choice.
+- **Decentralized and Secure**: Built on a secure and transparent blockchain.
+- **User-Friendly Interface**: A clean and intuitive interface for a seamless experience.
+
+## Tech Stack
+
+- **Framework**: [Next.js](https://nextjs.org/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Web3 Integration**: [Wagmi](https://wagmi.sh/), [RainbowKit](https://www.rainbowkit.com/), [Viem](https://viem.sh/), [Ethers.js](https://ethers.org/)
+- **UI Components**: [Shadcn UI](https://ui.shadcn.com/), [Radix UI](https://www.radix-ui.com/)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/)
+- **Linting and Formatting**: [ESLint](https://eslint.org/), [Prettier](https://prettier.io/)
 
 ## Getting Started
 
-First, run the development server:
+To get a local copy up and running, follow these simple steps.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Prerequisites
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Node.js (v18 or higher)
+- Yarn or npm
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Installation
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/your-username/hodlCoin-Solidity-WebUI.git
+   cd hodlCoin-Solidity-WebUI
+   ```
 
-## Local Setup with Project ID
+2. **Install dependencies**:
+   ```bash
+   yarn install
+   # or
+   npm install
+   ```
 
-Before running the project locally, you need to set up an environment variable with your Project ID. Follow these steps:
-
-1. **Create a `.env` File**  
-   In the root directory of the project, create a file named `.env` and add the following line:
+3. **Set up environment variables**:
+   Create a `.env` file in the root directory and add your Project ID:
    ```env
    NEXT_PUBLIC_PROJECT_ID=your-project-id
    ```
+   You can obtain your Project ID from [Reown Cloud](https://cloud.reown.com/sign-in).
 
-2. **Obtain Your Project ID**  
-   To get your `your-project-id` value:
-   - Visit [Reown Cloud](https://cloud.reown.com/sign-in).
-   - Create an account or log in if you already have one.
-   - Create a new project within the dashboard.
-   - Once the project is created, locate your project key (this may be labeled as "Project ID" or "API Key").
-   - Copy the key and paste it into your `.env` file in place of `your-project-id`.
+4. **Run the development server**:
+   ```bash
+   yarn dev
+   # or
+   npm run dev
+   ```
 
-After setting up the environment variable, you can run the development server as described above.
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+To learn more about the technologies used in this project, check out the following resources:
 
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
+- [Wagmi Documentation](https://wagmi.sh/)
+- [RainbowKit Documentation](https://www.rainbowkit.com/docs)
