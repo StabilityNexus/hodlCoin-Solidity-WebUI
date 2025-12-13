@@ -1,8 +1,81 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+<div align="center">
+
+<img src="https://raw.githubusercontent.com/StabilityNexus/HammerAuctionHouse-WebUI/main/public/stability.svg" alt="Stability Nexus Logo" width="200"/>
+<img src="https://evm.hodlcoin.co.in/hodlcoin.svg" alt="hodlCoin Logo" width="200"/>
+
+![STABILITY NEXUS](https://img.shields.io/badge/STABILITY%20NEXUS-black?style=for-the-badge) ![HODLCOIN WEBUI](https://img.shields.io/badge/HODLCOIN%20WEBUI-8B5CF6?style=for-the-badge)
+
+[![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=flat&logo=telegram&logoColor=white)](https://t.me/StabilityNexus) [![X](https://img.shields.io/badge/Follow%20@StabilityNexus-000000?style=flat&logo=x&logoColor=white)](https://x.com/StabilityNexus) [![Discord](https://img.shields.io/badge/Discord-5865F2?style=flat&logo=discord&logoColor=white)](https://discord.com/invite/YzDKeEfWtS) [![Medium](https://img.shields.io/badge/Medium-12100E?style=flat&logo=medium&logoColor=white)](https://news.stability.nexus/?gi=b27790163ddc) [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/company/stability-nexus/) [![YouTube](https://img.shields.io/badge/YouTube-FF0000?style=flat&logo=youtube&logoColor=white)](https://www.youtube.com/@StabilityNexus)
+
+</div>
+
+---
+
+## hodlCoin Staking Platform
+
+[hodlCoin Solidity WebUI](https://evm.hodlcoin.co.in/) is a decentralized staking platform that provides a seamless interface for interacting with hodlCoin smart contracts on blockchain. Supporting self-stabilizing staking vaults where the price is mathematically proven to always increase through smart contracts, it provides a secure and transparent environment for staking digital assets.
+
+The platform is powered by smart contracts that implement:
+
+- **Multiple Vault Types**: Create and manage various types of staking vaults with different parameters and reward mechanisms
+- **Smart Contract Security**: Trustless execution with on-chain validation and verifiable, immutable transactions
+- **Token Staking**: Stake hodlCoin tokens and earn rewards based on vault performance
+- **Wallet Integration**: Seamless MetaMask and Web3 wallet support
+- **Transparent History**: Fully on-chain transaction records and staking history
+- **Extensible Services**: Modular vault services interface to support future staking mechanisms
+
+---
+
+## Tech Stack
+
+### Frontend
+
+- Next.js 14+ (React)
+- TypeScript
+- TailwindCSS
+- shadcn/ui
+
+### Blockchain
+
+- Wagmi
+- Solidity Smart Contracts
+- Ethers.js
+- Rainbow-Kit Wallet Integration
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- npm/yarn/pnpm
+- MetaMask or any other web3 wallet browser extension
+
+### Installation
+
+#### 1. Clone the Repository
+
+```bash
+git clone https://github.com/StabilityNexus/hodlCoin-Solidity-WebUI.git
+cd hodlCoin-Solidity-WebUI
+```
+
+#### 2. Install Dependencies
+
+Using your preferred package manager:
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+#### 3. Run the Development Server
+
+Start the app locally:
 
 ```bash
 npm run dev
@@ -10,40 +83,30 @@ npm run dev
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+#### 4. Open your Browser
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Navigate to [http://localhost:3000](http://localhost:3000) to see the application.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+---
 
-## Local Setup with Project ID
+## Contributing
 
-Before running the project locally, you need to set up an environment variable with your Project ID. Follow these steps:
+We welcome contributions of all kinds! To contribute:
 
-1. **Create a `.env` File**  
-   In the root directory of the project, create a file named `.env` and add the following line:
-   ```env
-   NEXT_PUBLIC_PROJECT_ID=your-project-id
-   ```
+1. Fork the repository and create your feature branch (`git checkout -b feature/AmazingFeature`).
+2. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
+3. Run the development workflow commands to ensure code quality:
+   - `npm run format:write`
+   - `npm run lint:fix`
+   - `npm run typecheck`
+4. Push your branch (`git push origin feature/AmazingFeature`).
+5. Open a Pull Request for review.
 
-2. **Obtain Your Project ID**  
-   To get your `your-project-id` value:
-   - Visit [Reown Cloud](https://cloud.reown.com/sign-in).
-   - Create an account or log in if you already have one.
-   - Create a new project within the dashboard.
-   - Once the project is created, locate your project key (this may be labeled as "Project ID" or "API Key").
-   - Copy the key and paste it into your `.env` file in place of `your-project-id`.
+If you encounter bugs, need help, or have feature requests:
 
-After setting up the environment variable, you can run the development server as described above.
+- Please open an issue in this repository providing detailed information.
+- Describe the problem clearly and include any relevant logs or screenshots.
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
+We appreciate your feedback and contributions!
