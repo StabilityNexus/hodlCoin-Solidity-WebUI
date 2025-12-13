@@ -1,4 +1,44 @@
-# HodlCoin Web UI
+<div align="center">
+
+# 🔒 HodlCoin Web UI
+
+### Decentralized Staking Protocol for Long-Term Token Holders
+
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-38bdf8?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+[![Wagmi](https://img.shields.io/badge/Wagmi-2-success?style=for-the-badge)](https://wagmi.sh/)
+[![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
+
+[**Live Demo**](https://your-demo-url.com) • [**Research Paper**](https://eprint.iacr.org/2023/1029) • [**Documentation**](#table-of-contents)
+
+</div>
+
+---
+
+## 📋 Table of Contents
+
+- [What is HodlCoin?](#what-is-hodlcoin)
+- [Key Features](#key-features)
+- [Screenshots](#screenshots)
+- [Tech Stack](#tech-stack)
+- [Prerequisites](#prerequisites)
+- [Environment Setup](#environment-setup)
+- [Quick Start](#quick-start)
+- [Project Structure](#project-structure)
+- [Chains & Configuration](#chains--configuration)
+- [How to Use](#how-to-use-the-application)
+- [Development](#development-tips)
+- [Deployment](#deployment)
+- [FAQ](#faq)
+- [Security](#security-considerations)
+- [Performance](#performance-optimization)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [Resources](#learn-more)
+- [License](#license)
+
+---
 
 A decentralized application (dApp) for interacting with HodlCoin vaults and the HodlCoin Factory smart contracts. This frontend enables users to create time-locked token vaults, stake assets, and earn rewards for long-term holding (hodling).
 
@@ -14,17 +54,74 @@ HodlCoin is a **staking protocol that encourages holding assets for extended per
 - **Fee Structure**: Unstaking fees are split between the vault creator and users who continue holding, creating a sustainable incentive mechanism
 
 > Based on research paper: [HodlCoin: A Staking Protocol with Optimal Rewards](https://eprint.iacr.org/2023/1029)
+## 📸 Screenshots
 
-## Key Features
+<details>
+<summary>Click to view application screenshots</summary>
 
-✅ **Create Custom Vaults** - Launch your own hodlCoin vaults with customizable parameters (fees, underlying token, etc.)  
-✅ **Multi-Chain Support** - Works on Ethereum, Polygon, Base, BSC, Ethereum Classic, Scroll Sepolia, and Citrea Testnet  
-✅ **Wallet Integration** - Seamless connection via RainbowKit supporting MetaMask, WalletConnect, and more  
-✅ **Vault Explorer** - Browse all vaults across supported chains with search and filtering  
-✅ **Favorites System** - Mark vaults as favorites and track them using IndexedDB  
-✅ **My Vaults** - View all vaults you've created or interacted with  
-✅ **Deposit & Withdraw** - Hodl (deposit) and unhodl (withdraw) with real-time fee calculations  
-✅ **Responsive Design** - Works on desktop and mobile with dark/light theme support
+### Home Page
+![Home Page](public/images/screenshot-home.png)
+*Landing page with hero section and protocol explanation*
+
+### Vault Explorer
+![Vault Explorer](public/images/screenshot-explorer.png)
+*Browse and search all vaults across multiple chains*
+
+### Create Vault
+![Create Vault](public/images/screenshot-create.png)
+*Create custom vaults with configurable parameters*
+
+### Vault Details
+![Vault Details](public/images/screenshot-vault.png)
+*Deposit (Hodl) and withdraw (Unhodl) with real-time calculations*
+
+> **Note**: Screenshots are placeholders. Add actual screenshots to the `public/images/` directory.
+
+</details>
+## ✨ Key Features
+
+<table>
+<tr>
+<td width="50%">
+
+### 🏦 Vault Management
+- ✅ **Create Custom Vaults** with configurable fees
+- ✅ **Vault Explorer** with advanced search
+- ✅ **My Vaults Dashboard** for creators & holders
+- ✅ **Favorites System** with local persistence
+
+</td>
+<td width="50%">
+
+### 🔗 Blockchain Integration
+- ✅ **7 Supported Chains** (Ethereum, Polygon, Base, etc.)
+- ✅ **Multi-Wallet Support** via RainbowKit
+- ✅ **Real-time Updates** with React Query
+- ✅ **Smart Contract Interaction** via Wagmi/Ethers
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+### 💰 Staking Operations
+- ✅ **Hodl (Deposit)** tokens to earn rewards
+- ✅ **Unhodl (Withdraw)** with transparent fees
+- ✅ **Fee Calculator** showing exact amounts
+- ✅ **Balance Tracking** for all positions
+
+</td>
+<td width="50%">
+
+### 🎨 User Experience
+- ✅ **Responsive Design** for all devices
+- ✅ **Dark/Light Theme** toggle
+- ✅ **Smooth Animations** with Framer Motion
+- ✅ **Accessible UI** with Radix components
+
+</td>
+</tr>
+</table>
 
 ## Tech Stack
 
@@ -57,26 +154,68 @@ HodlCoin is a **staking protocol that encourages holding assets for extended per
 - **react-blockies** - Ethereum address identicons
 - **react-window** - Virtualization for rendering large lists efficiently
 
-## Prerequisites
+## 📦 Prerequisites
 
-- Node.js 18+ and npm (or Yarn/Pnpm/Bun)
-- A wallet supported by RainbowKit (e.g., MetaMask)
-- Project ID from Reown Cloud for WalletConnect
+Before you begin, ensure you have the following installed:
 
-## Environment Setup
+| Tool | Version | Purpose | Download |
+|------|---------|---------|----------|
+| **Node.js** | 18.x or higher | JavaScript runtime | [nodejs.org](https://nodejs.org/) |
+| **npm** | 9.x or higher | Package manager | Comes with Node.js |
+| **Git** | Latest | Version control | [git-scm.com](https://git-scm.com/) |
+| **Web3 Wallet** | Latest | MetaMask, Coinbase, etc. | [metamask.io](https://metamask.io/) |
+
+**Check your versions:**
+```bash
+node --version   # Should be v18.0.0 or higher
+npm --version    # Should be 9.0.0 or higher
+git --version    # Any recent version
+```
+
+**Additional Requirements:**
+- 🔑 **Reown Project ID** - Get from [cloud.reown.com](https://cloud.reown.com/sign-in) for WalletConnect
+- 💳 **Native Tokens** - For gas fees on your chosen network
+- 🌐 **Modern Browser** - Chrome, Firefox, Brave, or Edge (latest versions)
+
+## ⚙️ Environment Setup
+
+### Step 1: Clone the Repository
+
+```bash
+git clone https://github.com/your-username/hodlCoin-Solidity-WebUI.git
+cd hodlCoin-Solidity-WebUI
+```
+
+### Step 2: Create Environment File
 
 Create a `.env` file in the project root:
 
 ```env
-NEXT_PUBLIC_PROJECT_ID=your-project-id
+# WalletConnect Configuration (Required)
+NEXT_PUBLIC_PROJECT_ID=your-project-id-here
+
+# Optional: Custom RPC URLs
+# NEXT_PUBLIC_ETHEREUM_RPC=https://eth-mainnet.g.alchemy.com/v2/YOUR-API-KEY
+# NEXT_PUBLIC_POLYGON_RPC=https://polygon-mainnet.g.alchemy.com/v2/YOUR-API-KEY
 ```
 
-How to obtain `your-project-id`:
-- Go to https://cloud.reown.com/sign-in
-- Create/login to your account and create a project
-- Copy the Project ID/API Key and paste it into `.env`
+### Step 3: Get Your Project ID
 
-## Running Locally
+1. Visit [Reown Cloud](https://cloud.reown.com/sign-in)
+2. Sign up or log in to your account
+3. Click **"Create New Project"**
+4. Give your project a name (e.g., "HodlCoin DApp")
+5. Copy the **Project ID**
+6. Paste it into your `.env` file replacing `your-project-id-here`
+
+**Example:**
+```env
+NEXT_PUBLIC_PROJECT_ID=a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6
+```
+
+> ⚠️ **Important**: Never commit your `.env` file to version control. It's already in `.gitignore`.
+
+## 🚀 Quick Start
 
 ### Installation
 
@@ -86,22 +225,54 @@ Install dependencies:
 npm install
 ```
 
+<details>
+<summary>Using Yarn or PNPM?</summary>
+
+```bash
+# Yarn
+yarn install
+
+# PNPM
+pnpm install
+
+# Bun
+bun install
+```
+</details>
+
 ### Start Development Server
 
 ```bash
 npm run dev
 ```
 
-The application will be available at **http://localhost:3000**
+The application will be available at **http://localhost:3000** 🎉
+
+You should see:
+```
+✓ Ready in 2.5s
+✓ Local: http://localhost:3000
+✓ Network: http://192.168.1.100:3000
+```
 
 ### Available Scripts
 
-```bash
-npm run dev       # Start development server with hot reload
-npm run build     # Create production build
-npm run start     # Start production server (requires build first)
-npm run lint      # Run ESLint to check code quality
-```
+| Command | Description | When to Use |
+|---------|-------------|-------------|
+| `npm run dev` | Start development server with hot reload | During development |
+| `npm run build` | Create optimized production build | Before deployment |
+| `npm run start` | Start production server | After building |
+| `npm run lint` | Run ESLint to check code quality | Before committing |
+
+### First Time Setup Checklist
+
+- [ ] Node.js 18+ installed
+- [ ] Repository cloned
+- [ ] Dependencies installed (`npm install`)
+- [ ] `.env` file created with `NEXT_PUBLIC_PROJECT_ID`
+- [ ] Development server running (`npm run dev`)
+- [ ] Wallet extension installed (MetaMask, etc.)
+- [ ] Application opens at http://localhost:3000
 
 ## How to Use the Application
 
@@ -580,6 +751,162 @@ Ensure `NEXT_PUBLIC_PROJECT_ID` is set in your deployment platform:
 - Netlify: Site Settings → Environment Variables
 - Docker: Use `.env` file or pass as build args
 
+## ❓ FAQ
+
+<details>
+<summary><strong>What is the cost to create a vault?</strong></summary>
+
+The cost depends on the gas fees of the network you're using. The transaction itself requires deploying a new smart contract. Typically:
+- Ethereum Mainnet: $20-$100 (depending on gas prices)
+- Polygon/Base: $0.01-$1
+- BSC: $0.10-$2
+</details>
+
+<details>
+<summary><strong>Can I withdraw my tokens immediately after depositing?</strong></summary>
+
+Yes, but you'll pay an unstaking fee. The fee is split between the vault creator and remaining hodlers, incentivizing longer holding periods. The longer you hold, the more you benefit from others' unstaking fees.
+</details>
+
+<details>
+<summary><strong>What happens to my tokens when I hodl?</strong></summary>
+
+Your tokens are locked in the vault smart contract, and you receive hodlCoins (ERC-20 tokens) representing your stake. These hodlCoins can be burned to withdraw the underlying assets (minus fees).
+</details>
+
+<details>
+<summary><strong>Are my funds safe?</strong></summary>
+
+Funds are secured by audited smart contracts. However, always DYOR (Do Your Own Research) and never invest more than you can afford to lose. See [Security Considerations](#security-considerations) for more details.
+</details>
+
+<details>
+<summary><strong>Can I use this on mobile?</strong></summary>
+
+Yes! The application is fully responsive. Use wallets with mobile browser support like MetaMask Mobile, Trust Wallet, or Coinbase Wallet.
+</details>
+
+<details>
+<summary><strong>Why isn't my transaction confirming?</strong></summary>
+
+Common reasons:
+- Gas price too low (try increasing it)
+- Insufficient native token for gas
+- Network congestion (wait or increase gas)
+- Nonce issues (reset wallet account)
+</details>
+
+<details>
+<summary><strong>How do vault creators earn?</strong></summary>
+
+Vault creators set a "creator fee" percentage. Every time someone unhodls (withdraws), the creator receives their fee percentage of the withdrawal.
+</details>
+
+<details>
+<summary><strong>Can I transfer my hodlCoins to someone else?</strong></summary>
+
+Yes! HodlCoins are standard ERC-20 tokens and can be transferred. The recipient can then unhodl to get the underlying assets.
+</details>
+
+## 🔒 Security Considerations
+
+### Smart Contract Security
+
+- ✅ Contracts follow industry best practices
+- ✅ Based on peer-reviewed research ([paper](https://eprint.iacr.org/2023/1029))
+- ⚠️ Always verify contract addresses on block explorers
+- ⚠️ Check addresses match those in [`utils/addresses.ts`](utils/addresses.ts)
+
+### Frontend Security
+
+- 🔐 **Never share your seed phrase or private keys**
+- 🔐 **Always verify URLs** - Bookmark the official site
+- 🔐 **Check transaction details** before confirming
+- 🔐 **Use hardware wallets** for large amounts
+- 🔐 **Enable 2FA** on exchanges and accounts
+
+### Best Practices
+
+```markdown
+✓ DO verify contract addresses on block explorers
+✓ DO start with small test transactions
+✓ DO keep your wallet software updated
+✓ DO use strong, unique passwords
+✓ DO backup your seed phrase securely offline
+
+✗ DON'T share your private keys or seed phrase
+✗ DON'T use unsecured WiFi for transactions
+✗ DON'T ignore wallet security warnings
+✗ DON'T approve unlimited token allowances
+✗ DON'T rush transactions - always review
+```
+
+### Reporting Security Issues
+
+If you discover a security vulnerability:
+1. **DO NOT** open a public issue
+2. Email security details to: [security@your-domain.com]
+3. Include steps to reproduce
+4. Allow reasonable time for a response
+
+## ⚡ Performance Optimization
+
+### Frontend Optimizations
+
+**Already Implemented:**
+- ✅ Next.js 14 with App Router for optimal loading
+- ✅ React Query for data caching and deduplication
+- ✅ Virtualized lists (react-window) for large datasets
+- ✅ Image optimization with Next.js Image component
+- ✅ Font optimization with next/font
+- ✅ Code splitting and lazy loading
+
+### Improving Load Times
+
+**RPC Optimization:**
+```typescript
+// utils/config.ts - Use custom RPC endpoints
+export const config = createConfig({
+  chains: [mainnet, polygon, base],
+  transports: {
+    [mainnet.id]: http('https://eth-mainnet.g.alchemy.com/v2/YOUR-KEY'),
+    [polygon.id]: http('https://polygon-mainnet.g.alchemy.com/v2/YOUR-KEY'),
+  },
+})
+```
+
+**Caching Strategies:**
+- Vault data cached for 30 seconds
+- Token lists cached for 5 minutes
+- Favorites stored in IndexedDB (instant load)
+- Balance updates on-demand
+
+### Network Performance Tips
+
+1. **Use Free RPC Providers:**
+   - [Alchemy](https://www.alchemy.com/) - 300M compute units/month free
+   - [Infura](https://www.infura.io/) - 100k requests/day free
+   - [QuickNode](https://www.quicknode.com/) - Free tier available
+
+2. **Enable Browser Caching:**
+   - Static assets cached for 1 year
+   - API responses cached per React Query config
+
+3. **Optimize Wallet Connections:**
+   - Use cached providers when available
+   - Minimize contract read calls
+   - Batch multiple contract calls
+
+### Monitoring Performance
+
+```bash
+# Build and analyze bundle size
+npm run build
+
+# Check bundle composition
+npx @next/bundle-analyzer
+```
+
 ## Troubleshooting
 
 ### Wallet Connection Issues
@@ -721,4 +1048,3 @@ Code license: [Specify your license here - MIT, Apache 2.0, etc.]
 **Built with ❤️ for the HodlCoin community**
 
 For questions or support, check the [research paper](https://eprint.iacr.org/2023/1029) or explore the code!
-
