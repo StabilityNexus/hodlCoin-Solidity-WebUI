@@ -1,0 +1,7 @@
+# robots.txt for hodlCoin-Solidity-WebUI
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://hodlcoin.io/hodlCoin-Solidity-WebUI/sitemap.xml
