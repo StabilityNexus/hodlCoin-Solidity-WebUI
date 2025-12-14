@@ -25,6 +25,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { TokenSchema } from '../hooks/useTokenList'
 import TokenPicker from './TokenPicker'
 import { getChainExplorer, getTransactionUrl } from '@/utils/chains'
+import { normalizeAddress, isValidChainId } from '@/utils/validation'
 
 
 export default function CreateForm() {
@@ -103,7 +104,7 @@ export default function CreateForm() {
 
     if (!coinName) Errors.coinName = 'Name for hodlCoin is required'
     if (!symbol) Errors.symbol = 'Symbol for hodlCoin is required'
-    if (!coin) Errors.coin = 'Underlying asset is required'
+    if (!coin || !normalizeAddress(coin)) Errors.coin = 'Valid ERC20 address is required'
     if (!vaultCreator) Errors.vaultCreator = 'Vault creator address is required'
     if (vaultFee === '') Errors.vaultFee = 'Vault fee is required'
     if (vaultCreatorFee === '')
@@ -111,6 +112,7 @@ export default function CreateForm() {
     if (Number(vaultFee) < 0) Errors.vaultFee = 'Vault fee cannot be negative'
     if (Number(vaultCreatorFee) < 0)
       Errors.vaultCreatorFee = 'Vault creator fee cannot be negative'
+    if (!isValidChainId(config.state.chainId)) Errors.coin = 'Unsupported chain'
 
     setErrors(Errors)
     return Object.keys(Errors).length === 0
@@ -438,6 +440,7 @@ export default function CreateForm() {
                 <Link
                   href={getBlockExplorerUrl(config.state.chainId, hashTx)}
                   target="_blank"
+                  rel="noreferrer"
                 >
                   <Button 
                     variant="outline" 
@@ -447,7 +450,7 @@ export default function CreateForm() {
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href={`/v?chainId=${config.state.chainId}&vault=${vaultAddress}`}>
+                <Link href={`/${normalizeAddress(vaultAddress) ?? vaultAddress}?chainId=${config.state.chainId}`}>
                   <Button className="h-10 px-6 bg-gradient-to-r from-primary to-purple-500 hover:from-primary/90 hover:to-purple-500/90 button-3d">
                     <span className="text-3d">Go to Vault</span>
                     <ArrowRight className="ml-2 h-4 w-4" />

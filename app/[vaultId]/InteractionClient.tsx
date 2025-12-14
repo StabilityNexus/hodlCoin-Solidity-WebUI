@@ -7,11 +7,12 @@ import VaultInformation from '@/components/Vault/VaultInformation'
 import { ERC20Abi } from '@/utils/contracts/ERC20'
 import { vaultsProps } from '@/utils/props'
 import { useEffect, useState } from 'react'
-import { useAccount } from 'wagmi'
+import { useAccount, useChainId } from 'wagmi'
 import { readContract, getPublicClient } from '@wagmi/core'
 import { config } from '@/utils/config'
 import { HodlCoinAbi } from '@/utils/contracts/HodlCoin'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams, useRouter, useParams } from 'next/navigation'
+import { parseVaultPathParam, normalizeAddress, isValidChainId } from '@/utils/validation'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { useMatrixEffect } from '@/components/hooks/useMatrixEffect'
@@ -22,8 +23,10 @@ import { getChainName } from '@/utils/chains'
 
 export default function InteractionClient() {
   const searchParams = useSearchParams()
+  const params = useParams()
   const router = useRouter()
   const account = useAccount()
+  const activeChainId = useChainId()
   const matrixRef = useMatrixEffect(0.15, 2)
 
   const [isLoading, setIsLoading] = useState(true)
@@ -61,16 +64,35 @@ export default function InteractionClient() {
     vaultCreatorFee: 0,
     stableOrderFee: 0,
   })
+  const [lastSyncedAt, setLastSyncedAt] = useState<number | null>(null)
 
   useEffect(() => {
     const vault = searchParams.get('vault')
     const chain = searchParams.get('chainId')
 
     if (vault && chain) {
-      setVaultAddress(vault as `0x${string}`)
-      setChainId(Number(chain))
+      const naddr = normalizeAddress(vault)
+      const cid = Number(chain)
+      if (naddr && isValidChainId(cid)) {
+        setVaultAddress(naddr)
+        setChainId(cid)
+      } else {
+        setError('Invalid vault address or chain ID')
+      }
+      return
     }
-  }, [searchParams])
+    const pv = (params as any)?.vaultId
+    if (typeof pv === 'string' && pv.length > 0) {
+      const { address, chainId: parsedCid } = parseVaultPathParam(pv)
+      const cid = parsedCid ?? activeChainId ?? 0
+      if (address && isValidChainId(cid)) {
+        setVaultAddress(address)
+        setChainId(cid)
+      } else {
+        setError('Invalid vault address or chain ID')
+      }
+    }
+  }, [searchParams, params, activeChainId])
 
 
   const getVaultsData = async (forceRefresh: boolean = false) => {
@@ -191,6 +213,7 @@ export default function InteractionClient() {
       setCoinName(name as string)
       setCoinSymbol(symbol as string)
       setHodlCoinSymbol(hodlSymbol as string)
+      setLastSyncedAt(Date.now())
     } catch (error) {
       console.error('Error fetching vault data:', error)
       setError('Failed to load vault data. Please check the vault address and chain ID.')
@@ -266,7 +289,7 @@ export default function InteractionClient() {
           }),
         ])
 
-      setBalances(prev => ({
+      setBalances((prev: typeof balances) => ({
         ...prev,
         coinReserve: Number(coinReserveOnChain) / 10 ** 18,
         coinBalance: Number(coinBalanceOnChain) / 10 ** 18,
@@ -298,7 +321,7 @@ export default function InteractionClient() {
         }),
       ])
 
-      setBalances(prev => ({
+      setBalances((prev: typeof balances) => ({
         ...prev,
         hodlCoinSupply: Number(hodlCoinSupplyOnChain) / 10 ** 18,
         priceHodl: Number(priceHodlOnChain) / 100000,
@@ -345,6 +368,7 @@ export default function InteractionClient() {
         title: 'Sync Complete',
         description: 'All vault data has been refreshed successfully.',
       })
+      setLastSyncedAt(Date.now())
     } catch (error) {
       console.error('❌ Manual sync failed:', error)
       toast({
@@ -489,6 +513,10 @@ export default function InteractionClient() {
                   {parseFloat(balances.hodlCoinBalance.toFixed(4))}
                 </span>
               </div>
+            </div>
+            
+            <div className="text-xs text-muted-foreground">
+              {lastSyncedAt ? `Last synced ${new Date(lastSyncedAt).toLocaleTimeString()}` : ''}
             </div>
           </div>
         </div>
