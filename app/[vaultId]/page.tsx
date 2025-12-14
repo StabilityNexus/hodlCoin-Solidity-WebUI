@@ -12,6 +12,11 @@ interface VaultPageProps {
   }
 }
 
+/**
+ * Vault detail page.
+ * Performs server-side validation of vault address and chain ID
+ * before rendering the client-side interaction component.
+ */
 export default function VaultPage({ params, searchParams }: VaultPageProps) {
   const vaultId = params.vaultId
   const chainId = Number(searchParams.chainId)
@@ -24,7 +29,7 @@ export default function VaultPage({ params, searchParams }: VaultPageProps) {
 
   return (
     <Suspense>
-      <InteractionClient />
+      <InteractionClient vaultId={vaultId as `0x${string}`} chainId={chainId} />
     </Suspense>
   )
 }
