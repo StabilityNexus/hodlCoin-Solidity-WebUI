@@ -7,6 +7,7 @@ import {
   RainbowKitProvider,
   darkTheme,
   Chain,
+  Locale,
 } from '@rainbow-me/rainbowkit'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { WagmiProvider } from 'wagmi'
@@ -15,6 +16,14 @@ import * as chains from 'wagmi/chains'
 import { citreaTestnet } from '@/components/CitreaTestnet'
 
 const queryClient = new QueryClient()
+
+const customLocale = {
+  connect: {
+    wrongNetwork: {
+      title: 'Switch Network',
+    },
+  },
+} as Locale
 
 export function WalletProvider({ children }: { children: ReactNode }) {
   // const [currentTheme, setCurrentTheme] = useState<string>('light')
@@ -55,6 +64,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
             borderRadius: 'medium',
             overlayBlur: 'small',
           })}
+          locale={customLocale}
         >
           {children}
         </RainbowKitProvider>
