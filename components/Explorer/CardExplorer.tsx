@@ -10,6 +10,7 @@ import { useFavorites } from '@/utils/favorites'
 import { useAccount } from 'wagmi'
 import { toast } from '../ui/use-toast'
 import { getChainName } from '@/utils/chains'
+import { normalizeAddress, isValidChainId } from '@/utils/validation'
 
 // Extended vault props with price and TVL data
 interface ExtendedVaultProps extends vaultsProps {
@@ -46,8 +47,10 @@ export default function CardExplorer({ vault }: { vault: ExtendedVaultProps }) {
   }, [checkFavoriteStatus])
 
   const handleContinue = () => {
-    if (vault.vaultAddress) {
-      router.push(`/v?chainId=${chainId}&vault=${vault.vaultAddress}`)
+    const addr = normalizeAddress(vault.vaultAddress)
+    const valid = isValidChainId(chainId)
+    if (addr && valid) {
+      router.push(`/${addr}?chainId=${chainId}`)
     }
   }
 
@@ -135,8 +138,8 @@ export default function CardExplorer({ vault }: { vault: ExtendedVaultProps }) {
                 <Star className="h-4 w-4" style={{ color: 'hsl(50 100% 45%)', fill: 'hsl(50 100% 45%)' }} />
               ) : (
                 <StarOff className="h-4 w-4 text-muted-foreground" 
-                         onMouseEnter={(e) => e.currentTarget.style.color = 'hsl(50 100% 45%)'}
-                         onMouseLeave={(e) => e.currentTarget.style.color = ''} />
+                         onMouseEnter={(e: any) => e.currentTarget.style.color = 'hsl(50 100% 45%)'}
+                         onMouseLeave={(e: any) => e.currentTarget.style.color = ''} />
               )}
             </Button>
             
@@ -158,15 +161,15 @@ export default function CardExplorer({ vault }: { vault: ExtendedVaultProps }) {
               <TrendingUp className='h-4 w-4 transition-transform duration-300 group-hover:scale-110' 
                          style={{ color: 'hsl(50 100% 45%)' }} />
               <span className='text-sm font-medium text-muted-foreground transition-colors duration-300'
-                    onMouseEnter={(e) => e.currentTarget.style.color = 'hsl(50 100% 45%)'}
-                    onMouseLeave={(e) => e.currentTarget.style.color = ''}>
+                    onMouseEnter={(e: any) => e.currentTarget.style.color = 'hsl(50 100% 45%)'}
+                    onMouseLeave={(e: any) => e.currentTarget.style.color = ''}>
                 Hodl Price
               </span>
             </div>
             <div className='text-right'>
               <span className='font-mono font-bold text-lg text-foreground/90 dark:text-foreground/80 transition-colors duration-300'
-                    onMouseEnter={(e) => e.currentTarget.style.color = 'hsl(50 100% 45%)'}
-                    onMouseLeave={(e) => e.currentTarget.style.color = ''}>
+                    onMouseEnter={(e: any) => e.currentTarget.style.color = 'hsl(50 100% 45%)'}
+                    onMouseLeave={(e: any) => e.currentTarget.style.color = ''}>
                 {vault.priceHodl !== null && vault.priceHodl !== undefined 
                   ? `${(Number(vault.priceHodl) / 100000).toFixed(5)}`
                   : 'N/A'
