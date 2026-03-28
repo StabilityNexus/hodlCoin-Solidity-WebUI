@@ -15,6 +15,7 @@ import { useState } from 'react'
 import { Button } from '../ui/button'
 import { useRouter } from 'next/navigation'
 import { Search, ExternalLink } from 'lucide-react'
+import { normalizeAddress, parseChainIdInput } from '@/utils/validation'
 
 interface PromptDialogBoxProps {
   children: React.ReactNode
@@ -24,10 +25,16 @@ export default function FindVault({ children }: PromptDialogBoxProps) {
   const router = useRouter()
   const [vaultAddress, setVaultAddress] = useState('')
   const [chainId, setChainId] = useState<number>(0)
+  const [addrError, setAddrError] = useState<string | null>(null)
+  const [chainError, setChainError] = useState<string | null>(null)
 
   const handleContinue = () => {
-    if (vaultAddress && chainId) {
-      router.push(`/v?chainId=${chainId}&vault=${vaultAddress}`)
+    const naddr = normalizeAddress(vaultAddress)
+    const validChain = parseChainIdInput(String(chainId))
+    setAddrError(naddr ? null : 'Invalid address')
+    setChainError(validChain !== null ? null : 'Unsupported chain')
+    if (naddr && validChain !== null) {
+      router.push(`/${naddr}?chainId=${validChain}`)
     }
   }
 
@@ -61,10 +68,15 @@ export default function FindVault({ children }: PromptDialogBoxProps) {
               type='number'
               placeholder='e.g., 1 (Ethereum), 534351 (Scroll Sepolia)'
               value={chainId || ''}
-              onChange={e => setChainId(Number(e.target.value))}
+              onChange={e => {
+                const v = parseChainIdInput(e.target.value)
+                setChainId(v ?? 0)
+                setChainError(v !== null ? null : 'Unsupported chain')
+              }}
               className="bg-background/50 backdrop-blur-sm border-primary/30 focus:border-primary/60 
                 transition-all duration-300 hover:border-primary/50 text-foreground placeholder:text-muted-foreground"
             />
+            {chainError && <span className="text-xs text-red-500 font-medium">{chainError}</span>}
           </div>
           
           <div className='grid gap-3'>
@@ -76,10 +88,14 @@ export default function FindVault({ children }: PromptDialogBoxProps) {
               id='vault-address'
               placeholder='0x1234567890abcdef...'
               value={vaultAddress}
-              onChange={e => setVaultAddress(e.target.value)}
+              onChange={e => {
+                setVaultAddress(e.target.value)
+                setAddrError(normalizeAddress(e.target.value) ? null : 'Invalid address')
+              }}
               className="bg-background/50 backdrop-blur-sm border-primary/30 focus:border-primary/60 
                 transition-all duration-300 hover:border-primary/50 text-foreground placeholder:text-muted-foreground font-mono"
             />
+            {addrError && <span className="text-xs text-red-500 font-medium">{addrError}</span>}
           </div>
           
           {vaultAddress && chainId && (
