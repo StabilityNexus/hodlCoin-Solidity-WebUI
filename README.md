@@ -22,21 +22,21 @@ Self-stabilizing staking vaults where the price is mathematically proven to alwa
 - Track your created vaults (`/myVaults`)
 - Save and revisit favorite vaults (`/favorites`)
 - Detailed vault view: balances, fees, price, and manual sync (`/v/[vaultId]`)
-- Wallet connection via RainbowKit/Wagmi with multi-chain support
+- Wallet connection via WalletLink/Wagmi with multi-chain support
 - Fast UI built with Tailwind and shadcn/ui components
 - Local caching using IndexedDB for snappy UX
 
 ## Tech Stack
 - Next.js 14 (App Router) + TypeScript
 - Tailwind CSS + shadcn/ui (Radix primitives)
-- Wagmi + RainbowKit + Reown AppKit
+- Wagmi + WalletLink (EIP-6963, no relay or projectId)
 - Ethers v5 and Viem utilities
 - TanStack Query
 - Lottie animations
 
 ## Architecture
 - Wallet and chain:
-  - Wagmi/RainbowKit configuration reads `NEXT_PUBLIC_PROJECT_ID` in `utils/config.ts:16`.
+  - Wallet connection via WalletLink (`@stability-nexus/walletlink`) configured in `utils/config.ts`; no projectId required.
   - Custom chain definitions under `components/CitreaTestnet.tsx` and `components/EthereumClassic.tsx`.
 - Data access:
   - Vault discovery via on-chain factories (`utils/addresses.ts`, ABIs under `utils/contracts/`).
@@ -73,13 +73,13 @@ components/
 contexts/
   EthersContext.tsx    # Metamask context values
 providers/
-  WalletProvider.tsx   # Wagmi/RainbowKit provider
+  WalletProvider.tsx   # Wagmi provider
   theme-provider.tsx   # Theme support
 utils/
   contracts/           # ABIs for HodlCoin, ERC20, Factory
   addresses.ts         # Chain factory addresses
   chains.ts            # Chain name helpers
-  config.ts            # Wagmi/RainbowKit config
+  config.ts            # Wagmi/WalletLink config
   favorites.ts         # Favorite handling
   indexedDB.ts         # Caching layer
   props.ts             # Shared types
@@ -108,9 +108,8 @@ tsconfig.json          # TS strict mode + path aliases
    npm install
    # or: yarn, pnpm
    ```
-2. Configure environment variables:
+2. Configure environment variables (optional):
    - Copy `.env.example` to `.env`
-   - Set `NEXT_PUBLIC_PROJECT_ID` with your Reown Cloud project ID
    - Optionally set `NEXT_PUBLIC_API_URL` if an API is used
 
 3. Run the dev server:
@@ -120,8 +119,6 @@ tsconfig.json          # TS strict mode + path aliases
    Visit `http://localhost:3000`
 
 ## Environment Variables
-- `NEXT_PUBLIC_PROJECT_ID`: Required for WalletConnect/Reown integration  
-  Used in `utils/config.ts:16`.
 - `NEXT_PUBLIC_API_URL`: Optional backend/API base URL (if applicable)
 
 ## Scripts
@@ -144,9 +141,9 @@ tsconfig.json          # TS strict mode + path aliases
   - IndexedDB manager in `utils/indexedDB.ts` for vault lists/details caching
 
 ## Debugging
-- Wallet/project ID issues
-  - Ensure `NEXT_PUBLIC_PROJECT_ID` is set in `.env` and not empty
-  - Configuration reads this in `utils/config.ts:16`
+- Wallet connection issues
+  - WalletLink uses injected EIP-6963 discovery; ensure a browser wallet extension (MetaMask, Rabby, and so on) is installed and unlocked
+  - Configuration is in `utils/config.ts`
 - Chain/client errors
   - If `getPublicClient` returns null, verify supported chains and wallet network
   - Check `components/ChainDropdown.tsx` and `utils/addresses.ts` for chain mapping
@@ -175,7 +172,7 @@ You can deploy `out/` to any static host (GitHub Pages, Vercel static, Netlify, 
 ## Project Structure
 - `app/`: Routes and pages (App Router)
 - `components/`: UI and feature components (e.g., Vault, Explorer, Home)
-- `providers/`: Wagmi/RainbowKit and theme providers
+- `providers/`: Wagmi and theme providers
 - `utils/`: Chains, addresses, ABIs, config, favorites, caching
 - `public/`: Static assets and animations
 

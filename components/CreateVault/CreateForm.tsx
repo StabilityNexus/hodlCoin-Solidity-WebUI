@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Loader2, ArrowRight } from 'lucide-react'
-import { Player } from '@lottiefiles/react-lottie-player'
+import dynamic from 'next/dynamic'
 import Animation from '@/public/animations/congrats_animation.json'
 import { toast } from '../ui/use-toast'
 import Link from 'next/link'
@@ -25,6 +25,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { TokenSchema } from '../hooks/useTokenList'
 import TokenPicker from './TokenPicker'
 import { getChainExplorer, getTransactionUrl } from '@/utils/chains'
+
+// Lottie's player touches `document` on import, which breaks static-export
+// prerendering. Load it client-side only.
+const Player = dynamic(
+  () => import('@lottiefiles/react-lottie-player').then((m) => m.Player),
+  { ssr: false }
+)
 
 
 export default function CreateForm() {
