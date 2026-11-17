@@ -10,9 +10,8 @@
 
 ## Getting Started
 - Fork the repository and create a feature branch from `main`.
-- Install dependencies and set up environment variables:
-  - Copy `.env.example` to `.env`
-  - Set `NEXT_PUBLIC_PROJECT_ID` from Reown Cloud (used in `utils/config.ts:16`)
+- Install dependencies. Environment variables are optional (only `NEXT_PUBLIC_API_URL` is used):
+  - Copy `.env.example` to `.env` if you need to set it
 - Run the app locally:
   - `npm run dev`
 

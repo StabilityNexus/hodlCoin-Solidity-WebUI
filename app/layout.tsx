@@ -1,4 +1,3 @@
-import '@rainbow-me/rainbowkit/styles.css'
 import './globals.css'
 import type { Metadata, Viewport } from 'next'
 import { Poppins } from 'next/font/google'

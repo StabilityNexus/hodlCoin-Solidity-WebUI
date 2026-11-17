@@ -3,8 +3,15 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '../ui/button'
-import { Player } from '@lottiefiles/react-lottie-player'
+import dynamic from 'next/dynamic'
 import FindVault from '../FindVault/FindVaultForm'
+
+// Lottie's player touches `document` on import, which breaks static-export
+// prerendering. Load it client-side only.
+const Player = dynamic(
+  () => import('@lottiefiles/react-lottie-player').then((m) => m.Player),
+  { ssr: false }
+)
 import { useMatrixEffect } from '../hooks/useMatrixEffect'
 
 export function Hero() {

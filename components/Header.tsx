@@ -8,7 +8,7 @@ import { NavBar } from './NavBar'
 // import MetamaskContext from '@/contexts/EthersContext'
 // import { Button } from './ui/button'
 import { ModeToggle } from './toggle-theme'
-import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { WalletButton } from './wallet-button'
 
 export function Header() {
   // const { signer, account, connectWallet } = React.useContext(
@@ -54,7 +54,7 @@ export function Header() {
 
           <ModeToggle />
 
-          <ConnectButton />
+          <WalletButton />
 
           {/* <Button onClick={connectWallet}>
             {signer
